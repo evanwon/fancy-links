@@ -38,6 +38,8 @@ ls -la src/
 - ✅ Format consolidation (8→6 options for better UX)
 - ✅ Fixed test suite (all tests passing)
 - ✅ Comprehensive documentation updates
+- ✅ Project structure reorganization (test/, tools/ directories)
+- ✅ Priority-based TODO system (P0-P3 nomenclature)
 
 ## Project Overview
 
@@ -192,7 +194,13 @@ This file is temporary and used for handoffs between development sessions.
 
 ### 📋 Current TODO List
 
-#### High Priority
+#### P0 (Critical - Do Next)
+- [ ] **Establish priority nomenclature system**
+  - Define P0 (critical/do next), P1 (high), P2 (medium), P3 (low) priority levels
+  - Re-categorize all existing TODO items using new priority system
+  - Update CLAUDE.md documentation to reflect priority workflow
+
+#### P1 (High Priority)
 - [ ] **Create fancy-links@evanw.com email address**
   - Email address is used as addon ID in manifest.json but doesn't exist
   - Needed for potential Mozilla Add-ons store submission or support requests
@@ -203,12 +211,46 @@ This file is temporary and used for handoffs between development sessions.
   - Add test running to build process
   - Consider proper test framework (Jest, Mocha, etc.)
 
-#### Medium Priority
+- [ ] **Migrate task tracking to GitHub Issues**
+  - Move medium/future priority items from CLAUDE.md to GitHub Issues
+  - Set up issue templates for bugs, features, and enhancements
+  - Establish workflow linking issues to commits and PRs
+  - Keep only high-priority current work items in CLAUDE.md
+
+- [ ] **Enhance format descriptions in popup UI**
+  - Extend "Works with" pattern from Markdown to other formats
+  - Add popular app examples for RTF (Word, Outlook, etc.)
+  - Research and document which apps support each format best
+  - Improve user understanding of when to use each format
+
+#### P2 (Medium Priority)
 - [ ] **Cross-browser compatibility testing**
   - Test extension in Chrome/Edge (Manifest V2 compatibility)
   - Verify clean-url utility works across all browsers
 
-#### Future Enhancements
+- [ ] **Re-evaluate manifest.json location**
+  - Research if manifest should be in src/ directory instead of root
+  - Compare with other browser extension projects on GitHub
+  - Consider impact on build process and web-ext tooling
+
+- [ ] **Review project naming for cross-browser compatibility**
+  - Remove Firefox-specific identifiers from project name and documentation
+  - Plan for future Chrome/Edge support with unified codebase
+  - Consider renaming repository to be browser-agnostic (e.g. fancy-links vs ff-fancy-links)
+
+- [ ] **Customizable format ordering in popup**
+  - Allow users to reorder link formats via drag-and-drop
+  - Persist user's preferred format order in extension storage
+  - Add simple interface in options page for format management
+  - Consider most-used formats floating to top automatically
+
+- [ ] **Mobile Firefox support**
+  - Research mobile Firefox extension capabilities and limitations
+  - Test current extension behavior on mobile Firefox
+  - Adapt UI for touch interfaces and smaller screens
+  - Ensure clipboard operations work on mobile
+
+#### P3 (Future Enhancements)
 - [ ] **Additional format types**
   - Consider adding BBCode format for forums
   - Wiki markup format support

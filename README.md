@@ -17,7 +17,8 @@ A Firefox browser extension that allows you to copy formatted links with titles 
 - **Toolbar Button**: Click to open popup with all format options
 - **Keyboard Shortcut**: `Ctrl+Shift+L` for quick copy with default format
 - **Live Previews**: See exactly how each format will look before copying
-- **Settings Page**: Configure default format and preferences
+- **Settings Page**: Configure default format, notifications, and clean URL feature
+- **Clean URLs**: Optional removal of tracking parameters (UTM, Facebook, etc.)
 
 ## Installation
 
@@ -61,6 +62,7 @@ web-ext build
 1. Right-click the extension icon → "Preferences"
 2. Choose your default format
 3. Configure notification preferences
+4. Enable/disable clean URL feature to remove tracking parameters
 
 ## Project Structure
 ```
