@@ -68,7 +68,7 @@ web-ext lint
 
 ## Session Management
 
-If a `SESSION_SUMMARY.md` file exists, review it for:
+If a `SESSION_SUMMARY.md` file exists in the root directory, or a `.temp/SESSION_SUMMARY.md` file exists, review it for:
 - Current implementation status
 - Recent work completed
 - Outstanding tasks
