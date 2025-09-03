@@ -26,12 +26,10 @@ When implementing this extension, follow the standard Firefox WebExtension struc
 - `notifications` - To show copy confirmation and error messages
 
 ### Format Modules
-Each link format should be implemented as a separate module in `src/formats/` directory:
+Each link format is implemented as a separate module in `src/formats/` directory:
 - `src/formats/slack.js` - Slack format (<URL|Title>)
-- `src/formats/discord.js` - Discord format ([Title](URL))
-- `src/formats/reddit.js` - Reddit format ([Title](URL))
 - `src/formats/html.js` - HTML anchor tag (<a href="URL">Title</a>)
-- `src/formats/markdown.js` - Markdown link format ([Title](URL))
+- `src/formats/markdown.js` - Markdown link format ([Title](URL)) - Used for Discord, Reddit, GitHub, Notion
 - `src/formats/plaintext.js` - Plain text format (Title - URL)
 - `src/formats/rtf.js` - Rich Text Format for Word/Outlook
 - `src/formats/urlparams.js` - URL with title as parameter (URL?_title=Title)
@@ -57,6 +55,29 @@ web-ext build
 # Lint extension
 web-ext lint
 ```
+
+## Git Commit Guidelines
+
+When making commits to this repository, follow these preferences:
+
+### Commit Organization
+- **Prefer cohesive logical commits** over many small commits
+- Commit early and often to make it easy to revert issues
+
+### Commit Message Format
+- Use descriptive commit messages that explain the complete scope of changes
+- Follow the existing project's commit message style (see `git log --oneline` for examples)
+- Include bullet points for multiple changes within the logical grouping
+- For changes that were primarily done via Claude Code, include Claude Code attribution:
+  ```
+  Co-Authored-By: Claude <noreply@anthropic.com>
+  ```
+
+### When to Separate Commits
+- Separate commits when changes are truly independent and could be reverted independently
+- Feature additions vs. bug fixes should typically be separate commits
+- Changes to different major components (UI vs. backend vs. tests) may warrant separate commits if they're independent
+- Keep refactors or style changes separate from functional changes
 
 ## Testing Approach
 
@@ -90,6 +111,12 @@ This file is temporary and used for handoffs between development sessions.
    - Updated both options page and popup UI
    - Reduced format choices from 8 to 6 while maintaining functionality
    - Added "Works with" labels for clarity
+
+3. **Removed Redundant Format Implementations** - Cleaned up duplicate code
+   - Deleted `src/formats/discord.js` and `reddit.js` (identical to markdown.js)
+   - Removed duplicate format definitions from `formats-browser.js` and `popup.js`
+   - Updated test files to remove references to deleted modules
+   - Reduced code duplication and bundle size while maintaining all functionality
 
 ### 📋 Current TODO List
 
