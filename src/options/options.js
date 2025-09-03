@@ -15,16 +15,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 async function loadSettings() {
     try {
+        // Check if browser and storage APIs are available
+        if (typeof browser === 'undefined') {
+            throw new Error('Browser API not available');
+        }
+        
+        if (!browser.storage || !browser.storage.sync) {
+            throw new Error('Storage API not available');
+        }
+        
         // Load settings from browser storage
         const result = await browser.storage.sync.get(DEFAULT_SETTINGS);
         const settings = { ...DEFAULT_SETTINGS, ...result };
+        
+        console.log('Settings loaded successfully:', settings);
         
         // Update UI with loaded settings
         updateUI(settings);
         
     } catch (error) {
         console.error('Error loading settings:', error);
-        showStatus('Error loading settings', 'error');
+        showStatus(`Error loading settings: ${error.message}`, 'error');
         
         // Fall back to defaults
         updateUI(DEFAULT_SETTINGS);
