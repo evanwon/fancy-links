@@ -7,20 +7,6 @@ const formats = {
             return `<${url}|${truncatedTitle}>`;
         }
     },
-    discord: {
-        format: (title, url) => {
-            const sanitizedTitle = title.replace(/[\[\]()\\]/g, ' ').trim();
-            const truncatedTitle = sanitizedTitle.length > 500 ? sanitizedTitle.substring(0, 497) + '...' : sanitizedTitle;
-            return `[${truncatedTitle}](${url})`;
-        }
-    },
-    reddit: {
-        format: (title, url) => {
-            const sanitizedTitle = title.replace(/[\[\]()\\]/g, ' ').trim();
-            const truncatedTitle = sanitizedTitle.length > 500 ? sanitizedTitle.substring(0, 497) + '...' : sanitizedTitle;
-            return `[${truncatedTitle}](${url})`;
-        }
-    },
     markdown: {
         format: (title, url) => {
             const sanitizedTitle = title.replace(/[\[\]()\\]/g, '\\$&');

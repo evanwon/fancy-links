@@ -45,21 +45,6 @@ const formats = {
         }
     },
     
-    discord: {
-        format: (title, url) => {
-            const displayText = title || url;
-            const sanitized = sanitizeForMarkdown(truncateText(displayText));
-            return `[${sanitized}](${url})`;
-        }
-    },
-    
-    reddit: {
-        format: (title, url) => {
-            const displayText = title || url;
-            const sanitized = sanitizeForMarkdown(truncateText(displayText));
-            return `[${sanitized}](${url})`;
-        }
-    },
     
     markdown: {
         format: (title, url) => {

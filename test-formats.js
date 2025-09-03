@@ -6,13 +6,11 @@ const path = require('path');
 
 // Read format modules
 const slackFormat = fs.readFileSync(path.join(__dirname, 'src/formats/slack.js'), 'utf8');
-const discordFormat = fs.readFileSync(path.join(__dirname, 'src/formats/discord.js'), 'utf8');
 const markdownFormat = fs.readFileSync(path.join(__dirname, 'src/formats/markdown.js'), 'utf8');
 const htmlFormat = fs.readFileSync(path.join(__dirname, 'src/formats/html.js'), 'utf8');
 const plaintextFormat = fs.readFileSync(path.join(__dirname, 'src/formats/plaintext.js'), 'utf8');
 const rtfFormat = fs.readFileSync(path.join(__dirname, 'src/formats/rtf.js'), 'utf8');
 const urlparamsFormat = fs.readFileSync(path.join(__dirname, 'src/formats/urlparams.js'), 'utf8');
-const redditFormat = fs.readFileSync(path.join(__dirname, 'src/formats/reddit.js'), 'utf8');
 
 // Read sanitize module
 const sanitizeModule = fs.readFileSync(path.join(__dirname, 'src/utils/sanitize.js'), 'utf8');
@@ -29,13 +27,11 @@ function createModule(code) {
 // Load all format modules
 const formats = {
     slack: createModule(slackFormat),
-    discord: createModule(discordFormat),
     markdown: createModule(markdownFormat),
     html: createModule(htmlFormat),
     plaintext: createModule(plaintextFormat),
     rtf: createModule(rtfFormat),
-    urlparams: createModule(urlparamsFormat),
-    reddit: createModule(redditFormat)
+    urlparams: createModule(urlparamsFormat)
 };
 
 // Test cases
