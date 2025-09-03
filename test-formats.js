@@ -4,34 +4,14 @@
 const fs = require('fs');
 const path = require('path');
 
-// Read format modules
-const slackFormat = fs.readFileSync(path.join(__dirname, 'src/formats/slack.js'), 'utf8');
-const markdownFormat = fs.readFileSync(path.join(__dirname, 'src/formats/markdown.js'), 'utf8');
-const htmlFormat = fs.readFileSync(path.join(__dirname, 'src/formats/html.js'), 'utf8');
-const plaintextFormat = fs.readFileSync(path.join(__dirname, 'src/formats/plaintext.js'), 'utf8');
-const rtfFormat = fs.readFileSync(path.join(__dirname, 'src/formats/rtf.js'), 'utf8');
-const urlparamsFormat = fs.readFileSync(path.join(__dirname, 'src/formats/urlparams.js'), 'utf8');
-
-// Read sanitize module
-const sanitizeModule = fs.readFileSync(path.join(__dirname, 'src/utils/sanitize.js'), 'utf8');
-
-// Create a simple module system for testing
-function createModule(code) {
-    const module = { exports: {} };
-    const exports = module.exports;
-    eval(sanitizeModule); // Load sanitize functions
-    eval(code);
-    return module.exports;
-}
-
-// Load all format modules
+// Import format modules directly using require
 const formats = {
-    slack: createModule(slackFormat),
-    markdown: createModule(markdownFormat),
-    html: createModule(htmlFormat),
-    plaintext: createModule(plaintextFormat),
-    rtf: createModule(rtfFormat),
-    urlparams: createModule(urlparamsFormat)
+    slack: require('./src/formats/slack.js'),
+    markdown: require('./src/formats/markdown.js'),
+    html: require('./src/formats/html.js'),
+    plaintext: require('./src/formats/plaintext.js'),
+    rtf: require('./src/formats/rtf.js'),
+    urlparams: require('./src/formats/urlparams.js')
 };
 
 // Test cases
