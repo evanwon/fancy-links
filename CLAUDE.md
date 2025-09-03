@@ -2,6 +2,42 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Quick Start
+
+**Project Status**: ✅ Production-ready Firefox extension with comprehensive test suite  
+**Current Working Directory**: `C:\Users\evanw\src\ff-fancy-links`
+
+### Immediate Commands
+```bash
+# Test the extension
+web-ext run
+
+# Run automated tests
+node test-clean-url.js
+node test-formats.js
+
+# Check git status
+git status
+
+# View project structure
+ls -la src/
+```
+
+### Key Files to Know
+- `manifest.json` - Extension configuration
+- `src/background/background.js` - Main extension logic
+- `src/popup/popup.js` - Toolbar popup UI
+- `src/options/options.js` - Settings page
+- `src/formats/*.js` - Format modules (6 types)
+- `src/utils/clean-url.js` - URL cleaning utility
+- `test-*.js` - Automated test suites
+
+### Recent Work (2025-09-03)
+- ✅ Clean links feature with URL parameter removal
+- ✅ Format consolidation (8→6 options for better UX)
+- ✅ Fixed test suite (all tests passing)
+- ✅ Comprehensive documentation updates
+
 ## Project Overview
 
 This is a Firefox browser extension called "Fancy Links" that allows users to copy formatted links with titles instead of plain URLs. The extension supports multiple output formats for different platforms (Slack, Discord, HTML, Markdown, etc.).
@@ -56,6 +92,25 @@ web-ext build
 web-ext lint
 ```
 
+## Version Management
+
+The extension follows [semantic versioning (semver)](https://semver.org/) principles:
+- **MAJOR.MINOR.PATCH** format (e.g., 1.2.3)
+- **PATCH**: Bug fixes, minor tweaks, documentation updates
+- **MINOR**: New features, format additions, backward-compatible changes
+- **MAJOR**: Breaking changes, major architecture changes
+
+### Version Update Guidelines
+- Update `manifest.json` version field before significant releases
+- Version is automatically displayed in popup UI
+- Consider version bumps for:
+  - New format types → MINOR
+  - New features (settings, UI improvements) → MINOR  
+  - Bug fixes, test improvements → PATCH
+  - Breaking API changes → MAJOR
+
+**Current version: 1.0.0** (Production-ready with all core features)
+
 ## Git Commit Guidelines
 
 When making commits to this repository, follow these preferences:
@@ -85,7 +140,10 @@ When making commits to this repository, follow these preferences:
 - Test each format type with various URLs and page titles
 - Verify keyboard shortcuts work across different pages
 - Test persistence of user preferences across browser sessions
-- Automated testing with `node test-clean-url.js` for URL cleaning functionality
+- Automated testing:
+  - `node test-clean-url.js` - URL cleaning functionality (13 test cases, 100% pass rate)
+  - `node test-formats.js` - Format module testing (6 formats, comprehensive test cases)
+  - `test.html` - Manual browser testing page with extension functionality checklist
 
 ## Session Management
 
@@ -118,6 +176,11 @@ This file is temporary and used for handoffs between development sessions.
    - Updated test files to remove references to deleted modules
    - Reduced code duplication and bundle size while maintaining all functionality
 
+4. **Fixed Test Suite** - Resolved module import issues
+   - Fixed `test-formats.js` to use proper Node.js require() instead of eval()
+   - All tests now run successfully: URL cleaning (100% pass rate), format testing (all formats working)
+   - Maintained comprehensive test coverage for both URL cleaning and format generation
+
 ### 📋 Current TODO List
 
 #### High Priority
@@ -144,6 +207,9 @@ This file is temporary and used for handoffs between development sessions.
   - Allow users to backup/restore their preferences
 
 ### 🧪 Testing Notes
-- URL cleaning tested with 10+ common tracking scenarios
+- URL cleaning tested with 13 test cases covering UTM, Facebook, Amazon, YouTube tracking
+- Format testing covers 6 consolidated formats with 3 comprehensive test scenarios
 - Format consolidation maintains backward compatibility
 - All individual format modules preserved for API stability
+- Test suite runs successfully with `node test-clean-url.js` and `node test-formats.js`
+- Manual testing available via `test.html` page

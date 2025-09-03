@@ -49,10 +49,36 @@ const formats = {
 // Current tab info
 let currentTab = null;
 
+// Load version from manifest
+function loadVersion() {
+    try {
+        const manifest = browser.runtime.getManifest();
+        const versionElement = document.getElementById('version');
+        
+        if (versionElement) {
+            if (manifest && manifest.version) {
+                versionElement.textContent = `v${manifest.version}`;
+                versionElement.style.display = 'inline';
+            } else {
+                // Hide the version element if version can't be retrieved
+                versionElement.style.display = 'none';
+            }
+        }
+    } catch (error) {
+        console.warn('Could not load version from manifest:', error);
+        // Hide version element on error
+        const versionElement = document.getElementById('version');
+        if (versionElement) {
+            versionElement.style.display = 'none';
+        }
+    }
+}
+
 // Initialize popup
 document.addEventListener('DOMContentLoaded', async () => {
     await loadCurrentTab();
     await updatePreviews();
+    loadVersion();
     setupEventListeners();
 });
 
