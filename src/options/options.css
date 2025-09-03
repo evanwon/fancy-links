@@ -113,6 +113,13 @@ body {
     padding: 4px 8px;
     border-radius: 4px;
     display: inline-block;
+    margin-bottom: 4px;
+}
+
+.format-apps {
+    font-size: 11px;
+    color: #888;
+    font-style: italic;
 }
 
 .checkbox-option {

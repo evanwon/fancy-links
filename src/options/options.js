@@ -3,6 +3,7 @@ const DEFAULT_SETTINGS = {
     defaultFormat: 'markdown',
     showNotifications: true,
     showBadge: true,
+    cleanUrls: false,
     debugMode: false
 };
 
@@ -40,6 +41,7 @@ function updateUI(settings) {
     // Set checkboxes
     document.getElementById('showNotifications').checked = settings.showNotifications;
     document.getElementById('showBadge').checked = settings.showBadge;
+    document.getElementById('cleanUrls').checked = settings.cleanUrls;
     document.getElementById('debugMode').checked = settings.debugMode;
 }
 
@@ -65,6 +67,7 @@ async function saveSettings() {
             defaultFormat: document.querySelector('input[name="defaultFormat"]:checked')?.value || DEFAULT_SETTINGS.defaultFormat,
             showNotifications: document.getElementById('showNotifications').checked,
             showBadge: document.getElementById('showBadge').checked,
+            cleanUrls: document.getElementById('cleanUrls').checked,
             debugMode: document.getElementById('debugMode').checked
         };
         

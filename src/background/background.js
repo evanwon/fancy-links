@@ -24,6 +24,22 @@ async function getCurrentFormat() {
 }
 
 /**
+ * Get all settings from storage
+ */
+async function getSettings() {
+  try {
+    const result = await browser.storage.sync.get({
+      defaultFormat: DEFAULT_FORMAT,
+      cleanUrls: false
+    });
+    return result;
+  } catch (error) {
+    console.error('Error getting settings:', error);
+    return { defaultFormat: DEFAULT_FORMAT, cleanUrls: false };
+  }
+}
+
+/**
  * Copy the current tab's link in the specified format
  */
 async function copyFancyLink(formatType = null) {
@@ -36,15 +52,21 @@ async function copyFancyLink(formatType = null) {
     
     const tab = tabs[0];
     const title = tab.title || '';
-    const url = tab.url || '';
+    let url = tab.url || '';
     
     // Check if we have a valid URL
     if (!url || url.startsWith('about:') || url.startsWith('chrome:')) {
       throw new Error('Cannot copy this type of URL');
     }
     
-    // Get format to use
-    const format = formatType || await getCurrentFormat();
+    // Get settings
+    const settings = await getSettings();
+    const format = formatType || settings.defaultFormat;
+    
+    // Clean URL if enabled
+    if (settings.cleanUrls && window.FancyLinkCleanUrl) {
+      url = window.FancyLinkCleanUrl.cleanUrl(url);
+    }
     
     // Get the formatter function
     const formatter = window.FancyLinkFormats[format];

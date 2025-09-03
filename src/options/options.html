@@ -28,26 +28,11 @@
                     </label>
                     
                     <label class="format-option">
-                        <input type="radio" name="defaultFormat" value="discord">
-                        <div class="format-info">
-                            <span class="format-name">Discord</span>
-                            <span class="format-example">[Page Title](https://example.com)</span>
-                        </div>
-                    </label>
-                    
-                    <label class="format-option">
-                        <input type="radio" name="defaultFormat" value="reddit">
-                        <div class="format-info">
-                            <span class="format-name">Reddit</span>
-                            <span class="format-example">[Page Title](https://example.com)</span>
-                        </div>
-                    </label>
-                    
-                    <label class="format-option">
                         <input type="radio" name="defaultFormat" value="markdown">
                         <div class="format-info">
-                            <span class="format-name">Markdown</span>
+                            <span class="format-name">Markdown Links</span>
                             <span class="format-example">[Page Title](https://example.com)</span>
+                            <span class="format-apps">Works with: Discord, Reddit, GitHub, Notion</span>
                         </div>
                     </label>
                     
@@ -111,6 +96,15 @@
             <section class="settings-section">
                 <h2>Advanced</h2>
                 <p class="section-description">Additional options</p>
+                
+                <label class="checkbox-option">
+                    <input type="checkbox" id="cleanUrls">
+                    <span class="checkmark"></span>
+                    <div class="option-info">
+                        <span class="option-name">Remove tracking parameters</span>
+                        <span class="option-description">Clean URLs by removing tracking parameters (utm_*, fbclid, etc.)</span>
+                    </div>
+                </label>
                 
                 <label class="checkbox-option">
                     <input type="checkbox" id="debugMode">

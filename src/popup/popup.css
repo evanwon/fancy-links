@@ -99,6 +99,13 @@ body {
 .format-name {
     font-weight: 500;
     color: #333;
+    margin-bottom: 2px;
+}
+
+.format-apps {
+    font-size: 10px;
+    color: #888;
+    font-style: italic;
     margin-bottom: 4px;
 }
 

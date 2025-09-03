@@ -64,6 +64,7 @@ web-ext lint
 - Test each format type with various URLs and page titles
 - Verify keyboard shortcuts work across different pages
 - Test persistence of user preferences across browser sessions
+- Automated testing with `node test-clean-url.js` for URL cleaning functionality
 
 ## Session Management
 
@@ -74,3 +75,48 @@ If a `SESSION_SUMMARY.md` file exists, review it for:
 - Known issues or decisions made
 
 This file is temporary and used for handoffs between development sessions.
+
+## Recent Changes (2025-09-03)
+
+### ✅ Completed Features
+1. **Clean Links Setting** - Added option to remove tracking parameters from URLs
+   - New utility: `src/utils/clean-url.js` with cross-browser URL cleaning
+   - Setting added to Advanced options (disabled by default)
+   - Integrated into background script for all format types
+   - Comprehensive test suite: `test-clean-url.js`
+
+2. **Consolidated Format Options** - Grouped similar formats for better UX
+   - Combined Discord, Reddit, GitHub, Notion under "Markdown Links"
+   - Updated both options page and popup UI
+   - Reduced format choices from 8 to 6 while maintaining functionality
+   - Added "Works with" labels for clarity
+
+### 📋 Current TODO List
+
+#### High Priority
+- [ ] **Set up automated test runner for CI/CD pipeline** 
+  - Integrate test suite into GitHub Actions or similar
+  - Add test running to build process
+  - Consider proper test framework (Jest, Mocha, etc.)
+
+#### Medium Priority
+- [ ] **Cross-browser compatibility testing**
+  - Test extension in Chrome/Edge (Manifest V2 compatibility)
+  - Verify clean-url utility works across all browsers
+
+#### Future Enhancements
+- [ ] **Additional format types**
+  - Consider adding BBCode format for forums
+  - Wiki markup format support
+  
+- [ ] **Advanced URL cleaning**
+  - Add whitelist/blacklist for specific domains
+  - Custom tracking parameter configuration
+  
+- [ ] **Export/Import settings**
+  - Allow users to backup/restore their preferences
+
+### 🧪 Testing Notes
+- URL cleaning tested with 10+ common tracking scenarios
+- Format consolidation maintains backward compatibility
+- All individual format modules preserved for API stability
