@@ -1,10 +1,10 @@
 /**
  * Tests for URL cleaning functionality
- * Run with: node test-clean-url.js
+ * Run with: node test/test-clean-url.js
  */
 
 // Import the clean-url module
-const { cleanUrl, hasTrackingParams, TRACKING_PARAMS } = require('./src/utils/clean-url.js');
+const { cleanUrl, hasTrackingParams, TRACKING_PARAMS } = require('../src/utils/clean-url.js');
 
 // Test cases
 const testCases = [

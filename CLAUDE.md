@@ -13,8 +13,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 web-ext run
 
 # Run automated tests
-node test-clean-url.js
-node test-formats.js
+node test/test-clean-url.js
+node test/test-formats.js
 
 # Check git status
 git status
@@ -30,7 +30,8 @@ ls -la src/
 - `src/options/options.js` - Settings page
 - `src/formats/*.js` - Format modules (6 types)
 - `src/utils/clean-url.js` - URL cleaning utility
-- `test-*.js` - Automated test suites
+- `test/` - Automated test suites and manual testing
+- `tools/` - Development utilities (icon generation)
 
 ### Recent Work (2025-09-03)
 - ✅ Clean links feature with URL parameter removal
@@ -52,6 +53,8 @@ When implementing this extension, follow the standard Firefox WebExtension struc
 - `src/utils/` - Shared utilities (browser API wrapper, clipboard, sanitization)
 - `src/formats/` - Format modules for different platforms
 - `icons/` - Extension icons in multiple sizes (16px, 32px, 48px, 128px)
+- `test/` - Automated test suites and manual testing files
+- `tools/` - Development utilities (icon generation, etc.)
 
 ## Key Implementation Notes
 
@@ -141,9 +144,9 @@ When making commits to this repository, follow these preferences:
 - Verify keyboard shortcuts work across different pages
 - Test persistence of user preferences across browser sessions
 - Automated testing:
-  - `node test-clean-url.js` - URL cleaning functionality (13 test cases, 100% pass rate)
-  - `node test-formats.js` - Format module testing (6 formats, comprehensive test cases)
-  - `test.html` - Manual browser testing page with extension functionality checklist
+  - `node test/test-clean-url.js` - URL cleaning functionality (13 test cases, 100% pass rate)
+  - `node test/test-formats.js` - Format module testing (6 formats, comprehensive test cases)
+  - `test/manual.html` - Manual browser testing page with extension functionality checklist
 
 ## Session Management
 
@@ -162,7 +165,7 @@ This file is temporary and used for handoffs between development sessions.
    - New utility: `src/utils/clean-url.js` with cross-browser URL cleaning
    - Setting added to Advanced options (disabled by default)
    - Integrated into background script for all format types
-   - Comprehensive test suite: `test-clean-url.js`
+   - Comprehensive test suite: `test/test-clean-url.js`
 
 2. **Consolidated Format Options** - Grouped similar formats for better UX
    - Combined Discord, Reddit, GitHub, Notion under "Markdown Links"
@@ -177,9 +180,15 @@ This file is temporary and used for handoffs between development sessions.
    - Reduced code duplication and bundle size while maintaining all functionality
 
 4. **Fixed Test Suite** - Resolved module import issues
-   - Fixed `test-formats.js` to use proper Node.js require() instead of eval()
+   - Fixed `test/test-formats.js` to use proper Node.js require() instead of eval()
    - All tests now run successfully: URL cleaning (100% pass rate), format testing (all formats working)
    - Maintained comprehensive test coverage for both URL cleaning and format generation
+
+5. **Project Structure Reorganization** - Organized auxiliary files
+   - Created `test/` directory for all testing files (automated tests, manual testing)
+   - Created `tools/` directory for development utilities (icon generation)
+   - Renamed `test.html` to `test/manual.html` for clarity
+   - Clean root directory with only essential project files
 
 ### 📋 Current TODO List
 
@@ -216,5 +225,6 @@ This file is temporary and used for handoffs between development sessions.
 - Format testing covers 6 consolidated formats with 3 comprehensive test scenarios
 - Format consolidation maintains backward compatibility
 - All individual format modules preserved for API stability
-- Test suite runs successfully with `node test-clean-url.js` and `node test-formats.js`
-- Manual testing available via `test.html` page
+- Test suite runs successfully with `node test/test-clean-url.js` and `node test/test-formats.js`
+- Manual testing available via `test/manual.html` page
+- Icon generation utility available at `tools/generate-icons.html`

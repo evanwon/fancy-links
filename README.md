@@ -54,7 +54,7 @@ web-ext build
 
 ### Format Selection (Popup)
 1. Click the Fancy Links icon in the toolbar
-2. Choose from 8 different formats
+2. Choose from 6 different format categories
 3. Click any format button to copy instantly
 
 ### Settings
@@ -73,22 +73,28 @@ firefox-fancy-links/
 │   ├── formats/           # Individual format modules
 │   └── utils/             # Shared utilities
 ├── icons/                 # Extension icons (SVG)
-├── test.html             # Manual testing page
-├── test-formats.js       # Format testing script
-└── generate-icons.html   # Icon generation tool
+├── test/
+│   ├── manual.html        # Manual testing page
+│   ├── test-formats.js    # Format testing script
+│   └── test-clean-url.js  # URL cleaning tests
+└── tools/
+    └── generate-icons.html # Icon generation utility
 ```
 
 ## Testing
 
 ### Manual Testing
 1. Run `web-ext run` to start development Firefox
-2. Open `test.html` for comprehensive testing scenarios
+2. Open `test/manual.html` for comprehensive testing scenarios
 3. Test all format buttons and keyboard shortcut
 
-### Format Testing
+### Automated Testing
 ```bash
 # Test all formats with sample data
-node test-formats.js
+node test/test-formats.js
+
+# Test URL cleaning functionality
+node test/test-clean-url.js
 ```
 
 ## Contributing

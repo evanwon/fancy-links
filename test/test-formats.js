@@ -1,17 +1,17 @@
 // Manual test script for format functions
-// Run with: node test-formats.js
+// Run with: node test/test-formats.js
 
 const fs = require('fs');
 const path = require('path');
 
 // Import format modules directly using require
 const formats = {
-    slack: require('./src/formats/slack.js'),
-    markdown: require('./src/formats/markdown.js'),
-    html: require('./src/formats/html.js'),
-    plaintext: require('./src/formats/plaintext.js'),
-    rtf: require('./src/formats/rtf.js'),
-    urlparams: require('./src/formats/urlparams.js')
+    slack: require('../src/formats/slack.js'),
+    markdown: require('../src/formats/markdown.js'),
+    html: require('../src/formats/html.js'),
+    plaintext: require('../src/formats/plaintext.js'),
+    rtf: require('../src/formats/rtf.js'),
+    urlparams: require('../src/formats/urlparams.js')
 };
 
 // Test cases
