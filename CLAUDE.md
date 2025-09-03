@@ -184,6 +184,11 @@ This file is temporary and used for handoffs between development sessions.
 ### 📋 Current TODO List
 
 #### High Priority
+- [ ] **Create fancy-links@evanw.com email address**
+  - Email address is used as addon ID in manifest.json but doesn't exist
+  - Needed for potential Mozilla Add-ons store submission or support requests
+  - Could be an alias or forwarding address
+
 - [ ] **Set up automated test runner for CI/CD pipeline** 
   - Integrate test suite into GitHub Actions or similar
   - Add test running to build process
