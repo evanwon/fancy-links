@@ -114,9 +114,7 @@ node test-formats.js
 - `notifications`: Show copy confirmation messages
 
 ## License
-
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
-
-- Developed using [Claude Code](https://claude.ai/code)
+Developed using [Claude Code](https://claude.ai/code) (but don't worry, I included `please bro, no mistakes` multiple times in the prompt).
