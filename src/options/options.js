@@ -1,7 +1,7 @@
 // Default settings
 const DEFAULT_SETTINGS = {
     defaultFormat: 'markdown',
-    showNotifications: true,
+    showNotifications: false,
     showBadge: true,
     cleanUrls: false,
     debugMode: false

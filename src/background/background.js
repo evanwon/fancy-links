@@ -30,12 +30,14 @@ async function getSettings() {
   try {
     const result = await browser.storage.sync.get({
       defaultFormat: DEFAULT_FORMAT,
-      cleanUrls: false
+      cleanUrls: false,
+      showNotifications: false,
+      showBadge: true
     });
     return result;
   } catch (error) {
     console.error('Error getting settings:', error);
-    return { defaultFormat: DEFAULT_FORMAT, cleanUrls: false };
+    return { defaultFormat: DEFAULT_FORMAT, cleanUrls: false, showNotifications: false, showBadge: true };
   }
 }
 
@@ -126,13 +128,15 @@ async function copyFancyLink(formatType = null) {
     });
     
     // Show success notification
-    await showNotification('success', `Copied ${format} link!`, title);
+    await showNotification('success', `Copied ${format} link!`, title, settings);
     
     return { success: true };
     
   } catch (error) {
     console.error('Error copying fancy link:', error);
-    await showNotification('error', 'Failed to copy link', error.message);
+    // Load settings for notification, or use defaults if not available
+    const notificationSettings = settings || await getSettings();
+    await showNotification('error', 'Failed to copy link', error.message, notificationSettings);
     return { success: false, error: error.message };
   }
 }
@@ -140,27 +144,31 @@ async function copyFancyLink(formatType = null) {
 /**
  * Show a notification to the user
  */
-async function showNotification(type, title, message) {
+async function showNotification(type, title, message, settings = {}) {
   try {
-    // Update badge
-    const badgeColor = type === 'success' ? '#4CAF50' : '#F44336';
-    const badgeText = type === 'success' ? '✓' : '!';
+    // Show badge if enabled (default true)
+    if (settings.showBadge !== false) {
+      const badgeColor = type === 'success' ? '#4CAF50' : '#F44336';
+      const badgeText = type === 'success' ? '✓' : '!';
+      
+      await browser.browserAction.setBadgeText({ text: badgeText });
+      await browser.browserAction.setBadgeBackgroundColor({ color: badgeColor });
+      
+      // Clear badge after timeout
+      setTimeout(() => {
+        browser.browserAction.setBadgeText({ text: '' });
+      }, NOTIFICATION_TIMEOUT);
+    }
     
-    await browser.browserAction.setBadgeText({ text: badgeText });
-    await browser.browserAction.setBadgeBackgroundColor({ color: badgeColor });
-    
-    // Clear badge after timeout
-    setTimeout(() => {
-      browser.browserAction.setBadgeText({ text: '' });
-    }, NOTIFICATION_TIMEOUT);
-    
-    // Create browser notification
-    await browser.notifications.create({
-      type: 'basic',
-      iconUrl: browser.runtime.getURL('icons/icon-48.png'),
-      title: title,
-      message: message
-    });
+    // Show system notification only if enabled (default false)
+    if (settings.showNotifications === true) {
+      await browser.notifications.create({
+        type: 'basic',
+        iconUrl: browser.runtime.getURL('icons/icon-48.png'),
+        title: title,
+        message: message
+      });
+    }
     
   } catch (error) {
     console.error('Error showing notification:', error);
