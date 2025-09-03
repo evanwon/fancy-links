@@ -193,6 +193,19 @@ browser.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     const format = await getCurrentFormat();
     return { format };
   }
+  
+  if (request.action === 'cleanUrl') {
+    try {
+      if (window.FancyLinkCleanUrl && request.url) {
+        const cleanedUrl = window.FancyLinkCleanUrl.cleanUrl(request.url);
+        return { cleanedUrl };
+      }
+      return { cleanedUrl: request.url };
+    } catch (error) {
+      console.error('Error cleaning URL:', error);
+      return { cleanedUrl: request.url };
+    }
+  }
 });
 
 /**

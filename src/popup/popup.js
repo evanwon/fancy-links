@@ -109,7 +109,35 @@ async function updatePreviews() {
     if (!currentTab) return;
     
     const title = currentTab.title || 'Untitled Page';
-    const url = currentTab.url || '';
+    let url = currentTab.url || '';
+    
+    // Get settings to check if URL cleaning is enabled
+    try {
+        const settings = await browser.storage.sync.get({
+            defaultFormat: 'markdown',
+            cleanUrls: false
+        });
+        
+        // Clean URL for preview if setting is enabled
+        if (settings.cleanUrls) {
+            // Send message to background script to clean the URL
+            try {
+                const cleanResult = await browser.runtime.sendMessage({
+                    action: 'cleanUrl',
+                    url: url
+                });
+                if (cleanResult && cleanResult.cleanedUrl) {
+                    url = cleanResult.cleanedUrl;
+                }
+            } catch (error) {
+                console.warn('Could not clean URL for preview:', error);
+                // Continue with original URL if cleaning fails
+            }
+        }
+    } catch (error) {
+        console.warn('Could not get settings for preview:', error);
+        // Continue with defaults if settings can't be loaded
+    }
     
     // Update each format preview
     Object.keys(formats).forEach(formatKey => {
@@ -149,48 +177,17 @@ async function copyWithFormat(formatKey) {
     }
     
     try {
-        const title = currentTab.title || 'Untitled Page';
-        const url = currentTab.url || '';
-        const formatted = formats[formatKey].format(title, url);
-        
-        // Copy to clipboard using content script injection
-        await browser.tabs.executeScript(currentTab.id, {
-            code: `
-                navigator.clipboard.writeText(${JSON.stringify(formatted)})
-                .then(() => {
-                    // Send success message back
-                    browser.runtime.sendMessage({
-                        type: 'copySuccess',
-                        format: '${formatKey}'
-                    });
-                })
-                .catch(error => {
-                    // Send error message back
-                    browser.runtime.sendMessage({
-                        type: 'copyError',
-                        error: error.message
-                    });
-                });
-            `
+        // Use the background script's copyLink function which handles settings like cleanUrls
+        const result = await browser.runtime.sendMessage({
+            action: 'copyLink',
+            format: formatKey
         });
         
-        // Listen for response from content script
-        const handleMessage = (message) => {
-            if (message.type === 'copySuccess') {
-                showNotification(`Copied as ${formatKey}!`, 'success');
-                browser.runtime.onMessage.removeListener(handleMessage);
-            } else if (message.type === 'copyError') {
-                showNotification(`Copy failed: ${message.error}`, 'error');
-                browser.runtime.onMessage.removeListener(handleMessage);
-            }
-        };
-        
-        browser.runtime.onMessage.addListener(handleMessage);
-        
-        // Fallback timeout
-        setTimeout(() => {
-            browser.runtime.onMessage.removeListener(handleMessage);
-        }, 3000);
+        if (result && result.success) {
+            showNotification(`Copied as ${formatKey}!`, 'success');
+        } else {
+            showNotification(`Copy failed: ${result ? result.error : 'Unknown error'}`, 'error');
+        }
         
     } catch (error) {
         console.error('Copy error:', error);
