@@ -1,0 +1,275 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+    background: #f5f5f5;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    min-height: 100vh;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    padding: 32px 32px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.header h1 {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.header p {
+    opacity: 0.9;
+    font-size: 16px;
+}
+
+.main-content {
+    flex: 1;
+    padding: 32px;
+}
+
+.settings-section {
+    margin-bottom: 48px;
+}
+
+.settings-section:last-child {
+    margin-bottom: 0;
+}
+
+.settings-section h2 {
+    font-size: 20px;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.section-description {
+    color: #666;
+    margin-bottom: 24px;
+}
+
+.format-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.format-option {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.format-option:hover {
+    border-color: #667eea;
+    background: #f8f9ff;
+}
+
+.format-option input[type="radio"] {
+    margin-right: 16px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.format-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.format-name {
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: #333;
+}
+
+.format-example {
+    font-size: 12px;
+    color: #666;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    background: #f5f5f5;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.checkbox-option {
+    display: flex;
+    align-items: center;
+    padding: 16px 0;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.checkbox-option:last-child {
+    border-bottom: none;
+}
+
+.checkbox-option input[type="checkbox"] {
+    display: none;
+}
+
+.checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    margin-right: 16px;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.checkbox-option input[type="checkbox"]:checked + .checkmark {
+    background: #667eea;
+    border-color: #667eea;
+}
+
+.checkbox-option input[type="checkbox"]:checked + .checkmark::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.option-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.option-name {
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: #333;
+}
+
+.option-description {
+    font-size: 13px;
+    color: #666;
+}
+
+.footer {
+    padding: 24px 32px;
+    background: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-message {
+    font-size: 14px;
+    color: #666;
+}
+
+.status-message.success {
+    color: #4caf50;
+}
+
+.status-message.error {
+    color: #f44336;
+}
+
+.footer-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.button-primary {
+    background: #667eea;
+    color: white;
+}
+
+.button-primary:hover {
+    background: #5a6fd8;
+}
+
+.button-primary:active {
+    transform: translateY(1px);
+}
+
+.button-secondary {
+    background: white;
+    color: #666;
+    border: 1px solid #ddd;
+}
+
+.button-secondary:hover {
+    border-color: #bbb;
+    color: #333;
+}
+
+.button-secondary:active {
+    transform: translateY(1px);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .container {
+        margin: 0;
+        min-height: 100vh;
+    }
+    
+    .header,
+    .main-content,
+    .footer {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    
+    .format-option {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .format-option input[type="radio"] {
+        margin-bottom: 8px;
+        margin-right: 0;
+    }
+    
+    .footer {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+    }
+    
+    .footer-buttons {
+        justify-content: center;
+    }
+}

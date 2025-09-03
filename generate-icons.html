@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fancy Links Icon Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .icon-preview {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        .icon-item {
+            text-align: center;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+        .icon-item canvas {
+            display: block;
+            margin: 10px auto;
+            border: 1px solid #ccc;
+        }
+        .icon-item label {
+            font-weight: bold;
+            color: #495057;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .controls {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .instructions {
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #17a2b8;
+            margin: 20px 0;
+        }
+        .color-controls {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .color-control {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        input[type="color"] {
+            width: 50px;
+            height: 30px;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 Fancy Links Extension Icons</h1>
+        
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <ol>
+                <li>Adjust the colors if desired using the color controls below</li>
+                <li>Click "Generate Icons" to create all sizes</li>
+                <li>Click "Download All Icons" to save them to your computer</li>
+                <li>Move the downloaded PNG files to the <code>icons/</code> folder in your extension</li>
+            </ol>
+        </div>
+
+        <div class="color-controls">
+            <div class="color-control">
+                <label>Background Color:</label>
+                <input type="color" id="bgColor" value="#4f46e5">
+            </div>
+            <div class="color-control">
+                <label>Link Color:</label>
+                <input type="color" id="linkColor" value="#ffffff">
+            </div>
+            <div class="color-control">
+                <label>Accent Color:</label>
+                <input type="color" id="accentColor" value="#fbbf24">
+            </div>
+        </div>
+
+        <div class="controls">
+            <button onclick="generateIcons()">🎨 Generate Icons</button>
+            <button onclick="downloadAllIcons()" id="downloadBtn" style="display:none;">⬇️ Download All Icons</button>
+        </div>
+
+        <div class="icon-preview" id="iconPreview"></div>
+    </div>
+
+    <script>
+        const sizes = [16, 32, 48, 128];
+        let canvasElements = {};
+
+        function drawLinkIcon(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            const bgColor = document.getElementById('bgColor').value;
+            const linkColor = document.getElementById('linkColor').value;
+            const accentColor = document.getElementById('accentColor').value;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, size, size);
+
+            // Background with subtle gradient
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, bgColor);
+            gradient.addColorStop(1, adjustBrightness(bgColor, -20));
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+
+            // Scale factors for different icon sizes
+            const scale = size / 128;
+            const strokeWidth = Math.max(1, 8 * scale);
+            
+            ctx.strokeStyle = linkColor;
+            ctx.fillStyle = linkColor;
+            ctx.lineWidth = strokeWidth;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            // Draw chain link icon - two interlocked ovals
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const linkWidth = 20 * scale;
+            const linkHeight = 35 * scale;
+            const offset = 12 * scale;
+
+            // Left link
+            ctx.save();
+            ctx.translate(centerX - offset, centerY);
+            ctx.rotate(-Math.PI / 6);
+            drawOval(ctx, 0, 0, linkWidth, linkHeight, strokeWidth);
+            ctx.restore();
+
+            // Right link
+            ctx.save();
+            ctx.translate(centerX + offset, centerY);
+            ctx.rotate(Math.PI / 6);
+            drawOval(ctx, 0, 0, linkWidth, linkHeight, strokeWidth);
+            ctx.restore();
+
+            // Add small accent dot to indicate "fancy" formatting
+            if (size >= 32) {
+                ctx.fillStyle = accentColor;
+                ctx.beginPath();
+                ctx.arc(size - (8 * scale), 8 * scale, 3 * scale, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function drawOval(ctx, x, y, width, height, strokeWidth) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(width / height, 1);
+            ctx.beginPath();
+            ctx.arc(0, 0, height / 2, 0, Math.PI * 2);
+            ctx.restore();
+            ctx.stroke();
+        }
+
+        function adjustBrightness(hex, percent) {
+            // Convert hex to RGB
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+
+            // Adjust brightness
+            const newR = Math.max(0, Math.min(255, r + percent));
+            const newG = Math.max(0, Math.min(255, g + percent));
+            const newB = Math.max(0, Math.min(255, b + percent));
+
+            // Convert back to hex
+            return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+        }
+
+        function generateIcons() {
+            const previewDiv = document.getElementById('iconPreview');
+            previewDiv.innerHTML = '';
+
+            sizes.forEach(size => {
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                canvasElements[size] = canvas;
+
+                drawLinkIcon(canvas, size);
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'icon-item';
+                itemDiv.innerHTML = `<label>icon-${size}.png</label>`;
+                itemDiv.appendChild(canvas);
+                previewDiv.appendChild(itemDiv);
+            });
+
+            document.getElementById('downloadBtn').style.display = 'inline-block';
+        }
+
+        function downloadAllIcons() {
+            sizes.forEach(size => {
+                const canvas = canvasElements[size];
+                const link = document.createElement('a');
+                link.download = `icon-${size}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+            
+            alert('All icons downloaded! Move them to the icons/ folder in your extension.');
+        }
+
+        // Color change listeners
+        ['bgColor', 'linkColor', 'accentColor'].forEach(id => {
+            document.getElementById(id).addEventListener('change', () => {
+                if (Object.keys(canvasElements).length > 0) {
+                    generateIcons(); // Regenerate with new colors
+                }
+            });
+        });
+
+        // Generate initial icons
+        generateIcons();
+    </script>
+</body>
+</html>

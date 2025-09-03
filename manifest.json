@@ -1,0 +1,50 @@
+{
+  "manifest_version": 2,
+  "name": "Fancy Links",
+  "version": "1.0.0",
+  "description": "Copy friendly links with titles instead of plain URLs",
+  
+  "permissions": [
+    "clipboardWrite",
+    "activeTab",
+    "storage",
+    "notifications"
+  ],
+  
+  "background": {
+    "scripts": ["src/utils/formats-browser.js", "src/background/background.js"],
+    "persistent": false
+  },
+  
+  "browser_action": {
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.svg",
+      "32": "icons/icon-32.svg",
+      "48": "icons/icon-48.svg",
+      "128": "icons/icon-128.svg"
+    },
+    "default_title": "Copy Fancy Link"
+  },
+  
+  "commands": {
+    "copy-fancy-link": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+L"
+      },
+      "description": "Copy the current page as a fancy link"
+    }
+  },
+  
+  "options_ui": {
+    "page": "src/options/options.html",
+    "open_in_tab": true
+  },
+  
+  "icons": {
+    "16": "icons/icon-16.svg",
+    "32": "icons/icon-32.svg",
+    "48": "icons/icon-48.svg",
+    "128": "icons/icon-128.svg"
+  }
+}

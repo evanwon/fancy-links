@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fancy Links</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Fancy Links</h1>
+            <div class="current-page">
+                <div class="page-title" id="pageTitle">Loading...</div>
+                <div class="page-url" id="pageUrl">Loading...</div>
+            </div>
+        </div>
+        
+        <div class="formats-section">
+            <h2>Copy As:</h2>
+            <div class="format-buttons">
+                <button class="format-btn" data-format="slack">
+                    <span class="format-name">Slack</span>
+                    <span class="format-preview" id="preview-slack">Loading...</span>
+                </button>
+                
+                <button class="format-btn" data-format="discord">
+                    <span class="format-name">Discord</span>
+                    <span class="format-preview" id="preview-discord">Loading...</span>
+                </button>
+                
+                <button class="format-btn" data-format="reddit">
+                    <span class="format-name">Reddit</span>
+                    <span class="format-preview" id="preview-reddit">Loading...</span>
+                </button>
+                
+                <button class="format-btn" data-format="markdown">
+                    <span class="format-name">Markdown</span>
+                    <span class="format-preview" id="preview-markdown">Loading...</span>
+                </button>
+                
+                <button class="format-btn" data-format="html">
+                    <span class="format-name">HTML</span>
+                    <span class="format-preview" id="preview-html">Loading...</span>
+                </button>
+                
+                <button class="format-btn" data-format="plaintext">
+                    <span class="format-name">Plain Text</span>
+                    <span class="format-preview" id="preview-plaintext">Loading...</span>
+                </button>
+                
+                <button class="format-btn" data-format="rtf">
+                    <span class="format-name">RTF</span>
+                    <span class="format-preview" id="preview-rtf">Loading...</span>
+                </button>
+                
+                <button class="format-btn" data-format="urlparams">
+                    <span class="format-name">URL + Title</span>
+                    <span class="format-preview" id="preview-urlparams">Loading...</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <button id="optionsBtn" class="options-btn">Settings</button>
+            <div class="keyboard-hint">Press Ctrl+Shift+L for quick copy</div>
+        </div>
+        
+        <div id="notification" class="notification"></div>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>

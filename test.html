@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page for Fancy Links Extension</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+        .instructions {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #bee5eb;
+        }
+        code {
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔗 Fancy Links Extension Test Page</h1>
+        <p>Use this page to test your Firefox extension functionality</p>
+    </div>
+
+    <div class="test-section">
+        <h2>📋 Testing Instructions</h2>
+        <div class="instructions">
+            <p><strong>Test the extension by:</strong></p>
+            <ol>
+                <li><strong>Toolbar Button:</strong> Click the Fancy Links icon in the Firefox toolbar to open the popup</li>
+                <li><strong>Keyboard Shortcut:</strong> Press <code>Ctrl+Shift+L</code> to copy using your default format</li>
+                <li><strong>Settings:</strong> Right-click the extension icon and select "Preferences" to access settings</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 Expected Formats</h2>
+        <p>When you copy this page, you should get different formats like:</p>
+        <ul>
+            <li><strong>Slack:</strong> <code>&lt;file:///path/to/test.html|Test Page for Fancy Links Extension&gt;</code></li>
+            <li><strong>Discord:</strong> <code>[Test Page for Fancy Links Extension](file:///path/to/test.html)</code></li>
+            <li><strong>Markdown:</strong> <code>[Test Page for Fancy Links Extension](file:///path/to/test.html)</code></li>
+            <li><strong>HTML:</strong> <code>&lt;a href="file:///path/to/test.html"&gt;Test Page for Fancy Links Extension&lt;/a&gt;</code></li>
+            <li><strong>Plain Text:</strong> <code>Test Page for Fancy Links Extension - file:///path/to/test.html</code></li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🧪 Test Cases</h2>
+        <p>This page tests:</p>
+        <ul>
+            <li>✅ Normal page title extraction</li>
+            <li>✅ Local file URL handling</li>
+            <li>✅ Title with special characters: "Test Page for Fancy Links Extension"</li>
+            <li>✅ Long title handling (this title is moderate length)</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>📝 Manual Test Checklist</h2>
+        <ul>
+            <li>☐ Extension icon appears in toolbar</li>
+            <li>☐ Clicking icon opens popup with current page info</li>
+            <li>☐ All 8 format buttons work in popup</li>
+            <li>☐ Keyboard shortcut Ctrl+Shift+L works</li>
+            <li>☐ Settings page opens and saves preferences</li>
+            <li>☐ Default format selection works</li>
+            <li>☐ Copied text appears correctly in clipboard</li>
+            <li>☐ Notifications appear when copying</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>🌐 Additional Testing</h2>
+        <p>For comprehensive testing, also try the extension on:</p>
+        <ul>
+            <li>A real website (like <a href="https://github.com">GitHub</a>)</li>
+            <li>A page with no title</li>
+            <li>A page with a very long title</li>
+            <li>A page with special characters in the title</li>
+        </ul>
+    </div>
+</body>
+</html>

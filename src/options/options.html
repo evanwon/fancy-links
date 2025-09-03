@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fancy Links - Settings</title>
+    <link rel="stylesheet" href="options.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Fancy Links Settings</h1>
+            <p>Configure your default format and preferences</p>
+        </header>
+        
+        <main class="main-content">
+            <section class="settings-section">
+                <h2>Default Format</h2>
+                <p class="section-description">Choose the format to use when copying via keyboard shortcut (Ctrl+Shift+L)</p>
+                
+                <div class="format-options">
+                    <label class="format-option">
+                        <input type="radio" name="defaultFormat" value="slack">
+                        <div class="format-info">
+                            <span class="format-name">Slack</span>
+                            <span class="format-example">&lt;https://example.com|Page Title&gt;</span>
+                        </div>
+                    </label>
+                    
+                    <label class="format-option">
+                        <input type="radio" name="defaultFormat" value="discord">
+                        <div class="format-info">
+                            <span class="format-name">Discord</span>
+                            <span class="format-example">[Page Title](https://example.com)</span>
+                        </div>
+                    </label>
+                    
+                    <label class="format-option">
+                        <input type="radio" name="defaultFormat" value="reddit">
+                        <div class="format-info">
+                            <span class="format-name">Reddit</span>
+                            <span class="format-example">[Page Title](https://example.com)</span>
+                        </div>
+                    </label>
+                    
+                    <label class="format-option">
+                        <input type="radio" name="defaultFormat" value="markdown">
+                        <div class="format-info">
+                            <span class="format-name">Markdown</span>
+                            <span class="format-example">[Page Title](https://example.com)</span>
+                        </div>
+                    </label>
+                    
+                    <label class="format-option">
+                        <input type="radio" name="defaultFormat" value="html">
+                        <div class="format-info">
+                            <span class="format-name">HTML</span>
+                            <span class="format-example">&lt;a href="https://example.com"&gt;Page Title&lt;/a&gt;</span>
+                        </div>
+                    </label>
+                    
+                    <label class="format-option">
+                        <input type="radio" name="defaultFormat" value="plaintext">
+                        <div class="format-info">
+                            <span class="format-name">Plain Text</span>
+                            <span class="format-example">Page Title - https://example.com</span>
+                        </div>
+                    </label>
+                    
+                    <label class="format-option">
+                        <input type="radio" name="defaultFormat" value="rtf">
+                        <div class="format-info">
+                            <span class="format-name">RTF (Rich Text)</span>
+                            <span class="format-example">For Word/Outlook compatibility</span>
+                        </div>
+                    </label>
+                    
+                    <label class="format-option">
+                        <input type="radio" name="defaultFormat" value="urlparams">
+                        <div class="format-info">
+                            <span class="format-name">URL + Title Parameter</span>
+                            <span class="format-example">https://example.com?_title=Page%20Title</span>
+                        </div>
+                    </label>
+                </div>
+            </section>
+            
+            <section class="settings-section">
+                <h2>Notifications</h2>
+                <p class="section-description">Configure feedback when copying links</p>
+                
+                <label class="checkbox-option">
+                    <input type="checkbox" id="showNotifications">
+                    <span class="checkmark"></span>
+                    <div class="option-info">
+                        <span class="option-name">Show copy notifications</span>
+                        <span class="option-description">Display a notification when a link is copied</span>
+                    </div>
+                </label>
+                
+                <label class="checkbox-option">
+                    <input type="checkbox" id="showBadge">
+                    <span class="checkmark"></span>
+                    <div class="option-info">
+                        <span class="option-name">Show badge on toolbar button</span>
+                        <span class="option-description">Display a temporary badge when copying via keyboard shortcut</span>
+                    </div>
+                </label>
+            </section>
+            
+            <section class="settings-section">
+                <h2>Advanced</h2>
+                <p class="section-description">Additional options</p>
+                
+                <label class="checkbox-option">
+                    <input type="checkbox" id="debugMode">
+                    <span class="checkmark"></span>
+                    <div class="option-info">
+                        <span class="option-name">Debug mode</span>
+                        <span class="option-description">Enable console logging for troubleshooting</span>
+                    </div>
+                </label>
+            </section>
+        </main>
+        
+        <footer class="footer">
+            <div class="status-message" id="statusMessage"></div>
+            <div class="footer-buttons">
+                <button id="resetButton" class="button button-secondary">Reset to Defaults</button>
+                <button id="saveButton" class="button button-primary">Save Settings</button>
+            </div>
+        </footer>
+    </div>
+    
+    <script src="options.js"></script>
+</body>
+</html>
