@@ -7,10 +7,10 @@ A browser extension that allows you to copy formatted links with titles instead 
 
 ### Supported Output Formats
 - **Slack**: `<URL|Title>`
-- **Markdown** (including Reddit, Discord, Obsidian, Notion, etc.): `[Title](URL)`
+- **Markdown** (Reddit, Discord, Obsidian, Notion, etc.): `[Title](URL)`
 - **HTML**: `<a href="URL">Title</a>`
 - **Plain Text**: `Title - URL`
-- **RTF**: Rich Text Format for Word/Outlook
+- **Rich Text Format (RTF)** (Word, Outlook, etc.): `{\rtf1{\field{\*\fldinst HYPERLINK "URL"}{\fldrslt Title}}}` :dizzy_face:
 - **URL Parameters**: `URL?_title=Title`
 
 ### Usage Options
