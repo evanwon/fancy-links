@@ -107,26 +107,31 @@ jobs:
         # Rename the artifact to have .xpi extension
         mv "dist/${{ steps.get_firefox_artifact.outputs.filename }}" "dist/fancy-links-firefox-v${{ steps.get_version.outputs.version }}.xpi"
         
+        # Create release notes file
+        cat > release_notes.md << 'EOF'
+        # Fancy Links v${{ steps.get_version.outputs.version }}
+
+        Browser extension for copying formatted links with titles.
+
+        ## Firefox Installation
+        1. Download the `.xpi` file below
+        2. Open Firefox and go to `about:addons`
+        3. Click the gear icon → "Install Add-on From File..."
+        4. Select the downloaded `.xpi` file
+
+        ## What's New
+        ${{ steps.changelog.outputs.changelog }}
+
+        ---
+
+        **Firefox Requirements:** Version 109+  
+        **Permissions:** clipboardWrite, activeTab, storage, notifications
+        EOF
+        
         # Create release with asset using GitHub CLI
         gh release create "${{ github.ref_name }}" \
           --title "Fancy Links v${{ steps.get_version.outputs.version }}" \
-          --notes "# Fancy Links v${{ steps.get_version.outputs.version }}
-
-Browser extension for copying formatted links with titles.
-
-## Firefox Installation
-1. Download the \`.xpi\` file below
-2. Open Firefox and go to \`about:addons\`
-3. Click the gear icon → \"Install Add-on From File...\"
-4. Select the downloaded \`.xpi\` file
-
-## What's New
-${{ steps.changelog.outputs.changelog }}
-
----
-
-**Firefox Requirements:** Version 109+  
-**Permissions:** clipboardWrite, activeTab, storage, notifications" \
+          --notes-file release_notes.md \
           "dist/fancy-links-firefox-v${{ steps.get_version.outputs.version }}.xpi"
         
     - name: Build Summary
