@@ -78,6 +78,7 @@ function loadVersion() {
 document.addEventListener('DOMContentLoaded', async () => {
     await loadCurrentTab();
     await updatePreviews();
+    await updateDefaultIndicator();
     loadVersion();
     setupEventListeners();
 });
@@ -192,6 +193,35 @@ async function copyWithFormat(formatKey) {
     } catch (error) {
         console.error('Copy error:', error);
         showNotification('Copy failed', 'error');
+    }
+}
+
+async function updateDefaultIndicator() {
+    try {
+        // Get the default format setting
+        const settings = await browser.storage.sync.get({
+            defaultFormat: 'markdown'
+        });
+        
+        const defaultFormat = settings.defaultFormat;
+        
+        // Remove default class from all format buttons first
+        document.querySelectorAll('.format-btn').forEach(button => {
+            button.classList.remove('default');
+        });
+        
+        // Add default class to the current default format button
+        const defaultButton = document.querySelector(`.format-btn[data-format="${defaultFormat}"]`);
+        if (defaultButton) {
+            defaultButton.classList.add('default');
+        }
+    } catch (error) {
+        console.warn('Could not load default format setting:', error);
+        // Fallback to showing markdown as default if settings can't be loaded
+        const markdownButton = document.querySelector('.format-btn[data-format="markdown"]');
+        if (markdownButton) {
+            markdownButton.classList.add('default');
+        }
     }
 }
 

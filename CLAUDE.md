@@ -43,6 +43,7 @@ ls -la src/
 - ✅ Priority-based TODO system (P0-P3 nomenclature)
 - ✅ Browser-agnostic rebranding (ff-fancy-links → fancy-links)
 - ✅ Updated README.md to remove Firefox-specific branding while maintaining platform clarity
+- ✅ Default format indicator in popup UI (GitHub issue #16) - Shows current default with border + "Default" label
 
 ## Project Overview
 

@@ -102,10 +102,37 @@ body {
     transform: translateY(1px);
 }
 
+.format-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 2px;
+}
+
 .format-name {
     font-weight: 500;
     color: #333;
-    margin-bottom: 2px;
+}
+
+.default-label {
+    font-size: 10px;
+    color: #667eea;
+    font-weight: 500;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.format-btn.default {
+    border-color: #667eea;
+    border-width: 2px;
+    background: #f8f9ff;
+}
+
+.format-btn.default .default-label {
+    opacity: 1;
 }
 
 .format-apps {
