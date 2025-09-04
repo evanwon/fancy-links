@@ -35,19 +35,6 @@ ls -la src/
 - `tools/` - Development utilities (icon generation)
 - `design/` - Design working files and assets
 
-### Recent Work (2025-09-03 to 2025-09-04)
-- ✅ Clean links feature with URL parameter removal
-- ✅ Format consolidation (8→6 options for better UX)
-- ✅ Fixed test suite (all tests passing)
-- ✅ Comprehensive documentation updates
-- ✅ Project structure reorganization (test/, tools/ directories)
-- ✅ Priority-based TODO system (P0-P3 nomenclature)
-- ✅ Browser-agnostic rebranding (ff-fancy-links → fancy-links)
-- ✅ Updated README.md to remove Firefox-specific branding while maintaining platform clarity
-- ✅ Default format indicator in popup UI (GitHub issue #16) - Shows current default with border + "Default" label
-- ✅ Centralized format configuration - Created `src/formats/format-registry.js` to consolidate all format logic into single registry
-- ✅ Format architecture refactor - Consolidated individual format files into unified registry pattern
-
 ## Project Overview
 
 This is a Firefox browser extension called "Fancy Links" that allows users to copy formatted links with titles instead of plain URLs. The extension supports multiple output formats for different platforms (Slack, Discord, HTML, Markdown, etc.).
@@ -127,6 +114,7 @@ web-ext lint
    - Do tests pass?
    - Is this a logical commit point?
    - Follow the project's git commit guidelines (cohesive logical commits preferred)
+   - What GitHub Issues need to be referenced / linked / resolved as a result of this work?
 
 3. **Consider Version Bump** - Evaluate if semver should be updated in `manifest.json`:
    - **PATCH**: Bug fixes, minor tweaks, documentation updates
@@ -188,7 +176,6 @@ When making commits to this repository, follow these preferences:
 - Keep refactors or style changes separate from functional changes
 
 ## Testing Approach
-
 - Manual testing with `web-ext run --verbose` to launch Firefox with extension loaded
 - Test each format type with various URLs and page titles
 - Verify keyboard shortcuts work across different pages
@@ -199,7 +186,6 @@ When making commits to this repository, follow these preferences:
   - `test/manual.html` - Manual browser testing page with extension functionality checklist
 
 ## Session Management
-
 If a `SESSION_SUMMARY.md` file exists in the root directory, or a `.temp/SESSION_SUMMARY.md` file exists, review it for:
 - Current implementation status
 - Recent work completed
@@ -210,7 +196,7 @@ This file is temporary and used for handoffs between development sessions.
 
 ### Task Management
 
-**All TODO items have been migrated to GitHub Issues:** https://github.com/evanwon/fancy-links/issues
+**All tasks are stored in GitHub Issues:** https://github.com/evanwon/fancy-links/issues
 
 #### Available GitHub Labels
 When creating issues, use these available labels appropriately:
