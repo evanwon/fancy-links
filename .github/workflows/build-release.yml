@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'  # Trigger on version tags like v1.1.0
 
+permissions:
+  contents: write  # Required for creating releases and uploading assets
+
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
@@ -96,51 +99,40 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
         fi
         
-    - name: Create Release (Firefox)
+    - name: Create Release with Asset (Firefox)
       if: matrix.browser == 'firefox'
-      uses: actions/create-release@v1
-      id: create_release
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref_name }}
-        release_name: "Fancy Links v${{ steps.get_version.outputs.version }}"
-        body: |
-          # Fancy Links v${{ steps.get_version.outputs.version }}
-          
-          Browser extension for copying formatted links with titles.
-          
-          ## Firefox Installation
-          1. Download the `.xpi` file below
-          2. Open Firefox and go to `about:addons`
-          3. Click the gear icon → "Install Add-on From File..."
-          4. Select the downloaded `.xpi` file
-          
-          ## What's New
-          ${{ steps.changelog.outputs.changelog }}
-          
-          ---
-          
-          **Firefox Requirements:** Version 109+  
-          **Permissions:** clipboardWrite, activeTab, storage, notifications
-        draft: false
-        prerelease: false
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Rename the artifact to have .xpi extension
+        mv "dist/${{ steps.get_firefox_artifact.outputs.filename }}" "dist/fancy-links-firefox-v${{ steps.get_version.outputs.version }}.xpi"
         
-    - name: Firefox - Upload Extension Asset
-      if: matrix.browser == 'firefox'
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: dist/${{ steps.get_firefox_artifact.outputs.filename }}
-        asset_name: fancy-links-firefox-v${{ steps.get_version.outputs.version }}.xpi
-        asset_content_type: application/x-xpinstall
+        # Create release with asset using GitHub CLI
+        gh release create "${{ github.ref_name }}" \
+          --title "Fancy Links v${{ steps.get_version.outputs.version }}" \
+          --notes "# Fancy Links v${{ steps.get_version.outputs.version }}
+
+Browser extension for copying formatted links with titles.
+
+## Firefox Installation
+1. Download the \`.xpi\` file below
+2. Open Firefox and go to \`about:addons\`
+3. Click the gear icon → \"Install Add-on From File...\"
+4. Select the downloaded \`.xpi\` file
+
+## What's New
+${{ steps.changelog.outputs.changelog }}
+
+---
+
+**Firefox Requirements:** Version 109+  
+**Permissions:** clipboardWrite, activeTab, storage, notifications" \
+          "dist/fancy-links-firefox-v${{ steps.get_version.outputs.version }}.xpi"
         
     - name: Build Summary
       run: |
         echo "🎉 ${{ matrix.browser }} build completed for v${{ steps.get_version.outputs.version }}!"
         if [ "${{ matrix.browser }}" == "firefox" ]; then
           echo "📦 Firefox Asset: fancy-links-firefox-v${{ steps.get_version.outputs.version }}.xpi"
-          echo "🔗 Release URL: ${{ steps.create_release.outputs.html_url }}"
+          echo "🔗 Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}"
         fi
