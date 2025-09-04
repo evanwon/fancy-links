@@ -224,96 +224,28 @@ This file is temporary and used for handoffs between development sessions.
    - Renamed `test.html` to `test/manual.html` for clarity
    - Clean root directory with only essential project files
 
-### 📋 Current TODO List
+### 📋 Task Management
 
-#### P0 (Critical - Do Next)
-- [x] **Establish priority nomenclature system** ✅
-  - ✅ Define P0 (critical/do next), P1 (high), P2 (medium), P3 (low) priority levels
-  - ✅ Re-categorize all existing TODO items using new priority system
-  - ✅ Update CLAUDE.md documentation to reflect priority workflow
+**All TODO items have been migrated to GitHub Issues:** https://github.com/evanwon/fancy-links/issues
 
-- [ ] **Move permanent TODOs to GitHub Issues after repo setup**
-  - Migrate medium/future priority items from CLAUDE.md to GitHub Issues
-  - Set up issue templates for bugs, features, and enhancements  
-  - Establish workflow linking issues to commits and PRs
-  - Keep only high-priority current work items in CLAUDE.md
+#### Current High-Priority Work
+For immediate development priorities, see GitHub Issues with `priority: high` label:
+- [Issue #2: Set up GitHub repository and update documentation URLs](https://github.com/evanwon/fancy-links/issues/2)  
+- [Issue #3: Create fancy-links@evanw.com email address](https://github.com/evanwon/fancy-links/issues/3)
+- [Issue #4: Set up automated test runner for CI/CD pipeline](https://github.com/evanwon/fancy-links/issues/4)
+- [Issue #5: Evaluate architecture for plug-and-play community link format plugins](https://github.com/evanwon/fancy-links/issues/5)
+- [Issue #6: Enhance format descriptions in popup UI](https://github.com/evanwon/fancy-links/issues/6)
 
-#### P1 (High Priority)
-- [ ] **Set up GitHub repository and update documentation URLs**
-  - Create public GitHub repository for fancy-links
-  - Update README.md clone URLs and release links to actual GitHub repo
-  - Update any hardcoded GitHub references in documentation
-  - Set up proper repository description and topics/tags
+#### Completed Priority Items
+- [x] **Establish priority nomenclature system** ✅ (2025-09-04)
+- [x] **Move permanent TODOs to GitHub Issues** ✅ (2025-09-04) - [Issue #1](https://github.com/evanwon/fancy-links/issues/1)  
+- [x] **Review project naming for cross-browser compatibility** ✅ (2025-09-04)
 
-- [ ] **Create fancy-links@evanw.com email address**
-  - Email address is used as addon ID in manifest.json but doesn't exist
-  - Needed for potential Mozilla Add-ons store submission or support requests
-  - Could be an alias or forwarding address
-
-- [ ] **Set up automated test runner for CI/CD pipeline** 
-  - Integrate test suite into GitHub Actions or similar
-  - Add test running to build process
-  - Consider proper test framework (Jest, Mocha, etc.)
-
-
-- [ ] **Evaluate architecture for plug-and-play community link format plugins**
-  - Research extension architecture patterns for plugin systems
-  - Design format module registration system for community contributions
-  - Consider format validation and security implications
-  - Create documentation and templates for community format development
-  - Evaluate impact on extension size and performance
-
-- [ ] **Enhance format descriptions in popup UI**
-  - Extend "Works with" pattern from Markdown to other formats
-  - Add popular app examples for RTF (Word, Outlook, etc.)
-  - Research and document which apps support each format best
-  - Improve user understanding of when to use each format
-
-#### P2 (Medium Priority)
-- [ ] **Cross-browser compatibility testing**
-  - Test extension in Chrome/Edge (Manifest V2 compatibility)
-  - Verify clean-url utility works across all browsers
-
-- [ ] **Re-evaluate manifest.json location**
-  - Research if manifest should be in src/ directory instead of root
-  - Compare with other browser extension projects on GitHub
-  - Consider impact on build process and web-ext tooling
-
-- [x] **Review project naming for cross-browser compatibility** ✅
-  - ✅ Remove Firefox-specific identifiers from project name and documentation
-  - ✅ Plan for future Chrome/Edge support with unified codebase
-  - ✅ Renamed repository from ff-fancy-links to fancy-links (2025-09-04)
-  - ✅ Updated README.md title, description, and examples to be browser-agnostic
-
-- [ ] **Customizable toolbar icon selection**
-  - Add icon selection UI to options page for users to choose toolbar appearance
-  - Use browser.browserAction.setIcon() API to dynamically update toolbar icon
-  - Bundle alternative icon themes or allow custom icon uploads
-  - Store user's icon preference in extension storage
-
-- [ ] **Customizable format ordering in popup**
-  - Allow users to reorder link formats via drag-and-drop
-  - Persist user's preferred format order in extension storage
-  - Add simple interface in options page for format management
-  - Consider most-used formats floating to top automatically
-
-- [ ] **Mobile Firefox support**
-  - Research mobile Firefox extension capabilities and limitations
-  - Test current extension behavior on mobile Firefox
-  - Adapt UI for touch interfaces and smaller screens
-  - Ensure clipboard operations work on mobile
-
-#### P3 (Future Enhancements)
-- [ ] **Additional format types**
-  - Consider adding BBCode format for forums
-  - Wiki markup format support
-  
-- [ ] **Advanced URL cleaning**
-  - Add whitelist/blacklist for specific domains
-  - Custom tracking parameter configuration
-  
-- [ ] **Export/Import settings**
-  - Allow users to backup/restore their preferences
+#### Issue Management Workflow
+- **High Priority**: Issues that should be addressed in the next development cycle
+- **Medium Priority**: Issues for future releases or enhancements  
+- **Low Priority**: Future considerations and nice-to-have features
+- **New Issues**: Use GitHub Issues for all new tasks, bugs, and feature requests
 
 ### 🧪 Testing Notes
 - URL cleaning tested with 13 test cases covering UTM, Facebook, Amazon, YouTube tracking
