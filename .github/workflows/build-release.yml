@@ -61,6 +61,17 @@ jobs:
         echo "Firefox: Building extension with web-ext..."
         web-ext build --source-dir=src --artifacts-dir=dist --overwrite-dest
         
+    - name: Firefox - Sign extension (optional)
+      if: matrix.browser == 'firefox' && env.AMO_API_KEY != '' && env.AMO_API_SECRET != ''
+      env:
+        AMO_API_KEY: ${{ secrets.AMO_API_KEY }}
+        AMO_API_SECRET: ${{ secrets.AMO_API_SECRET }}
+      run: |
+        echo "Firefox: Signing extension for self-distribution..."
+        web-ext sign --source-dir=src --artifacts-dir=dist-signed \
+          --api-key="$AMO_API_KEY" --api-secret="$AMO_API_SECRET" \
+          --channel=unlisted || echo "Signing failed or not configured"
+        
     # Future Chrome/Edge build steps would go here:
     # - name: Chrome - Build extension
     #   if: matrix.browser == 'chrome'
@@ -74,9 +85,19 @@ jobs:
       if: matrix.browser == 'firefox'
       id: get_firefox_artifact
       run: |
-        filename=$(ls dist/*.zip | head -1 | xargs basename)
+        # Check for signed version first, fall back to unsigned
+        if [ -d "dist-signed" ] && [ "$(ls -A dist-signed/*.xpi 2>/dev/null)" ]; then
+          filename=$(ls dist-signed/*.xpi | head -1 | xargs basename)
+          filepath="dist-signed/$filename"
+          echo "signed=true" >> $GITHUB_OUTPUT
+        else
+          filename=$(ls dist/*.zip | head -1 | xargs basename)
+          filepath="dist/$filename"
+          echo "signed=false" >> $GITHUB_OUTPUT
+        fi
         echo "filename=$filename" >> $GITHUB_OUTPUT
-        echo "Found Firefox artifact: $filename"
+        echo "filepath=$filepath" >> $GITHUB_OUTPUT
+        echo "Found Firefox artifact: $filename (signed: $([ -d dist-signed ] && echo 'yes' || echo 'no'))"
         
     - name: Generate changelog
       id: changelog
@@ -104,8 +125,16 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        # Rename the artifact to have .xpi extension
-        mv "dist/${{ steps.get_firefox_artifact.outputs.filename }}" "dist/fancy-links-firefox-v${{ steps.get_version.outputs.version }}.xpi"
+        # Use appropriate source path and extension
+        if [ "${{ steps.get_firefox_artifact.outputs.signed }}" == "true" ]; then
+          # Already has .xpi extension from signing
+          cp "${{ steps.get_firefox_artifact.outputs.filepath }}" "dist/fancy-links-firefox-v${{ steps.get_version.outputs.version }}-signed.xpi"
+          xpi_file="dist/fancy-links-firefox-v${{ steps.get_version.outputs.version }}-signed.xpi"
+        else
+          # Rename unsigned .zip to .xpi
+          mv "${{ steps.get_firefox_artifact.outputs.filepath }}" "dist/fancy-links-firefox-v${{ steps.get_version.outputs.version }}.xpi"
+          xpi_file="dist/fancy-links-firefox-v${{ steps.get_version.outputs.version }}.xpi"
+        fi
         
         # Create release notes file
         cat > release_notes.md << 'EOF'
@@ -114,10 +143,38 @@ jobs:
         Browser extension for copying formatted links with titles.
 
         ## Firefox Installation
+        
+        EOF
+        
+        # Add appropriate installation instructions based on signing status
+        if [ "${{ steps.get_firefox_artifact.outputs.signed }}" == "true" ]; then
+          cat >> release_notes.md << 'EOF'
+        **✅ This release is signed by Mozilla and can be installed directly.**
+        
         1. Download the `.xpi` file below
-        2. Open Firefox and go to `about:addons`
-        3. Click the gear icon → "Install Add-on From File..."
-        4. Select the downloaded `.xpi` file
+        2. Open the file with Firefox or drag it into a Firefox window
+        3. Click "Add" when prompted
+        
+        EOF
+        else
+          cat >> release_notes.md << 'EOF'
+        **⚠️ This is an unsigned build. Installation options:**
+        
+        **Option 1: Firefox Developer Edition or Nightly**
+        1. In Firefox Developer/Nightly, go to `about:config`
+        2. Set `xpinstall.signatures.required` to `false`
+        3. Download and install the `.xpi` file normally
+        
+        **Option 2: Temporary Installation (Regular Firefox)**
+        1. Extract the `.xpi` file (it's a ZIP file)
+        2. Go to `about:debugging` → "This Firefox"
+        3. Click "Load Temporary Add-on"
+        4. Select the `manifest.json` from extracted files
+        
+        EOF
+        fi
+        
+        cat >> release_notes.md << 'EOF'
 
         ## What's New
         ${{ steps.changelog.outputs.changelog }}
@@ -132,12 +189,16 @@ jobs:
         gh release create "${{ github.ref_name }}" \
           --title "Fancy Links v${{ steps.get_version.outputs.version }}" \
           --notes-file release_notes.md \
-          "dist/fancy-links-firefox-v${{ steps.get_version.outputs.version }}.xpi"
+          "$xpi_file"
         
     - name: Build Summary
       run: |
         echo "🎉 ${{ matrix.browser }} build completed for v${{ steps.get_version.outputs.version }}!"
         if [ "${{ matrix.browser }}" == "firefox" ]; then
-          echo "📦 Firefox Asset: fancy-links-firefox-v${{ steps.get_version.outputs.version }}.xpi"
+          if [ "${{ steps.get_firefox_artifact.outputs.signed }}" == "true" ]; then
+            echo "✅ Firefox Asset: fancy-links-firefox-v${{ steps.get_version.outputs.version }}-signed.xpi (SIGNED)"
+          else
+            echo "⚠️ Firefox Asset: fancy-links-firefox-v${{ steps.get_version.outputs.version }}.xpi (unsigned)"
+          fi
           echo "🔗 Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}"
         fi

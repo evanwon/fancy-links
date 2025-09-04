@@ -111,6 +111,49 @@ node test/test-clean-url.js
 node test/test-formats.js
 ```
 
+## Extension Signing & Distribution
+
+### Installing Unsigned Extensions (Development/Testing)
+
+Firefox requires all extensions to be signed. For unsigned builds:
+
+1. **Firefox Developer Edition or Nightly**
+   - Set `xpinstall.signatures.required` to `false` in `about:config`
+   - Install `.xpi` files normally
+
+2. **Regular Firefox (Temporary)**
+   - Go to `about:debugging` → "This Firefox" → "Load Temporary Add-on"
+   - Select `manifest.json` from `src/` directory
+
+3. **Use `web-ext run`** (Recommended for development)
+   - Launches Firefox with extension loaded temporarily
+
+### Automatic Signing (GitHub Actions)
+
+The GitHub Actions workflow supports automatic Mozilla signing when configured:
+
+1. **Create AMO Developer Account**
+   - Sign up at https://addons.mozilla.org/developers/
+   - Generate API credentials
+
+2. **Configure GitHub Secrets**
+   - Add `AMO_API_KEY` and `AMO_API_SECRET` to repository secrets
+   - Workflow will automatically sign releases when these are present
+
+3. **Signed vs Unsigned Releases**
+   - With secrets configured: Releases include signed `.xpi` (installable in regular Firefox)
+   - Without secrets: Releases include unsigned `.xpi` (requires Developer Edition/Nightly)
+
+### Manual Signing
+
+```bash
+# Sign extension for self-distribution (requires AMO account)
+web-ext sign --source-dir=src \
+  --api-key=your-key \
+  --api-secret=your-secret \
+  --channel=unlisted
+```
+
 ## Post-Change Checklist
 
 **CRITICAL**: After every functional change to this project, Claude Code must consider these five items:
