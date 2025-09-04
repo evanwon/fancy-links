@@ -253,6 +253,27 @@ For immediate development priorities, see GitHub Issues with `priority: high` la
 - [x] **Move permanent TODOs to GitHub Issues** ✅ (2025-09-04) - [Issue #1](https://github.com/evanwon/fancy-links/issues/1)  
 - [x] **Review project naming for cross-browser compatibility** ✅ (2025-09-04)
 
+#### Available GitHub Labels
+When creating issues, use these available labels appropriately:
+
+**Primary Labels (use frequently):**
+- `enhancement` - New features or improvements (most common)
+- `bug` - Something isn't working correctly
+- `documentation` - Documentation improvements or additions
+
+**Priority Labels (always include one):**
+- `priority: high` - Issues for next development cycle
+- `priority: medium` - Future releases or enhancements  
+- `priority: low` - Future considerations and nice-to-have features
+
+**Special Purpose Labels (use sparingly):**
+- `good first issue` - For simple tasks suitable for new contributors
+- `help wanted` - When external input/assistance would be valuable
+- `question` - For clarification requests (consider GitHub Discussions instead)
+
+**Labels to avoid:**
+- `duplicate`, `invalid`, `wontfix` - Better to close issues with clear explanations
+
 #### Issue Management Workflow
 - **High Priority**: Issues that should be addressed in the next development cycle
 - **Medium Priority**: Issues for future releases or enhancements  
