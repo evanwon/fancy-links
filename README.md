@@ -1,5 +1,7 @@
-# Firefox Fancy Links
-A Firefox browser extension that allows you to copy formatted links with titles instead of plain URLs. Perfect for sharing links in chat apps, documentation, and anywhere formatted links look better than bare URLs.
+# Fancy Links
+A browser extension that allows you to copy formatted links with titles instead of plain URLs. Perfect for sharing links in chat apps, documentation, and anywhere formatted links look better than bare URLs.
+
+**Currently supports:** Firefox (Chrome/Edge support planned)
 
 ## Features
 
@@ -33,8 +35,8 @@ Note: We'll eventually publish this as an official extension. Probably.
 ### Development Installation
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/firefox-fancy-links.git
-cd firefox-fancy-links
+git clone https://github.com/yourusername/fancy-links.git
+cd fancy-links
 
 # Install web-ext (if not already installed)
 npm install -g web-ext
@@ -66,7 +68,7 @@ web-ext build
 
 ## Project Structure
 ```
-firefox-fancy-links/
+fancy-links/
 ├── manifest.json           # Extension configuration
 ├── src/
 │   ├── background/         # Background script

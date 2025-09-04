@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Quick Start
 
 **Project Status**: ✅ Production-ready Firefox extension with comprehensive test suite  
-**Current Working Directory**: `C:\Users\evanw\src\ff-fancy-links`
+**Current Working Directory**: `C:\Users\evanw\src\fancy-links`
 
 ### Immediate Commands
 ```bash
@@ -34,13 +34,15 @@ ls -la src/
 - `tools/` - Development utilities (icon generation)
 - `design/` - Design working files and assets
 
-### Recent Work (2025-09-03)
+### Recent Work (2025-09-03 to 2025-09-04)
 - ✅ Clean links feature with URL parameter removal
 - ✅ Format consolidation (8→6 options for better UX)
 - ✅ Fixed test suite (all tests passing)
 - ✅ Comprehensive documentation updates
 - ✅ Project structure reorganization (test/, tools/ directories)
 - ✅ Priority-based TODO system (P0-P3 nomenclature)
+- ✅ Browser-agnostic rebranding (ff-fancy-links → fancy-links)
+- ✅ Updated README.md to remove Firefox-specific branding while maintaining platform clarity
 
 ## Project Overview
 
@@ -201,12 +203,24 @@ This file is temporary and used for handoffs between development sessions.
 ### 📋 Current TODO List
 
 #### P0 (Critical - Do Next)
-- [ ] **Establish priority nomenclature system**
-  - Define P0 (critical/do next), P1 (high), P2 (medium), P3 (low) priority levels
-  - Re-categorize all existing TODO items using new priority system
-  - Update CLAUDE.md documentation to reflect priority workflow
+- [x] **Establish priority nomenclature system** ✅
+  - ✅ Define P0 (critical/do next), P1 (high), P2 (medium), P3 (low) priority levels
+  - ✅ Re-categorize all existing TODO items using new priority system
+  - ✅ Update CLAUDE.md documentation to reflect priority workflow
+
+- [ ] **Move permanent TODOs to GitHub Issues after repo setup**
+  - Migrate medium/future priority items from CLAUDE.md to GitHub Issues
+  - Set up issue templates for bugs, features, and enhancements  
+  - Establish workflow linking issues to commits and PRs
+  - Keep only high-priority current work items in CLAUDE.md
 
 #### P1 (High Priority)
+- [ ] **Set up GitHub repository and update documentation URLs**
+  - Create public GitHub repository for fancy-links
+  - Update README.md clone URLs and release links to actual GitHub repo
+  - Update any hardcoded GitHub references in documentation
+  - Set up proper repository description and topics/tags
+
 - [ ] **Create fancy-links@evanw.com email address**
   - Email address is used as addon ID in manifest.json but doesn't exist
   - Needed for potential Mozilla Add-ons store submission or support requests
@@ -217,11 +231,13 @@ This file is temporary and used for handoffs between development sessions.
   - Add test running to build process
   - Consider proper test framework (Jest, Mocha, etc.)
 
-- [ ] **Migrate task tracking to GitHub Issues**
-  - Move medium/future priority items from CLAUDE.md to GitHub Issues
-  - Set up issue templates for bugs, features, and enhancements
-  - Establish workflow linking issues to commits and PRs
-  - Keep only high-priority current work items in CLAUDE.md
+
+- [ ] **Evaluate architecture for plug-and-play community link format plugins**
+  - Research extension architecture patterns for plugin systems
+  - Design format module registration system for community contributions
+  - Consider format validation and security implications
+  - Create documentation and templates for community format development
+  - Evaluate impact on extension size and performance
 
 - [ ] **Enhance format descriptions in popup UI**
   - Extend "Works with" pattern from Markdown to other formats
@@ -239,10 +255,11 @@ This file is temporary and used for handoffs between development sessions.
   - Compare with other browser extension projects on GitHub
   - Consider impact on build process and web-ext tooling
 
-- [ ] **Review project naming for cross-browser compatibility**
-  - Remove Firefox-specific identifiers from project name and documentation
-  - Plan for future Chrome/Edge support with unified codebase
-  - Consider renaming repository to be browser-agnostic (e.g. fancy-links vs ff-fancy-links)
+- [x] **Review project naming for cross-browser compatibility** ✅
+  - ✅ Remove Firefox-specific identifiers from project name and documentation
+  - ✅ Plan for future Chrome/Edge support with unified codebase
+  - ✅ Renamed repository from ff-fancy-links to fancy-links (2025-09-04)
+  - ✅ Updated README.md title, description, and examples to be browser-agnostic
 
 - [ ] **Customizable format ordering in popup**
   - Allow users to reorder link formats via drag-and-drop
