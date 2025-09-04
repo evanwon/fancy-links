@@ -28,8 +28,10 @@ ls -la src/
 - `src/background/background.js` - Main extension logic
 - `src/popup/popup.js` - Toolbar popup UI
 - `src/options/options.js` - Settings page
+- `src/formats/format-config.js` - Centralized format configuration
 - `src/formats/*.js` - Format modules (6 types)
 - `src/utils/clean-url.js` - URL cleaning utility
+- `src/shared/` - Shared utilities and configurations
 - `test/` - Automated test suites and manual testing
 - `tools/` - Development utilities (icon generation)
 - `design/` - Design working files and assets
@@ -44,6 +46,7 @@ ls -la src/
 - ✅ Browser-agnostic rebranding (ff-fancy-links → fancy-links)
 - ✅ Updated README.md to remove Firefox-specific branding while maintaining platform clarity
 - ✅ Default format indicator in popup UI (GitHub issue #16) - Shows current default with border + "Default" label
+- ✅ Centralized format configuration - Created `src/formats/format-config.js` to eliminate code duplication between popup and options UI
 
 ## Project Overview
 
