@@ -4,9 +4,10 @@
   "version": "1.0.0",
   "description": "Copy friendly links with titles instead of plain URLs",
   
-  "applications": {
+  "browser_specific_settings": {
     "gecko": {
-      "id": "fancy-links@evanw.com"
+      "id": "fancy-links@evanw.com",
+      "strict_min_version": "109.0"
     }
   },
   

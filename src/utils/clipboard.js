@@ -43,9 +43,10 @@ async function copyToClipboard(text, isRichText = false) {
 }
 
 function stripHtml(html) {
-  const temp = document.createElement('div');
-  temp.innerHTML = html;
-  return temp.textContent || temp.innerText || '';
+  // Use DOMParser for safe HTML parsing instead of innerHTML
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  return doc.body.textContent || '';
 }
 
 if (typeof module !== 'undefined' && module.exports) {
