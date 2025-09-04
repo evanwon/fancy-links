@@ -114,7 +114,7 @@ web-ext lint
    - Do tests pass?
    - Is this a logical commit point?
    - Follow the project's git commit guidelines (cohesive logical commits preferred)
-   - What GitHub Issues need to be referenced / linked / resolved as a result of this work?
+   - What GitHub Issues need to be referenced / linked / resolved as a result of this work? IMPORTANT: If the change resolves an open GitHub issue, reference that issue in the first line of the commit message.
 
 3. **Consider Version Bump** - Evaluate if semver should be updated in `manifest.json`:
    - **PATCH**: Bug fixes, minor tweaks, documentation updates
