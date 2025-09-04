@@ -40,10 +40,14 @@ cd fancy-links
 npm install -g web-ext
 
 # Run in development mode
-web-ext run
+web-ext run --source-dir=src
 
 # Build for distribution
-web-ext build
+web-ext build --source-dir=src --artifacts-dir=dist
+
+# Run tests
+node test/test-clean-url.js
+node test/test-formats.js
 ```
 
 ## Usage
@@ -86,7 +90,7 @@ fancy-links/
 ## Testing
 
 ### Manual Testing
-1. Run `web-ext run` to start development Firefox
+1. Run `web-ext run --source-dir=src` to start development Firefox
 2. Open `test/manual.html` for comprehensive testing scenarios
 3. Test all format buttons and keyboard shortcut
 
@@ -103,16 +107,36 @@ node test/test-clean-url.js
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/amazing-feature`
 3. Make your changes
-4. Test thoroughly with `web-ext run`
+4. Test thoroughly with `web-ext run --source-dir=src`
 5. Commit: `git commit -m 'Add amazing feature'`
 6. Push: `git push origin feature/amazing-feature`
 7. Open a Pull Request
+
+## Project Structure
+
+```
+fancy-links/
+├── src/                    # Extension source code (production files only)
+│   ├── manifest.json       # Extension manifest
+│   ├── background/         # Background scripts  
+│   ├── popup/             # Toolbar popup UI
+│   ├── options/           # Settings page
+│   ├── formats/           # Format registry and logic
+│   ├── utils/             # Shared utilities
+│   └── icons/             # Extension icons
+├── test/                  # Automated and manual tests
+├── tools/                 # Development utilities
+├── design/                # Design files and assets
+├── .github/              # GitHub Actions workflows
+└── dist/                 # Build output (generated)
+```
 
 ## Development Notes
 - Uses **Manifest V2** (Firefox still prefers MV2 over MV3)
 - **No external dependencies** - pure HTML/CSS/JS
 - **Modular architecture** for easy format addition
 - **Browser-compatible format system** (avoids Node.js require() issues)
+- **Clean separation** between extension code (`src/`) and development files
 - **Comprehensive sanitization** prevents XSS and format-breaking
 
 ## Permissions
