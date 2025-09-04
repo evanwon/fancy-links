@@ -30,10 +30,43 @@ body {
     color: white;
 }
 
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
 .header h1 {
     font-size: 18px;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin: 0;
+}
+
+.header-settings-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.header-settings-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.header-settings-btn:active {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.header-settings-btn svg {
+    display: block;
 }
 
 .version {

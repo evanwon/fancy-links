@@ -164,8 +164,8 @@ function setupEventListeners() {
         });
     });
     
-    // Options button
-    document.getElementById('optionsBtn').addEventListener('click', () => {
+    // Header settings button
+    document.getElementById('headerOptionsBtn').addEventListener('click', () => {
         browser.runtime.openOptionsPage();
         window.close();
     });
