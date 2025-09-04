@@ -1,7 +1,7 @@
 # Fancy Links
 A browser extension that allows you to copy formatted links with titles instead of plain URLs. Perfect for sharing links in chat apps, documentation, and anywhere formatted links look better than bare URLs.
 
-**Currently supports:** Firefox (Chrome/Edge support planned)
+**Currently supports:** Firefox (may support Chrome/Edge in the future - please vote for it in the issues!)
 
 ## Features
 
@@ -127,4 +127,6 @@ node test/test-clean-url.js
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
-Developed using [Claude Code](https://claude.ai/code) (but don't worry, I included `please bro, no mistakes` multiple times in the prompt).
+Developed using [Claude Code](https://claude.ai/code), but don't worry, I included `please bro, no mistakes` multiple times in the prompt.
+
+(In seriousness, I wanted to use this as an opportunity to try out Claude Code-first development. At least at the start of this project, I'm trying to primarily use Claude Code, and I included `CLAUDE.md` in the repo so you can see how I'm trying to guide the tool. For any Claude-driven commits, Claude will note itself as a co-author in the commit message. I'm still intervening quite a bit and haven't yet been bold enough to set it in full-auto mode, but maybe we'll get there eventually.)
