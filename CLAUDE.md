@@ -107,7 +107,7 @@ web-ext lint
 
 ## Post-Change Checklist
 
-**CRITICAL**: After every functional change to this project, Claude Code must consider these three items:
+**CRITICAL**: After every functional change to this project, Claude Code must consider these five items:
 
 1. **Execute Tests** - Always run the test suite after functional changes:
    ```bash
@@ -128,6 +128,17 @@ web-ext lint
    - **MINOR**: New features, format additions, backward-compatible changes  
    - **MAJOR**: Breaking changes, major architecture changes
    - Update version in `manifest.json` for significant releases
+
+4. **Consider Building/Packaging** - Evaluate if extension should be built and released:
+   - For significant releases, build extension with `web-ext build`
+   - Create GitHub Release with `.xpi` file attachment
+   - Eventually: Automated process to push to Mozilla Add-ons store
+   - Coordinate with version bumps for logical release points
+
+5. **Push to Remote Repository** - Keep GitHub repository synchronized:
+   - Push commits to `origin/master` after completing logical changes
+   - Ensure GitHub Issues and documentation stay in sync with local work
+   - Required for team collaboration and public visibility of changes
 
 ## Version Management
 
