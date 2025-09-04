@@ -1,0 +1,146 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags like v1.1.0
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        browser: [firefox]  # Future: [firefox, chrome, edge]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Install build tools
+      run: |
+        npm install -g web-ext  # Firefox extension tool
+        # Future: npm install -g chrome-webstore-upload-cli
+        
+    - name: Validate manifest
+      run: |
+        echo "Validating manifest.json for ${{ matrix.browser }}..."
+        node -e "
+          const manifest = JSON.parse(require('fs').readFileSync('manifest.json', 'utf8'));
+          console.log('Extension:', manifest.name, 'v' + manifest.version);
+          console.log('Target browser: ${{ matrix.browser }}');
+          if (!manifest.version) throw new Error('No version in manifest');
+          if ('${{ matrix.browser }}' === 'firefox' && manifest.manifest_version !== 2) {
+            console.warn('Firefox build using Manifest V2');
+          }
+        "
+        
+    - name: Run cross-browser tests
+      run: |
+        echo "Running test suite (browser-agnostic)..."
+        node test/test-clean-url.js
+        node test/test-formats.js
+        
+    - name: Firefox - Lint extension
+      if: matrix.browser == 'firefox'
+      run: |
+        echo "Firefox: Linting extension with web-ext..."
+        web-ext lint --warnings-as-errors
+        
+    - name: Firefox - Build extension
+      if: matrix.browser == 'firefox'
+      run: |
+        echo "Firefox: Building extension with web-ext..."
+        web-ext build --overwrite-dest
+        
+    # Future Chrome/Edge build steps would go here:
+    # - name: Chrome - Build extension
+    #   if: matrix.browser == 'chrome'
+    #   run: echo "Chrome build steps..."
+        
+    - name: Extract version from tag
+      id: get_version
+      run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      
+    - name: Firefox - Get build artifact
+      if: matrix.browser == 'firefox'
+      id: get_firefox_artifact
+      run: |
+        filename=$(ls web-ext-artifacts/*.zip | head -1 | xargs basename)
+        echo "filename=$filename" >> $GITHUB_OUTPUT
+        echo "Found Firefox artifact: $filename"
+        
+    - name: Generate changelog
+      id: changelog
+      run: |
+        if git describe --tags --abbrev=0 HEAD^ 2>/dev/null; then
+          previous_tag=$(git describe --tags --abbrev=0 HEAD^)
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "## Changes since $previous_tag" >> $GITHUB_OUTPUT
+          git log --pretty=format:"- %s" $previous_tag..HEAD >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        else
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "## Initial Release" >> $GITHUB_OUTPUT
+          echo "First official release of Fancy Links browser extension." >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "### Features" >> $GITHUB_OUTPUT
+          git log --pretty=format:"- %s" --reverse >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Create Release (Firefox)
+      if: matrix.browser == 'firefox'
+      uses: actions/create-release@v1
+      id: create_release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref_name }}
+        release_name: "Fancy Links v${{ steps.get_version.outputs.version }}"
+        body: |
+          # Fancy Links v${{ steps.get_version.outputs.version }}
+          
+          Browser extension for copying formatted links with titles.
+          
+          ## Firefox Installation
+          1. Download the `.xpi` file below
+          2. Open Firefox and go to `about:addons`
+          3. Click the gear icon → "Install Add-on From File..."
+          4. Select the downloaded `.xpi` file
+          
+          ## What's New
+          ${{ steps.changelog.outputs.changelog }}
+          
+          ---
+          
+          **Firefox Requirements:** Version 109+  
+          **Permissions:** clipboardWrite, activeTab, storage, notifications
+        draft: false
+        prerelease: false
+        
+    - name: Firefox - Upload Extension Asset
+      if: matrix.browser == 'firefox'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: web-ext-artifacts/${{ steps.get_firefox_artifact.outputs.filename }}
+        asset_name: fancy-links-firefox-v${{ steps.get_version.outputs.version }}.xpi
+        asset_content_type: application/x-xpinstall
+        
+    - name: Build Summary
+      run: |
+        echo "🎉 ${{ matrix.browser }} build completed for v${{ steps.get_version.outputs.version }}!"
+        if [ "${{ matrix.browser }}" == "firefox" ]; then
+          echo "📦 Firefox Asset: fancy-links-firefox-v${{ steps.get_version.outputs.version }}.xpi"
+          echo "🔗 Release URL: ${{ steps.create_release.outputs.html_url }}"
+        fi
