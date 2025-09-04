@@ -27,7 +27,7 @@ A browser extension that allows you to copy formatted links with titles instead 
 ### Normal Installation
 Note: We'll eventually publish this as an official extension. Probably.
 
-1. Download the latest `.xpi` file from [Releases](../../releases)
+1. Download the latest `.xpi` file from [Releases](https://github.com/evanwon/fancy-links/releases)
 2. Open Firefox and navigate to `about:addons`
 3. Click the gear icon → "Install Add-on From File"
 4. Select the downloaded `.xpi` file
@@ -35,7 +35,7 @@ Note: We'll eventually publish this as an official extension. Probably.
 ### Development Installation
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/fancy-links.git
+git clone https://github.com/evanwon/fancy-links.git
 cd fancy-links
 
 # Install web-ext (if not already installed)
