@@ -4,15 +4,8 @@
 const fs = require('fs');
 const path = require('path');
 
-// Import format modules directly using require
-const formats = {
-    slack: require('../src/formats/slack.js'),
-    markdown: require('../src/formats/markdown.js'),
-    html: require('../src/formats/html.js'),
-    plaintext: require('../src/formats/plaintext.js'),
-    rtf: require('../src/formats/rtf.js'),
-    urlparams: require('../src/formats/urlparams.js')
-};
+// Import format configuration from centralized registry
+const { formatConfig: formats } = require('../src/formats/format-registry.js');
 
 // Test cases
 const testCases = [

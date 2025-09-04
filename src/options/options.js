@@ -1,44 +1,7 @@
-// Centralized format configuration (matching popup.js)
-const formatConfig = {
-    slack: {
-        name: 'Slack',
-        description: 'Slack-compatible link format',
-        example: '<https://example.com|Page Title>',
-        worksWith: []
-    },
-    markdown: {
-        name: 'Markdown', 
-        description: 'Markdown link format',
-        example: '[Page Title](https://example.com)',
-        worksWith: ['Discord', 'Reddit', 'GitHub', 'Notion']
-    },
-    html: {
-        name: 'HTML',
-        description: 'HTML anchor tag',
-        example: '<a href="https://example.com">Page Title</a>',
-        worksWith: []
-    },
-    plaintext: {
-        name: 'Plain Text',
-        description: 'Simple text format',
-        example: 'Page Title - https://example.com',
-        worksWith: []
-    },
-    rtf: {
-        name: 'RTF (Rich Text)',
-        description: 'Rich Text Format',
-        example: 'For Word/Outlook compatibility',
-        worksWith: []
-    },
-    urlparams: {
-        name: 'URL + Title Parameter',
-        description: 'URL with title as parameter',
-        example: 'https://example.com?_title=Page%20Title',
-        worksWith: []
-    }
-};
-
-const formats = formatConfig;
+// Load format configuration from centralized registry 
+// The registry is loaded as a script in the HTML, making FancyLinkFormatRegistry available globally
+const formats = globalThis.FancyLinkFormatRegistry.formatConfig;
+// Note: getWorksWithText is used directly from globalThis.FancyLinkFormatRegistry.getWorksWithText to avoid redeclaration
 
 // Default settings
 const DEFAULT_SETTINGS = {

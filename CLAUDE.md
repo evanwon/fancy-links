@@ -28,8 +28,7 @@ ls -la src/
 - `src/background/background.js` - Main extension logic
 - `src/popup/popup.js` - Toolbar popup UI
 - `src/options/options.js` - Settings page
-- `src/formats/format-config.js` - Centralized format configuration
-- `src/formats/*.js` - Format modules (6 types)
+- `src/formats/format-registry.js` - Centralized format registry with all format logic
 - `src/utils/clean-url.js` - URL cleaning utility
 - `src/shared/` - Shared utilities and configurations
 - `test/` - Automated test suites and manual testing
@@ -46,7 +45,8 @@ ls -la src/
 - ✅ Browser-agnostic rebranding (ff-fancy-links → fancy-links)
 - ✅ Updated README.md to remove Firefox-specific branding while maintaining platform clarity
 - ✅ Default format indicator in popup UI (GitHub issue #16) - Shows current default with border + "Default" label
-- ✅ Centralized format configuration - Created `src/formats/format-config.js` to eliminate code duplication between popup and options UI
+- ✅ Centralized format configuration - Created `src/formats/format-registry.js` to consolidate all format logic into single registry
+- ✅ Format architecture refactor - Consolidated individual format files into unified registry pattern
 
 ## Project Overview
 
@@ -60,7 +60,7 @@ When implementing this extension, follow the standard Firefox WebExtension struc
 - `src/popup/` - UI for toolbar popup (HTML/CSS/JS)
 - `src/options/` - Settings page for configuring default format and preferences
 - `src/utils/` - Shared utilities (browser API wrapper, clipboard, sanitization)
-- `src/formats/` - Format modules for different platforms
+- `src/formats/` - Format registry with centralized format logic
 - `icons/` - Extension icons in multiple sizes (16px, 32px, 48px, 128px)
 - `test/` - Automated test suites and manual testing files
 - `tools/` - Development utilities (icon generation, etc.)
@@ -78,16 +78,17 @@ When implementing this extension, follow the standard Firefox WebExtension struc
 - `storage` - To save user preferences
 - `notifications` - To show copy confirmation and error messages
 
-### Format Modules
-Each link format is implemented as a separate module in `src/formats/` directory:
-- `src/formats/slack.js` - Slack format (<URL|Title>)
-- `src/formats/html.js` - HTML anchor tag (<a href="URL">Title</a>)
-- `src/formats/markdown.js` - Markdown link format ([Title](URL)) - Used for Discord, Reddit, GitHub, Notion
-- `src/formats/plaintext.js` - Plain text format (Title - URL)
-- `src/formats/rtf.js` - Rich Text Format for Word/Outlook
-- `src/formats/urlparams.js` - URL with title as parameter (URL?_title=Title)
+### Format Registry
+All link formats are consolidated in a single registry file:
+- `src/formats/format-registry.js` - Universal format registry with all format configurations and logic
+  - `slack` - Slack format (<URL|Title>)
+  - `html` - HTML anchor tag (<a href="URL">Title</a>)
+  - `markdown` - Markdown link format ([Title](URL)) - Used for Discord, Reddit, GitHub, Notion
+  - `plaintext` - Plain text format (Title - URL)
+  - `rtf` - Rich Text Format for Word/Outlook
+  - `urlparams` - URL with title as parameter (URL?_title=Title)
 
-Each format module should export a `format(title, url)` function.
+The registry exports format configurations with metadata, sanitizers, and format functions. It supports ES6 modules, CommonJS, and global contexts.
 
 ### Browser Compatibility
 - Target Firefox 109+ for modern WebExtension APIs
@@ -161,7 +162,7 @@ The extension follows [semantic versioning (semver)](https://semver.org/) princi
   - Bug fixes, test improvements → PATCH
   - Breaking API changes → MAJOR
 
-**Current version: 1.0.0** (Production-ready with all core features)
+**Current version: 1.0.2** (Production-ready with consolidated format architecture)
 
 ## Git Commit Guidelines
 
@@ -188,7 +189,7 @@ When making commits to this repository, follow these preferences:
 
 ## Testing Approach
 
-- Manual testing with `web-ext run` to launch Firefox with extension loaded
+- Manual testing with `web-ext run --verbose` to launch Firefox with extension loaded
 - Test each format type with various URLs and page titles
 - Verify keyboard shortcuts work across different pages
 - Test persistence of user preferences across browser sessions
@@ -207,54 +208,9 @@ If a `SESSION_SUMMARY.md` file exists in the root directory, or a `.temp/SESSION
 
 This file is temporary and used for handoffs between development sessions.
 
-## Recent Changes (2025-09-03)
-
-### ✅ Completed Features
-1. **Clean Links Setting** - Added option to remove tracking parameters from URLs
-   - New utility: `src/utils/clean-url.js` with cross-browser URL cleaning
-   - Setting added to Advanced options (disabled by default)
-   - Integrated into background script for all format types
-   - Comprehensive test suite: `test/test-clean-url.js`
-
-2. **Consolidated Format Options** - Grouped similar formats for better UX
-   - Combined Discord, Reddit, GitHub, Notion under "Markdown Links"
-   - Updated both options page and popup UI
-   - Reduced format choices from 8 to 6 while maintaining functionality
-   - Added "Works with" labels for clarity
-
-3. **Removed Redundant Format Implementations** - Cleaned up duplicate code
-   - Deleted `src/formats/discord.js` and `reddit.js` (identical to markdown.js)
-   - Removed duplicate format definitions from `formats-browser.js` and `popup.js`
-   - Updated test files to remove references to deleted modules
-   - Reduced code duplication and bundle size while maintaining all functionality
-
-4. **Fixed Test Suite** - Resolved module import issues
-   - Fixed `test/test-formats.js` to use proper Node.js require() instead of eval()
-   - All tests now run successfully: URL cleaning (100% pass rate), format testing (all formats working)
-   - Maintained comprehensive test coverage for both URL cleaning and format generation
-
-5. **Project Structure Reorganization** - Organized auxiliary files
-   - Created `test/` directory for all testing files (automated tests, manual testing)
-   - Created `tools/` directory for development utilities (icon generation)
-   - Renamed `test.html` to `test/manual.html` for clarity
-   - Clean root directory with only essential project files
-
-### 📋 Task Management
+### Task Management
 
 **All TODO items have been migrated to GitHub Issues:** https://github.com/evanwon/fancy-links/issues
-
-#### Current High-Priority Work
-For immediate development priorities, see GitHub Issues with `priority: high` label:
-- [Issue #2: Set up GitHub repository and update documentation URLs](https://github.com/evanwon/fancy-links/issues/2)  
-- [Issue #3: Create fancy-links@evanw.com email address](https://github.com/evanwon/fancy-links/issues/3)
-- [Issue #4: Set up automated test runner for CI/CD pipeline](https://github.com/evanwon/fancy-links/issues/4)
-- [Issue #5: Evaluate architecture for plug-and-play community link format plugins](https://github.com/evanwon/fancy-links/issues/5)
-- [Issue #6: Enhance format descriptions in popup UI](https://github.com/evanwon/fancy-links/issues/6)
-
-#### Completed Priority Items
-- [x] **Establish priority nomenclature system** ✅ (2025-09-04)
-- [x] **Move permanent TODOs to GitHub Issues** ✅ (2025-09-04) - [Issue #1](https://github.com/evanwon/fancy-links/issues/1)  
-- [x] **Review project naming for cross-browser compatibility** ✅ (2025-09-04)
 
 #### Available GitHub Labels
 When creating issues, use these available labels appropriately:
@@ -283,11 +239,11 @@ When creating issues, use these available labels appropriately:
 - **Low Priority**: Future considerations and nice-to-have features
 - **New Issues**: Use GitHub Issues for all new tasks, bugs, and feature requests
 
-### 🧪 Testing Notes
+### Testing Notes
 - URL cleaning tested with 13 test cases covering UTM, Facebook, Amazon, YouTube tracking
 - Format testing covers 6 consolidated formats with 3 comprehensive test scenarios
 - Format consolidation maintains backward compatibility
-- All individual format modules preserved for API stability
+- Format architecture consolidated into single registry for better maintainability
 - Test suite runs successfully with `node test/test-clean-url.js` and `node test/test-formats.js`
 - Manual testing available via `test/manual.html` page
 - Icon generation utility available at `tools/generate-icons.html`

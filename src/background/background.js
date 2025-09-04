@@ -4,7 +4,7 @@
  */
 
 // Use shared format library loaded by manifest.json
-// Note: FancyLinkFormatConfig is available from format-config.js
+// Note: FancyLinkFormatConfig is available from format-registry.js
 
 // Default settings
 const DEFAULT_FORMAT = 'markdown';
