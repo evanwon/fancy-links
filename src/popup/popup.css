@@ -168,6 +168,38 @@ body {
     opacity: 1;
 }
 
+.set-default-btn {
+    font-size: 9px;
+    color: #aaa;
+    opacity: 0.6;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font-family: inherit;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.set-default-btn:hover {
+    opacity: 1;
+    color: #667eea;
+    text-decoration: underline;
+}
+
+.set-default-btn:active {
+    transform: scale(0.95);
+}
+
+.set-default-btn:focus {
+    outline: 1px solid #667eea;
+    outline-offset: 1px;
+    border-radius: 2px;
+}
+
 .format-apps {
     font-size: 10px;
     color: #888;

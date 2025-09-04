@@ -64,6 +64,16 @@ function generateFormatButtons() {
         defaultLabel.textContent = 'Default';
         header.appendChild(defaultLabel);
         
+        const setDefaultBtn = document.createElement('button');
+        setDefaultBtn.className = 'set-default-btn';
+        setDefaultBtn.textContent = 'Set Default';
+        setDefaultBtn.setAttribute('data-format', formatKey);
+        setDefaultBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent format button click
+            setDefaultFormat(formatKey);
+        });
+        header.appendChild(setDefaultBtn);
+        
         button.appendChild(header);
         
         // Add "works with" text if applicable
@@ -211,6 +221,27 @@ async function copyWithFormat(formatKey) {
     }
 }
 
+async function setDefaultFormat(formatKey) {
+    try {
+        // Save the new default format to storage
+        await browser.storage.sync.set({
+            defaultFormat: formatKey
+        });
+        
+        // Update the UI to reflect the change
+        await updateDefaultIndicator();
+        
+        // Show confirmation notification
+        const config = formats[formatKey];
+        const formatName = config ? config.name : formatKey;
+        showNotification(`${formatName} set as default format`, 'success');
+        
+    } catch (error) {
+        console.error('Error setting default format:', error);
+        showNotification('Failed to set default format', 'error');
+    }
+}
+
 async function updateDefaultIndicator() {
     try {
         // Get the default format setting
@@ -220,16 +251,28 @@ async function updateDefaultIndicator() {
         
         const defaultFormat = settings.defaultFormat;
         
-        // Remove default class from all format buttons first
+        // Update all format buttons
         document.querySelectorAll('.format-btn').forEach(button => {
-            button.classList.remove('default');
+            const formatKey = button.getAttribute('data-format');
+            const isDefault = formatKey === defaultFormat;
+            
+            // Update button class
+            button.classList.toggle('default', isDefault);
+            
+            // Show/hide appropriate label/button
+            const defaultLabel = button.querySelector('.default-label');
+            const setDefaultBtn = button.querySelector('.set-default-btn');
+            
+            if (defaultLabel && setDefaultBtn) {
+                if (isDefault) {
+                    defaultLabel.style.display = 'inline';
+                    setDefaultBtn.style.display = 'none';
+                } else {
+                    defaultLabel.style.display = 'none';
+                    setDefaultBtn.style.display = 'inline';
+                }
+            }
         });
-        
-        // Add default class to the current default format button
-        const defaultButton = document.querySelector(`.format-btn[data-format="${defaultFormat}"]`);
-        if (defaultButton) {
-            defaultButton.classList.add('default');
-        }
     } catch (error) {
         console.warn('Could not load default format setting:', error);
         // Fallback to showing markdown as default if settings can't be loaded

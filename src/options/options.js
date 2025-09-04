@@ -14,60 +14,10 @@ const DEFAULT_SETTINGS = {
 
 // Initialize options page
 document.addEventListener('DOMContentLoaded', async () => {
-    generateFormatOptions();
     await loadSettings();
     setupEventListeners();
 });
 
-/**
- * Generate format options dynamically from the format configuration
- */
-function generateFormatOptions() {
-    const container = document.getElementById('formatOptions');
-    if (!container) return;
-    
-    // Clear existing content
-    container.innerHTML = '';
-    
-    // Generate radio options for each format
-    Object.keys(formats).forEach(formatKey => {
-        const config = formats[formatKey];
-        if (!config) return;
-        
-        const label = document.createElement('label');
-        label.className = 'format-option';
-        
-        const input = document.createElement('input');
-        input.type = 'radio';
-        input.name = 'defaultFormat';
-        input.value = formatKey;
-        label.appendChild(input);
-        
-        const formatInfo = document.createElement('div');
-        formatInfo.className = 'format-info';
-        
-        const name = document.createElement('span');
-        name.className = 'format-name';
-        name.textContent = config.name;
-        formatInfo.appendChild(name);
-        
-        const example = document.createElement('span');
-        example.className = 'format-example';
-        example.textContent = config.example;
-        formatInfo.appendChild(example);
-        
-        // Add "works with" text if applicable
-        if (config.worksWith && config.worksWith.length > 0) {
-            const worksWithSpan = document.createElement('span');
-            worksWithSpan.className = 'format-apps';
-            worksWithSpan.textContent = 'Works with: ' + config.worksWith.join(', ');
-            formatInfo.appendChild(worksWithSpan);
-        }
-        
-        label.appendChild(formatInfo);
-        container.appendChild(label);
-    });
-}
 
 async function loadSettings() {
     try {
@@ -99,12 +49,6 @@ async function loadSettings() {
 }
 
 function updateUI(settings) {
-    // Set default format radio button
-    const formatRadio = document.querySelector(`input[name="defaultFormat"][value="${settings.defaultFormat}"]`);
-    if (formatRadio) {
-        formatRadio.checked = true;
-    }
-    
     // Set checkboxes
     document.getElementById('showNotifications').checked = settings.showNotifications;
     document.getElementById('showBadge').checked = settings.showBadge;
@@ -130,8 +74,11 @@ function setupEventListeners() {
 
 async function saveSettings() {
     try {
+        // Get current default format from storage to preserve it
+        const currentSettings = await browser.storage.sync.get({ defaultFormat: DEFAULT_SETTINGS.defaultFormat });
+        
         const settings = {
-            defaultFormat: document.querySelector('input[name="defaultFormat"]:checked')?.value || DEFAULT_SETTINGS.defaultFormat,
+            defaultFormat: currentSettings.defaultFormat, // Preserve existing default format
             showNotifications: document.getElementById('showNotifications').checked,
             showBadge: document.getElementById('showBadge').checked,
             cleanUrls: document.getElementById('cleanUrls').checked,
