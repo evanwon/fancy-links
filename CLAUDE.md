@@ -32,6 +32,7 @@ ls -la src/
 - `src/utils/clean-url.js` - URL cleaning utility
 - `test/` - Automated test suites and manual testing
 - `tools/` - Development utilities (icon generation)
+- `design/` - Design working files and assets
 
 ### Recent Work (2025-09-03)
 - ✅ Clean links feature with URL parameter removal
@@ -57,6 +58,11 @@ When implementing this extension, follow the standard Firefox WebExtension struc
 - `icons/` - Extension icons in multiple sizes (16px, 32px, 48px, 128px)
 - `test/` - Automated test suites and manual testing files
 - `tools/` - Development utilities (icon generation, etc.)
+- `design/` - Design working files and source assets
+  - `design/icons/` - GIMP .xcf, Photoshop .psd, and other icon source files
+  - `design/mockups/` - UI mockups and wireframes
+  - `design/assets/` - Reference images, color palettes, design resources
+  - `design/exports/` - Temporary exports before moving to production folders
 
 ## Key Implementation Notes
 
