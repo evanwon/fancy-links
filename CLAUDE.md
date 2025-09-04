@@ -105,6 +105,30 @@ web-ext build
 web-ext lint
 ```
 
+## Post-Change Checklist
+
+**CRITICAL**: After every functional change to this project, Claude Code must consider these three items:
+
+1. **Execute Tests** - Always run the test suite after functional changes:
+   ```bash
+   node test/test-clean-url.js
+   node test/test-formats.js
+   ```
+   - Once automated tests are hooked up to PRs, this will move to automatic execution
+   - Until then, manual test execution is required for all functional changes
+
+2. **Consider Committing Changes** - Evaluate if changes should be committed:
+   - Are the changes complete and functional?
+   - Do tests pass?
+   - Is this a logical commit point?
+   - Follow the project's git commit guidelines (cohesive logical commits preferred)
+
+3. **Consider Version Bump** - Evaluate if semver should be updated in `manifest.json`:
+   - **PATCH**: Bug fixes, minor tweaks, documentation updates
+   - **MINOR**: New features, format additions, backward-compatible changes  
+   - **MAJOR**: Breaking changes, major architecture changes
+   - Update version in `manifest.json` for significant releases
+
 ## Version Management
 
 The extension follows [semantic versioning (semver)](https://semver.org/) principles:
@@ -260,6 +284,12 @@ This file is temporary and used for handoffs between development sessions.
   - ✅ Plan for future Chrome/Edge support with unified codebase
   - ✅ Renamed repository from ff-fancy-links to fancy-links (2025-09-04)
   - ✅ Updated README.md title, description, and examples to be browser-agnostic
+
+- [ ] **Customizable toolbar icon selection**
+  - Add icon selection UI to options page for users to choose toolbar appearance
+  - Use browser.browserAction.setIcon() API to dynamically update toolbar icon
+  - Bundle alternative icon themes or allow custom icon uploads
+  - Store user's icon preference in extension storage
 
 - [ ] **Customizable format ordering in popup**
   - Allow users to reorder link formats via drag-and-drop
