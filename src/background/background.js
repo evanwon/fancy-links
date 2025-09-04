@@ -4,7 +4,7 @@
  */
 
 // Use shared format library loaded by manifest.json
-// Note: FancyLinkFormats is available from formats-browser.js
+// Note: FancyLinkFormatConfig is available from format-config.js
 
 // Default settings
 const DEFAULT_FORMAT = 'markdown';
@@ -70,14 +70,14 @@ async function copyFancyLink(formatType = null) {
       url = window.FancyLinkCleanUrl.cleanUrl(url);
     }
     
-    // Get the formatter function
-    const formatter = window.FancyLinkFormats[format];
-    if (!formatter) {
+    // Get the formatter configuration and function
+    const formatConfig = window.FancyLinkFormatConfig.getFormatConfig(format);
+    if (!formatConfig || !formatConfig.format) {
       throw new Error(`Unknown format: ${format}`);
     }
     
     // Format the link
-    const formattedLink = formatter.format(title, url);
+    const formattedLink = formatConfig.format(title, url);
     
     // Copy to clipboard using content script injection
     // This is necessary because clipboard API isn't available in background scripts

@@ -18,55 +18,8 @@
                 <h2>Default Format</h2>
                 <p class="section-description">Choose the format to use when copying via keyboard shortcut (Ctrl+Shift+L)</p>
                 
-                <div class="format-options">
-                    <label class="format-option">
-                        <input type="radio" name="defaultFormat" value="slack">
-                        <div class="format-info">
-                            <span class="format-name">Slack</span>
-                            <span class="format-example">&lt;https://example.com|Page Title&gt;</span>
-                        </div>
-                    </label>
-                    
-                    <label class="format-option">
-                        <input type="radio" name="defaultFormat" value="markdown">
-                        <div class="format-info">
-                            <span class="format-name">Markdown</span>
-                            <span class="format-example">[Page Title](https://example.com)</span>
-                            <span class="format-apps">Works with: Discord, Reddit, GitHub, Notion</span>
-                        </div>
-                    </label>
-                    
-                    <label class="format-option">
-                        <input type="radio" name="defaultFormat" value="html">
-                        <div class="format-info">
-                            <span class="format-name">HTML</span>
-                            <span class="format-example">&lt;a href="https://example.com"&gt;Page Title&lt;/a&gt;</span>
-                        </div>
-                    </label>
-                    
-                    <label class="format-option">
-                        <input type="radio" name="defaultFormat" value="plaintext">
-                        <div class="format-info">
-                            <span class="format-name">Plain Text</span>
-                            <span class="format-example">Page Title - https://example.com</span>
-                        </div>
-                    </label>
-                    
-                    <label class="format-option">
-                        <input type="radio" name="defaultFormat" value="rtf">
-                        <div class="format-info">
-                            <span class="format-name">RTF (Rich Text)</span>
-                            <span class="format-example">For Word/Outlook compatibility</span>
-                        </div>
-                    </label>
-                    
-                    <label class="format-option">
-                        <input type="radio" name="defaultFormat" value="urlparams">
-                        <div class="format-info">
-                            <span class="format-name">URL + Title Parameter</span>
-                            <span class="format-example">https://example.com?_title=Page%20Title</span>
-                        </div>
-                    </label>
+                <div class="format-options" id="formatOptions">
+                    <!-- Format options will be generated dynamically from format-config.js -->
                 </div>
             </section>
             

@@ -1,20 +1,34 @@
-// Format functions - inline implementations for popup
-const formats = {
+// Centralized format configuration
+const formatConfig = {
     slack: {
+        name: 'Slack',
+        description: 'Slack-compatible link format',
+        example: '<https://example.com|Page Title>',
+        worksWith: [],
         format: (title, url) => {
             const sanitizedTitle = title.replace(/[<>|\[\]]/g, ' ').trim();
             const truncatedTitle = sanitizedTitle.length > 500 ? sanitizedTitle.substring(0, 497) + '...' : sanitizedTitle;
             return `<${url}|${truncatedTitle}>`;
         }
     },
+    
     markdown: {
+        name: 'Markdown',
+        description: 'Markdown link format',
+        example: '[Page Title](https://example.com)',
+        worksWith: ['Discord', 'Reddit', 'GitHub', 'Notion'],
         format: (title, url) => {
             const sanitizedTitle = title.replace(/[\[\]()\\]/g, '\\$&');
             const truncatedTitle = sanitizedTitle.length > 500 ? sanitizedTitle.substring(0, 497) + '...' : sanitizedTitle;
             return `[${truncatedTitle}](${url})`;
         }
     },
+    
     html: {
+        name: 'HTML',
+        description: 'HTML anchor tag',
+        example: '<a href="https://example.com">Page Title</a>',
+        worksWith: [],
         format: (title, url) => {
             const sanitizedTitle = title.replace(/[&<>"']/g, match => ({
                 '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
@@ -23,20 +37,35 @@ const formats = {
             return `<a href="${url}">${truncatedTitle}</a>`;
         }
     },
+    
     plaintext: {
+        name: 'Plain Text',
+        description: 'Simple text format',
+        example: 'Page Title - https://example.com',
+        worksWith: [],
         format: (title, url) => {
             const truncatedTitle = title.length > 500 ? title.substring(0, 497) + '...' : title;
             return `${truncatedTitle} - ${url}`;
         }
     },
+    
     rtf: {
+        name: 'RTF',
+        description: 'Rich Text Format',
+        example: 'For Word/Outlook compatibility',
+        worksWith: ['Microsoft Word', 'Outlook'],
         format: (title, url) => {
             const sanitizedTitle = title.replace(/[{}\\]/g, '\\$&');
             const truncatedTitle = sanitizedTitle.length > 500 ? sanitizedTitle.substring(0, 497) + '...' : sanitizedTitle;
             return `{\\rtf1\\ansi\\deff0 {\\field{\\*\\fldinst{HYPERLINK "${url}"}}{\\fldrslt{${truncatedTitle}}}}}`;
         }
     },
+    
     urlparams: {
+        name: 'URL + Title',
+        description: 'URL with title as parameter',
+        example: 'https://example.com?_title=Page%20Title',
+        worksWith: [],
         format: (title, url) => {
             const separator = url.includes('?') ? '&' : '?';
             const encodedTitle = encodeURIComponent(title.replace(/[^\w\s-]/g, ' ').trim());
@@ -45,6 +74,8 @@ const formats = {
         }
     }
 };
+
+const formats = formatConfig;
 
 // Current tab info
 let currentTab = null;
@@ -74,8 +105,63 @@ function loadVersion() {
     }
 }
 
+/**
+ * Generate format buttons dynamically from the format configuration
+ */
+function generateFormatButtons() {
+    const container = document.getElementById('formatButtons');
+    if (!container) return;
+    
+    // Clear existing content
+    container.innerHTML = '';
+    
+    // Generate buttons for each format
+    Object.keys(formats).forEach(formatKey => {
+        const config = formats[formatKey];
+        if (!config) return;
+        
+        const button = document.createElement('button');
+        button.className = 'format-btn';
+        button.setAttribute('data-format', formatKey);
+        
+        // Header with name and default label
+        const header = document.createElement('div');
+        header.className = 'format-header';
+        
+        const name = document.createElement('span');
+        name.className = 'format-name';
+        name.textContent = config.name;
+        header.appendChild(name);
+        
+        const defaultLabel = document.createElement('span');
+        defaultLabel.className = 'default-label';
+        defaultLabel.textContent = 'Default';
+        header.appendChild(defaultLabel);
+        
+        button.appendChild(header);
+        
+        // Add "works with" text if applicable
+        if (config.worksWith && config.worksWith.length > 0) {
+            const worksWithSpan = document.createElement('span');
+            worksWithSpan.className = 'format-apps';
+            worksWithSpan.textContent = config.worksWith.join(', ');
+            button.appendChild(worksWithSpan);
+        }
+        
+        // Preview area
+        const preview = document.createElement('span');
+        preview.className = 'format-preview';
+        preview.id = `preview-${formatKey}`;
+        preview.textContent = 'Loading...';
+        button.appendChild(preview);
+        
+        container.appendChild(button);
+    });
+}
+
 // Initialize popup
 document.addEventListener('DOMContentLoaded', async () => {
+    generateFormatButtons();
     await loadCurrentTab();
     await updatePreviews();
     await updateDefaultIndicator();
@@ -143,9 +229,10 @@ async function updatePreviews() {
     // Update each format preview
     Object.keys(formats).forEach(formatKey => {
         const previewElement = document.getElementById(`preview-${formatKey}`);
-        if (previewElement && formats[formatKey]) {
+        const config = formats[formatKey];
+        if (previewElement && config && config.format) {
             try {
-                const formatted = formats[formatKey].format(title, url);
+                const formatted = config.format(title, url);
                 previewElement.textContent = formatted;
             } catch (error) {
                 console.error(`Error formatting ${formatKey}:`, error);
@@ -156,12 +243,13 @@ async function updatePreviews() {
 }
 
 function setupEventListeners() {
-    // Format button clicks
-    document.querySelectorAll('.format-btn').forEach(button => {
-        button.addEventListener('click', async (e) => {
+    // Format button clicks - use event delegation since buttons are dynamically created
+    document.getElementById('formatButtons').addEventListener('click', async (e) => {
+        const button = e.target.closest('.format-btn');
+        if (button) {
             const format = button.getAttribute('data-format');
             await copyWithFormat(format);
-        });
+        }
     });
     
     // Header settings button
@@ -172,7 +260,8 @@ function setupEventListeners() {
 }
 
 async function copyWithFormat(formatKey) {
-    if (!currentTab || !formats[formatKey]) {
+    const config = formats[formatKey];
+    if (!currentTab || !config || !config.format) {
         showNotification('Error: Invalid format or tab', 'error');
         return;
     }
@@ -185,7 +274,7 @@ async function copyWithFormat(formatKey) {
         });
         
         if (result && result.success) {
-            showNotification(`Copied as ${formatKey}!`, 'success');
+            showNotification(`Copied as ${config.name}!`, 'success');
         } else {
             showNotification(`Copy failed: ${result ? result.error : 'Unknown error'}`, 'error');
         }
