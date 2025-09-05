@@ -193,6 +193,9 @@ function setupEventListeners() {
         browser.runtime.openOptionsPage();
         window.close();
     });
+    
+    // Help button for issue reporting
+    document.getElementById('helpButton').addEventListener('click', handleHelpButtonClick);
 }
 
 async function copyWithFormat(formatKey) {
@@ -311,3 +314,24 @@ function showNotification(message, type = 'success') {
         notificationTimeout = null;
     }, 2000);
 }
+
+async function handleHelpButtonClick() {
+    try {
+        // Get current settings to determine if we should include page info
+        const settings = await browser.storage.sync.get(['includeCurrentPageInBugReports']);
+        const includeCurrentPage = settings.includeCurrentPageInBugReports === true;
+        
+        // Collect diagnostics information
+        const diagnostics = await Diagnostics.collectDiagnostics(includeCurrentPage);
+        const issueUrl = Diagnostics.generateGitHubIssueUrl(diagnostics);
+        
+        // Open GitHub Issues in new tab
+        browser.tabs.create({ url: issueUrl });
+        window.close(); // Close popup after opening issue reporting
+        
+    } catch (error) {
+        console.error('Error generating issue report:', error);
+        showNotification('Error generating issue report', 'error');
+    }
+}
+

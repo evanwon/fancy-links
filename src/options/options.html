@@ -62,12 +62,22 @@
                         <span class="option-description">Enable console logging for troubleshooting</span>
                     </div>
                 </label>
+                
+                <label class="checkbox-option">
+                    <input type="checkbox" id="includeCurrentPageInBugReports">
+                    <span class="checkmark"></span>
+                    <div class="option-info">
+                        <span class="option-name">Include current page in bug reports</span>
+                        <span class="option-description">When reporting issues, include current page URL and title (disabled by default for privacy)</span>
+                    </div>
+                </label>
             </section>
         </main>
         
         <footer class="footer">
             <div class="status-message" id="statusMessage"></div>
             <div class="footer-buttons">
+                <a href="#" id="reportIssueLink" class="report-issue-link">Report Issue</a>
                 <button id="resetButton" class="button button-secondary">Reset to Defaults</button>
                 <button id="saveButton" class="button button-primary">Save Settings</button>
             </div>
@@ -75,6 +85,7 @@
     </div>
     
     <script src="../formats/format-registry.js"></script>
+    <script src="../utils/diagnostics.js"></script>
     <script src="options.js"></script>
 </body>
 </html>

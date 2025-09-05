@@ -216,6 +216,23 @@ body {
 .footer-buttons {
     display: flex;
     gap: 12px;
+    align-items: center;
+}
+
+.report-issue-link {
+    color: #666;
+    text-decoration: none;
+    font-size: 13px;
+    margin-right: auto;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.report-issue-link:hover {
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+    text-decoration: none;
 }
 
 .button {

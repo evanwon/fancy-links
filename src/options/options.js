@@ -9,7 +9,8 @@ const DEFAULT_SETTINGS = {
     showNotifications: false,
     showBadge: true,
     cleanUrls: false,
-    debugMode: false
+    debugMode: false,
+    includeCurrentPageInBugReports: false
 };
 
 // Initialize options page
@@ -54,6 +55,7 @@ function updateUI(settings) {
     document.getElementById('showBadge').checked = settings.showBadge;
     document.getElementById('cleanUrls').checked = settings.cleanUrls;
     document.getElementById('debugMode').checked = settings.debugMode;
+    document.getElementById('includeCurrentPageInBugReports').checked = settings.includeCurrentPageInBugReports;
 }
 
 function setupEventListeners() {
@@ -62,6 +64,9 @@ function setupEventListeners() {
     
     // Reset button
     document.getElementById('resetButton').addEventListener('click', resetSettings);
+    
+    // Report issue link
+    document.getElementById('reportIssueLink').addEventListener('click', handleReportIssue);
     
     // Auto-save on change
     document.querySelectorAll('input').forEach(input => {
@@ -82,7 +87,8 @@ async function saveSettings() {
             showNotifications: document.getElementById('showNotifications').checked,
             showBadge: document.getElementById('showBadge').checked,
             cleanUrls: document.getElementById('cleanUrls').checked,
-            debugMode: document.getElementById('debugMode').checked
+            debugMode: document.getElementById('debugMode').checked,
+            includeCurrentPageInBugReports: document.getElementById('includeCurrentPageInBugReports').checked
         };
         
         // Save to browser storage
@@ -127,3 +133,25 @@ function showStatus(message, type = '') {
     statusElement.textContent = message;
     statusElement.className = `status-message ${type}`;
 }
+
+async function handleReportIssue(event) {
+    event.preventDefault();
+    
+    try {
+        // Get current settings to determine if we should include page info
+        const settings = await browser.storage.sync.get(['includeCurrentPageInBugReports']);
+        const includeCurrentPage = settings.includeCurrentPageInBugReports === true;
+        
+        // Load diagnostics utility - use chrome API for compatibility
+        const diagnostics = await Diagnostics.collectDiagnostics(includeCurrentPage);
+        const issueUrl = Diagnostics.generateGitHubIssueUrl(diagnostics);
+        
+        // Open GitHub Issues in new tab
+        browser.tabs.create({ url: issueUrl });
+        
+    } catch (error) {
+        console.error('Error generating issue report:', error);
+        showStatus('Error generating issue report', 'error');
+    }
+}
+
