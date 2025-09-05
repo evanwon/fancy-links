@@ -106,7 +106,7 @@
         rtf: {
             name: 'RTF',
             description: 'Rich Text Format',
-            example: 'For Word/Outlook compatibility',
+            example: '{\\\\rtf1\\\\ansi\\\\deff0 {\\\\fonttbl {\\\\f0 Times New Roman;}} {\\\\field {\\\\*\\\\fldinst HYPERLINK "https://example.com"} {\\\\fldrslt {\\\\ul\\\\cf1 Page Title}}}}',
             worksWith: ['Microsoft Word', 'Outlook'],
             format: (title, url) => {
                 const displayText = title || url;
