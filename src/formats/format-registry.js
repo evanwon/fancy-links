@@ -37,19 +37,6 @@
      * Each format is a self-contained plugin with all necessary metadata
      */
     const formatConfig = {
-        slack: {
-            name: 'Slack',
-            description: 'Slack-compatible link format',
-            example: '<https://example.com|Page Title>',
-            worksWith: [], // Slack doesn't need a "works with" list
-            format: (title, url) => {
-                const displayText = title || url;
-                const truncated = truncateText(displayText);
-                const sanitized = sanitizers.slack(truncated);
-                return `<${url}|${sanitized}>`;
-            }
-        },
-        
         markdown: {
             name: 'Markdown',
             description: 'Markdown link format',
@@ -60,6 +47,19 @@
                 const truncated = truncateText(displayText);
                 const sanitized = sanitizers.markdown(truncated);
                 return `[${sanitized}](${url})`;
+            }
+        },
+
+        slack: {
+            name: 'Slack',
+            description: 'Slack-compatible link format',
+            example: '<https://example.com|Page Title>',
+            worksWith: [], // Slack doesn't need a "works with" list
+            format: (title, url) => {
+                const displayText = title || url;
+                const truncated = truncateText(displayText);
+                const sanitized = sanitizers.slack(truncated);
+                return `<${url}|${sanitized}>`;
             }
         },
         
@@ -89,20 +89,6 @@
             }
         },
         
-        rtf: {
-            name: 'RTF',
-            description: 'Rich Text Format',
-            example: 'For Word/Outlook compatibility',
-            worksWith: ['Microsoft Word', 'Outlook'],
-            format: (title, url) => {
-                const displayText = title || url;
-                const truncated = truncateText(displayText);
-                const sanitized = sanitizers.rtf(truncated);
-                const urlEscaped = sanitizers.rtf(url);
-                return `{\\rtf1\\ansi\\deff0 {\\fonttbl {\\f0 Times New Roman;}} {\\field {\\*\\fldinst HYPERLINK "${urlEscaped}"} {\\fldrslt {\\ul\\cf1 ${sanitized}}}}}`;
-            }
-        },
-        
         urlparams: {
             name: 'URL + Title',
             description: 'URL with title as parameter',
@@ -114,6 +100,20 @@
                 const sanitized = sanitizers.urlParam(truncated);
                 const separator = url.includes('?') ? '&' : '?';
                 return `${url}${separator}_title=${sanitized}`;
+            }
+        },
+
+        rtf: {
+            name: 'RTF',
+            description: 'Rich Text Format',
+            example: 'For Word/Outlook compatibility',
+            worksWith: ['Microsoft Word', 'Outlook'],
+            format: (title, url) => {
+                const displayText = title || url;
+                const truncated = truncateText(displayText);
+                const sanitized = sanitizers.rtf(truncated);
+                const urlEscaped = sanitizers.rtf(url);
+                return `{\\rtf1\\ansi\\deff0 {\\fonttbl {\\f0 Times New Roman;}} {\\field {\\*\\fldinst HYPERLINK "${urlEscaped}"} {\\fldrslt {\\ul\\cf1 ${sanitized}}}}}`;
             }
         }
     };
