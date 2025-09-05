@@ -220,12 +220,16 @@ async function runTests() {
         // Decode the URL to check content
         const decodedUrl = decodeURIComponent(issueUrl);
         
+        // Debug: print the decoded content to understand what we're getting
+        // console.log('Decoded URL content:', decodedUrl);
+        
         // Check that the URL and title are present somewhere in the body
+        // Note: URL encoding uses + for spaces, so we need to check for both forms
         if (!decodedUrl.includes('https://example.com/test-page')) {
             throw new Error('Missing page URL in issue body');
         }
-        if (!decodedUrl.includes('Test Page Title')) {
-            throw new Error('Missing page title in issue body');
+        if (!decodedUrl.includes('Test Page Title') && !decodedUrl.includes('Test+Page+Title')) {
+            throw new Error(`Missing page title in issue body. Content: ${decodedUrl.substring(0, 500)}...`);
         }
     });
     

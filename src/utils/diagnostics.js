@@ -12,12 +12,24 @@ async function collectDiagnostics(includeCurrentPage = false) {
   const diagnostics = {};
 
   // Extension information
-  // Use browser API if available, fall back to chrome
-  const api = typeof browser !== 'undefined' ? browser : chrome;
-  const manifest = api.runtime.getManifest();
-  diagnostics.extension = {
-    version: manifest.version
-  };
+  // Use browser API if available, fall back to chrome, handle missing APIs
+  let api = null;
+  if (typeof browser !== 'undefined') {
+    api = browser;
+  } else if (typeof chrome !== 'undefined') {
+    api = chrome;
+  }
+  
+  if (api) {
+    const manifest = api.runtime.getManifest();
+    diagnostics.extension = {
+      version: manifest.version
+    };
+  } else {
+    diagnostics.extension = {
+      version: 'Unknown - API not available'
+    };
+  }
 
   // Browser and OS information
   diagnostics.browser = {
@@ -28,8 +40,18 @@ async function collectDiagnostics(includeCurrentPage = false) {
 
   // Extension settings
   try {
-    // Use browser API if available, fall back to chrome
-    const api = typeof browser !== 'undefined' ? browser : chrome;
+    // Use browser API if available, fall back to chrome, handle missing APIs
+    let api = null;
+    if (typeof browser !== 'undefined') {
+      api = browser;
+    } else if (typeof chrome !== 'undefined') {
+      api = chrome;
+    }
+    
+    if (!api) {
+      throw new Error('No browser API available');
+    }
+    
     const settings = await api.storage.sync.get([
       'defaultFormat',
       'cleanUrls', 
@@ -54,8 +76,18 @@ async function collectDiagnostics(includeCurrentPage = false) {
   // Current page information (privacy-conscious)
   if (includeCurrentPage) {
     try {
-      // Use browser API if available, fall back to chrome
-      const api = typeof browser !== 'undefined' ? browser : chrome;
+      // Use browser API if available, fall back to chrome, handle missing APIs
+      let api = null;
+      if (typeof browser !== 'undefined') {
+        api = browser;
+      } else if (typeof chrome !== 'undefined') {
+        api = chrome;
+      }
+      
+      if (!api) {
+        throw new Error('No browser API available');
+      }
+      
       const [tab] = await api.tabs.query({ active: true, currentWindow: true });
       if (tab) {
         diagnostics.currentPage = {
