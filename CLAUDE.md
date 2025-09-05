@@ -18,6 +18,8 @@ web-ext build --source-dir=src --artifacts-dir=dist
 # Run automated tests
 node test/test-clean-url.js
 node test/test-formats.js
+node test/test-truncation.js
+node test/test-diagnostics.js
 
 # Check git status
 git status
@@ -109,6 +111,8 @@ web-ext lint --source-dir=src
 # Run tests
 node test/test-clean-url.js
 node test/test-formats.js
+node test/test-truncation.js
+node test/test-diagnostics.js
 ```
 
 ## Extension Signing & Distribution
@@ -162,6 +166,8 @@ web-ext sign --source-dir=src \
    ```bash
    node test/test-clean-url.js
    node test/test-formats.js
+   node test/test-truncation.js
+   node test/test-diagnostics.js
    ```
    - Once automated tests are hooked up to PRs, this will move to automatic execution
    - Until then, manual test execution is required for all functional changes
@@ -186,7 +192,7 @@ web-ext sign --source-dir=src \
    - Coordinate with version bumps for logical release points
 
 5. **Push to Remote Repository** - Keep GitHub repository synchronized:
-   - Push commits to `origin/master` after completing logical changes
+   - Push commits to `origin/main` after completing logical changes
    - Ensure GitHub Issues and documentation stay in sync with local work
    - Required for team collaboration and public visibility of changes
 
@@ -207,7 +213,7 @@ The extension follows [semantic versioning (semver)](https://semver.org/) princi
   - Bug fixes, test improvements → PATCH
   - Breaking API changes → MAJOR
 
-**Current version: 1.0.2** (Production-ready with consolidated format architecture)
+**Current version: Check `src/manifest.json` "version" field** (Production-ready with consolidated format architecture)
 
 ## Git Commit Guidelines
 
