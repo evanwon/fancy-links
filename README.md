@@ -18,7 +18,7 @@ Interested in other browsers? Please vote for [Chrome support](https://github.co
 
 ### How to Use
 - **Toolbar Button**: Click to open popup with all format options
-- **Keyboard Shortcut**: `Ctrl+Shift+L` (or `Cmd+Shift+L` on Mac) for quick copy with default format (can be changed)
+- **Keyboard Shortcut**: `Ctrl+Alt+C` (or `Cmd+Option+C` on Mac) for quick copy with default format (can be changed)
 - **Live Previews**: See exactly how each format will look before copying
 - **Settings Page**: Configure default format, notifications, and clean URL feature
 - **Clean URLs**: Optional removal of tracking parameters (UTM, Facebook, etc.)
@@ -58,7 +58,7 @@ web-ext build --source-dir=src --artifacts-dir=dist
 
 ### Quick Copy (Keyboard Shortcut)
 1. Navigate to any webpage
-2. Press `Ctrl+Shift+L`
+2. Press `Ctrl+Alt+C`
 3. The formatted link is copied using your default format
 
 ### Format Selection (Popup)
@@ -73,7 +73,7 @@ web-ext build --source-dir=src --artifacts-dir=dist
 4. Enable/disable clean URL feature to remove tracking parameters
 
 ### Customizing Keyboard Shortcuts
-The default keyboard shortcut is `Ctrl+Shift+L` (or `Cmd+Shift+L` on Mac), but you can customize it:
+The default keyboard shortcut is `Ctrl+Alt+C` (or `Cmd+Option+C` on Mac), but you can customize it:
 
 1. Go to `about:addons` in Firefox
 2. Click Extensions in the sidebar

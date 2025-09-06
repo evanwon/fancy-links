@@ -6,17 +6,6 @@ const formats = globalThis.FancyLinkFormatRegistry.formatConfig;
 // Current tab info
 let currentTab = null;
 
-// Helper function to detect OS and get appropriate modifier key
-function getOSModifierKey() {
-    const platform = navigator.platform;
-    const userAgent = navigator.userAgent;
-    
-    if (platform.includes('Mac') || userAgent.includes('Macintosh')) {
-        return 'Cmd';
-    }
-    return 'Ctrl';
-}
-
 // Load version from manifest
 function loadVersion() {
     try {
@@ -119,8 +108,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Update keyboard hint based on OS
 async function updateKeyboardHint() {
-    const hintElement = document.querySelector('.keyboard-hint');
-    if (!hintElement) return;
+    const shortcutSpan = document.getElementById('keyboardShortcut');
+    if (!shortcutSpan) return;
     
     try {
         // Try to get browser API (cross-browser compatible)
@@ -132,34 +121,35 @@ async function updateKeyboardHint() {
             const copyCommand = commands.find(cmd => cmd.name === 'copy-fancy-link');
             
             if (copyCommand && copyCommand.shortcut) {
-                // Use the actual registered shortcut
-                hintElement.textContent = `Press ${copyCommand.shortcut} to quickly copy using your default format`;
+                // Use the centralized formatter
+                shortcutSpan.textContent = KeyboardShortcuts.formatShortcutForDisplay(copyCommand.shortcut);
                 return;
             } else if (copyCommand) {
                 // Command exists but no shortcut assigned
-                hintElement.innerHTML = `No keyboard shortcut set. <a href="#" id="shortcutSettingsLink">Configure in settings →</a>`;
-                
-                // Add click handler for settings link
-                const settingsLink = document.getElementById('shortcutSettingsLink');
-                if (settingsLink) {
-                    settingsLink.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        browserAPI.runtime.openOptionsPage();
-                    });
+                const hintElement = document.querySelector('.keyboard-hint');
+                if (hintElement) {
+                    hintElement.innerHTML = `No keyboard shortcut set. <a href="#" id="shortcutSettingsLink">Configure in settings →</a>`;
+                    
+                    // Add click handler for settings link
+                    const settingsLink = document.getElementById('shortcutSettingsLink');
+                    if (settingsLink) {
+                        settingsLink.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            browserAPI.runtime.openOptionsPage();
+                        });
+                    }
                 }
                 return;
             }
         }
         
-        // Fallback to OS-specific default if command not found
-        const modifier = getOSModifierKey();
-        hintElement.textContent = `Press ${modifier}+Shift+L to quickly copy using your default format`;
+        // Fallback to default
+        shortcutSpan.textContent = KeyboardShortcuts.getDefaultShortcut();
         
     } catch (error) {
         // If commands API fails, use fallback
         console.warn('Could not get keyboard shortcut from commands API:', error);
-        const modifier = getOSModifierKey();
-        hintElement.textContent = `Press ${modifier}+Shift+L to quickly copy using your default format`;
+        shortcutSpan.textContent = KeyboardShortcuts.getDefaultShortcut();
     }
 }
 
