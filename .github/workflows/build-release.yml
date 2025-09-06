@@ -113,7 +113,7 @@ jobs:
         if [ -n "$previous_tag" ]; then
           echo "changelog<<EOF" >> $GITHUB_OUTPUT
           echo "### Changes since $previous_tag" >> $GITHUB_OUTPUT
-          git log --pretty=format:"- %s" $previous_tag..HEAD >> $GITHUB_OUTPUT
+          git log --pretty=format:"- %s (%h)" $previous_tag..HEAD >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
         else
@@ -122,7 +122,7 @@ jobs:
           echo "First official release of Fancy Links browser extension." >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           echo "### Features" >> $GITHUB_OUTPUT
-          git log --pretty=format:"- %s" --reverse >> $GITHUB_OUTPUT
+          git log --pretty=format:"- %s (%h)" --reverse >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
         fi
