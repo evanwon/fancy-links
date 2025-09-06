@@ -173,9 +173,9 @@ jobs:
         3. Download and install the `.xpi` file normally
         
         **Option 2: Temporary Installation (Regular Firefox)**
-        1. Extract the `.xpi` file (it's a ZIP file)
-        2. Go to `about:debugging` → "This Firefox"
-        3. Click "Load Temporary Add-on"
+        1. Right-click the `.xpi` file link below and select "Save Link As" to download the extension (if you click the link, Firefox will try to install it which will be blocked because it's unsigned)
+        2. Go to [about:debugging → "This Firefox"](about:debugging#/runtime/this-firefox)
+        3. Click "Load Temporary Add-on..."
         4. Select the `.xpi` file you downloaded in Step 1
         
         EOF
