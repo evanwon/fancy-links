@@ -37,8 +37,8 @@
   "commands": {
     "copy-fancy-link": {
       "suggested_key": {
-        "default": "Ctrl+Alt+C",
-        "mac": "Command+Alt+C"
+        "default": "Alt+Shift+C",
+        "mac": "Alt+Shift+C"
       },
       "description": "Copy the current page as a fancy link"
     }
