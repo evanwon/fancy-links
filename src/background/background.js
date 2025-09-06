@@ -193,15 +193,6 @@ browser.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     return result;
   }
   
-  if (request.action === 'getFormats') {
-    return Object.keys(window.FancyLinkFormats);
-  }
-  
-  if (request.action === 'getCurrentFormat') {
-    const format = await getCurrentFormat();
-    return { format };
-  }
-  
   if (request.action === 'cleanUrl') {
     try {
       if (window.FancyLinkCleanUrl && request.url) {
