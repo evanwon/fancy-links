@@ -19,8 +19,9 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      with:
-        fetch-tags: true  # Fetch all tags for changelog generation
+      
+    - name: Fetch tags for changelog generation
+      run: git fetch --tags origin
       
     - name: Setup Node.js
       uses: actions/setup-node@v4
