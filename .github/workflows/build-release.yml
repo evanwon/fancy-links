@@ -102,8 +102,10 @@ jobs:
     - name: Generate changelog
       id: changelog
       run: |
-        if git describe --tags --abbrev=0 HEAD^ 2>/dev/null; then
-          previous_tag=$(git describe --tags --abbrev=0 HEAD^)
+        # Find the previous tag (second most recent)
+        previous_tag=$(git tag -l --sort=-version:refname | sed -n '2p')
+        
+        if [ -n "$previous_tag" ]; then
           echo "changelog<<EOF" >> $GITHUB_OUTPUT
           echo "## Changes since $previous_tag" >> $GITHUB_OUTPUT
           git log --pretty=format:"- %s" $previous_tag..HEAD >> $GITHUB_OUTPUT
