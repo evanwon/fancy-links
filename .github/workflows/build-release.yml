@@ -176,7 +176,7 @@ jobs:
         1. Extract the `.xpi` file (it's a ZIP file)
         2. Go to `about:debugging` → "This Firefox"
         3. Click "Load Temporary Add-on"
-        4. Select the `manifest.json` from extracted files
+        4. Select the `.xpi` file you downloaded in Step 1
         
         EOF
         fi
