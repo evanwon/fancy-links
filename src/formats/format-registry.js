@@ -106,14 +106,14 @@
         rtf: {
             name: 'RTF',
             description: 'Rich Text Format',
-            example: '{\\\\rtf1\\\\ansi\\\\deff0 {\\\\fonttbl {\\\\f0 Times New Roman;}} {\\\\field {\\\\*\\\\fldinst HYPERLINK "https://example.com"} {\\\\fldrslt {\\\\ul\\\\cf1 Page Title}}}}',
+            example: '{\\\\rtf1\\\\ansi\\\\deff0 {\\\\field {\\\\*\\\\fldinst HYPERLINK "https://example.com"} {\\\\fldrslt {\\\\ul\\\\cf1 Page Title}}}}',
             worksWith: ['Microsoft Word', 'Outlook'],
             format: (title, url) => {
                 const displayText = title || url;
                 const truncated = truncateText(displayText);
                 const sanitized = sanitizers.rtf(truncated);
                 const urlEscaped = sanitizers.rtf(url);
-                return `{\\rtf1\\ansi\\deff0 {\\fonttbl {\\f0 Times New Roman;}} {\\field {\\*\\fldinst HYPERLINK "${urlEscaped}"} {\\fldrslt {\\ul\\cf1 ${sanitized}}}}}`;
+                return `{\\rtf1\\ansi\\deff0 {\\field {\\*\\fldinst HYPERLINK "${urlEscaped}"} {\\fldrslt {\\ul\\cf1 ${sanitized}}}}}`;
             }
         }
     };

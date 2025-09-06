@@ -6,6 +6,17 @@ const formats = globalThis.FancyLinkFormatRegistry.formatConfig;
 // Current tab info
 let currentTab = null;
 
+// Helper function to detect OS and get appropriate modifier key
+function getOSModifierKey() {
+    const platform = navigator.platform;
+    const userAgent = navigator.userAgent;
+    
+    if (platform.includes('Mac') || userAgent.includes('Macintosh')) {
+        return 'Cmd';
+    }
+    return 'Ctrl';
+}
+
 // Load version from manifest
 function loadVersion() {
     try {
@@ -103,7 +114,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     await updateDefaultIndicator();
     loadVersion();
     setupEventListeners();
+    updateKeyboardHint();
 });
+
+// Update keyboard hint based on OS
+async function updateKeyboardHint() {
+    const hintElement = document.querySelector('.keyboard-hint');
+    if (!hintElement) return;
+    
+    try {
+        // Try to get the actual keyboard shortcut from browser commands API
+        const commands = await browser.commands.getAll();
+        const copyCommand = commands.find(cmd => cmd.name === 'copy-fancy-link');
+        
+        if (copyCommand && copyCommand.shortcut) {
+            // Use the actual registered shortcut
+            hintElement.textContent = `Press ${copyCommand.shortcut} to quickly copy using your default format`;
+        } else {
+            // Fallback to OS-specific default if command not found
+            const modifier = getOSModifierKey();
+            hintElement.textContent = `Press ${modifier}+Shift+L to quickly copy using your default format`;
+        }
+    } catch (error) {
+        // If commands API fails, use fallback
+        console.warn('Could not get keyboard shortcut from commands API:', error);
+        const modifier = getOSModifierKey();
+        hintElement.textContent = `Press ${modifier}+Shift+L to quickly copy using your default format`;
+    }
+}
 
 async function loadCurrentTab() {
     try {
