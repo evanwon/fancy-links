@@ -2,7 +2,7 @@
 A browser extension that allows you to copy formatted links with titles instead of plain URLs. Perfect for sharing links in chat apps, documentation, and anywhere formatted links look better than bare URLs.
 
 **Browser Support:**
-- [Firefox)](https://www.firefox.com/) (minimum version 109)
+- [Firefox](https://www.firefox.com/) (minimum version 109)
 
 Interested in other browsers? Please vote for [Chrome support](https://github.com/evanwon/fancy-links/issues/15) or [suggest a new browser!](https://github.com/evanwon/fancy-links/issues/new/choose).
 
