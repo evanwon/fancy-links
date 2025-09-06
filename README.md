@@ -58,7 +58,7 @@ web-ext build --source-dir=src --artifacts-dir=dist
 
 ### Quick Copy (Keyboard Shortcut)
 1. Navigate to any webpage
-2. Press `Ctrl+Alt+C`
+2. Press `Ctrl+Alt+C` or `Cmd+Option+C` on Mac
 3. The formatted link is copied using your default format
 
 ### Format Selection (Popup)
