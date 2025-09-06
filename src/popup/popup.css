@@ -270,6 +270,15 @@ body {
     color: #888;
 }
 
+.keyboard-hint a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.keyboard-hint a:hover {
+    text-decoration: underline;
+}
+
 .notification {
     position: fixed;
     top: 16px;

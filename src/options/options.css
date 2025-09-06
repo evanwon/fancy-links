@@ -307,3 +307,45 @@ body {
         justify-content: center;
     }
 }
+
+/* Info box for keyboard shortcuts */
+.info-box {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 12px;
+}
+
+.info-box h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.info-box p {
+    color: #666;
+    margin-bottom: 16px;
+}
+
+.shortcut-help h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.shortcut-help p {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 0;
+}
+
+.shortcut-help code {
+    background: #e9ecef;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 12px;
+}

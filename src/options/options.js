@@ -16,8 +16,42 @@ const DEFAULT_SETTINGS = {
 // Initialize options page
 document.addEventListener('DOMContentLoaded', async () => {
     await loadSettings();
+    await updateKeyboardShortcutDisplay();
     setupEventListeners();
 });
+
+// Update keyboard shortcut display (cross-browser compatible)
+async function updateKeyboardShortcutDisplay() {
+    const shortcutElement = document.getElementById('currentShortcut');
+    if (!shortcutElement) return;
+    
+    try {
+        // Try to get browser API (Firefox primarily, but designed for cross-browser)
+        const browserAPI = typeof browser !== 'undefined' ? browser : 
+                          (typeof chrome !== 'undefined' ? chrome : null);
+        
+        if (browserAPI && browserAPI.commands && browserAPI.commands.getAll) {
+            const commands = await browserAPI.commands.getAll();
+            const copyCommand = commands.find(cmd => cmd.name === 'copy-fancy-link');
+            
+            if (copyCommand && copyCommand.shortcut) {
+                shortcutElement.textContent = copyCommand.shortcut;
+                return;
+            }
+        }
+        
+        // Fallback to OS-specific default
+        const platform = navigator.platform;
+        const userAgent = navigator.userAgent;
+        const isMac = platform.includes('Mac') || userAgent.includes('Macintosh');
+        shortcutElement.textContent = isMac ? 'Cmd+Shift+L' : 'Ctrl+Shift+L';
+        
+    } catch (error) {
+        console.warn('Could not get keyboard shortcut:', error);
+        // Fallback to generic display
+        shortcutElement.textContent = 'Ctrl+Shift+L (Cmd+Shift+L on Mac)';
+    }
+}
 
 
 async function loadSettings() {

@@ -123,18 +123,38 @@ async function updateKeyboardHint() {
     if (!hintElement) return;
     
     try {
-        // Try to get the actual keyboard shortcut from browser commands API
-        const commands = await browser.commands.getAll();
-        const copyCommand = commands.find(cmd => cmd.name === 'copy-fancy-link');
+        // Try to get browser API (cross-browser compatible)
+        const browserAPI = typeof browser !== 'undefined' ? browser : 
+                          (typeof chrome !== 'undefined' ? chrome : null);
         
-        if (copyCommand && copyCommand.shortcut) {
-            // Use the actual registered shortcut
-            hintElement.textContent = `Press ${copyCommand.shortcut} to quickly copy using your default format`;
-        } else {
-            // Fallback to OS-specific default if command not found
-            const modifier = getOSModifierKey();
-            hintElement.textContent = `Press ${modifier}+Shift+L to quickly copy using your default format`;
+        if (browserAPI && browserAPI.commands && browserAPI.commands.getAll) {
+            const commands = await browserAPI.commands.getAll();
+            const copyCommand = commands.find(cmd => cmd.name === 'copy-fancy-link');
+            
+            if (copyCommand && copyCommand.shortcut) {
+                // Use the actual registered shortcut
+                hintElement.textContent = `Press ${copyCommand.shortcut} to quickly copy using your default format`;
+                return;
+            } else if (copyCommand) {
+                // Command exists but no shortcut assigned
+                hintElement.innerHTML = `No keyboard shortcut set. <a href="#" id="shortcutSettingsLink">Configure in settings →</a>`;
+                
+                // Add click handler for settings link
+                const settingsLink = document.getElementById('shortcutSettingsLink');
+                if (settingsLink) {
+                    settingsLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        browserAPI.runtime.openOptionsPage();
+                    });
+                }
+                return;
+            }
         }
+        
+        // Fallback to OS-specific default if command not found
+        const modifier = getOSModifierKey();
+        hintElement.textContent = `Press ${modifier}+Shift+L to quickly copy using your default format`;
+        
     } catch (error) {
         // If commands API fails, use fallback
         console.warn('Could not get keyboard shortcut from commands API:', error);
