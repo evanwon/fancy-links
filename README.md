@@ -1,34 +1,37 @@
 # Fancy Links
 A browser extension that allows you to copy formatted links with titles instead of plain URLs. Perfect for sharing links in chat apps, documentation, and anywhere formatted links look better than bare URLs.
 
-**Currently supports:** Firefox (may support Chrome/Edge in the future - please vote for it in the issues!)
+**Browser Support:**
+- [Firefox)](https://www.firefox.com/) (minimum version 109)
+
+Interested in other browsers? Please vote for [Chrome support](https://github.com/evanwon/fancy-links/issues/15) or [suggest a new browser!](https://github.com/evanwon/fancy-links/issues/new/choose).
 
 ## Features
 
-### Supported Output Formats
-- **Slack**: `<URL|Title>`
+### Supported Link Formats
 - **Markdown** (Reddit, Discord, Obsidian, Notion, etc.): `[Title](URL)`
+- **Slack**: `<URL|Title>`
 - **HTML**: `<a href="URL">Title</a>`
 - **Plain Text**: `Title - URL`
-- **Rich Text Format (RTF)** (Word, Outlook, etc.): `{\rtf1{\field{\*\fldinst HYPERLINK "URL"}{\fldrslt Title}}}` :dizzy_face:
 - **URL Parameters**: `URL?_title=Title`
+- **Rich Text Format (RTF)** (Word, Outlook, etc.): `{\rtf1\ansi\deff0 {\fonttbl {\f0 Times New Roman;}} {\field {\*\fldinst HYPERLINK "URL"} {\fldrslt {\ul\cf1 Title}}}}`
 
-### Usage Options
+### How to Use
 - **Toolbar Button**: Click to open popup with all format options
 - **Keyboard Shortcut**: `Ctrl+Shift+L` for quick copy with default format
 - **Live Previews**: See exactly how each format will look before copying
 - **Settings Page**: Configure default format, notifications, and clean URL feature
 - **Clean URLs**: Optional removal of tracking parameters (UTM, Facebook, etc.)
 
-## Installation
-
-### Normal Installation
-Note: We'll eventually publish this as an official extension. Probably.
+## How to Install
+Note: We're working on publishing this as an [official Firefox extension](https://github.com/evanwon/fancy-links/issues/23), but in the meantime, you can install it following the instructions below.
 
 1. Download the latest `.xpi` file from [Releases](https://github.com/evanwon/fancy-links/releases)
-2. Open Firefox and navigate to `about:addons`
-3. Click the gear icon → "Install Add-on From File"
+2. Open Firefox and navigate to [about:debugging#/runtime/this-firefox](about:debugging#/runtime/this-firefox)
+3. Click "Load Temporary Add-on"
 4. Select the downloaded `.xpi` file
+
+Note that using this `about:debugging` approach will only load the plugin for your current session. Once we get this published as an official Firefox extension this will no longer be an issue.
 
 ### Development Installation
 ```bash
@@ -39,15 +42,15 @@ cd fancy-links
 # Install web-ext (if not already installed)
 npm install -g web-ext
 
-# Run in development mode
+# Run tests
+# TODO: I plan to move this over to a standard test framework and then have a simpler command to run, see: https://github.com/evanwon/fancy-links/issues/41
+node test/test-clean-url.js && node test/test-formats.js && node test/test-truncation.js && node test/test-diagnostics.js
+
+# Run in development mode (will hot reload if you make any changes!)
 web-ext run --source-dir=src
 
-# Build for distribution
+# Package the extension
 web-ext build --source-dir=src --artifacts-dir=dist
-
-# Run tests
-node test/test-clean-url.js
-node test/test-formats.js
 ```
 
 ## Usage
@@ -59,7 +62,7 @@ node test/test-formats.js
 
 ### Format Selection (Popup)
 1. Click the Fancy Links icon in the toolbar
-2. Choose from 6 different format categories
+2. Choose from the different link formats
 3. Click any format button to copy instantly
 
 ### Settings
@@ -67,25 +70,6 @@ node test/test-formats.js
 2. Choose your default format
 3. Configure notification preferences
 4. Enable/disable clean URL feature to remove tracking parameters
-
-## Project Structure
-```
-fancy-links/
-├── manifest.json           # Extension configuration
-├── src/
-│   ├── background/         # Background script
-│   ├── popup/             # Toolbar popup (HTML, CSS, JS)
-│   ├── options/           # Settings page
-│   ├── formats/           # Individual format modules
-│   └── utils/             # Shared utilities
-├── icons/                 # Extension icons (SVG)
-├── test/
-│   ├── manual.html        # Manual testing page
-│   ├── test-formats.js    # Format testing script
-│   └── test-clean-url.js  # URL cleaning tests
-└── tools/
-    └── generate-icons.html # Icon generation utility
-```
 
 ## Testing
 
@@ -96,20 +80,17 @@ fancy-links/
 
 ### Automated Testing
 ```bash
-# Test all formats with sample data
-node test/test-formats.js
-
-# Test URL cleaning functionality
-node test/test-clean-url.js
+# TODO: I plan to move this over to a standard test framework and then have a simpler command to run, see: https://github.com/evanwon/fancy-links/issues/41
+node test/test-clean-url.js && node test/test-formats.js && node test/test-truncation.js && node test/test-diagnostics.js
 ```
 
 ## Contributing
 1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
+2. Create a feature branch: `git checkout -b feature/your-feature-name`
 3. Make your changes
 4. Test thoroughly with `web-ext run --source-dir=src`
-5. Commit: `git commit -m 'Add amazing feature'`
-6. Push: `git push origin feature/amazing-feature`
+5. Commit: `git commit -m 'Crisp, specific definition of your change'`
+6. Push: `git push origin feature/your-feature-name`
 7. Open a Pull Request
 
 ## Project Structure
@@ -122,8 +103,8 @@ fancy-links/
 │   ├── popup/             # Toolbar popup UI
 │   ├── options/           # Settings page
 │   ├── formats/           # Format registry and logic
-│   ├── utils/             # Shared utilities
-│   └── icons/             # Extension icons
+│   ├── utils/             # Shared utilities (clean-url, clipboard, etc.)
+│   └── icons/             # Extension icons (PNG/SVG)
 ├── test/                  # Automated and manual tests
 ├── tools/                 # Development utilities
 ├── design/                # Design files and assets
