@@ -112,7 +112,7 @@ jobs:
         
         if [ -n "$previous_tag" ]; then
           echo "changelog<<EOF" >> $GITHUB_OUTPUT
-          echo "## Changes since $previous_tag" >> $GITHUB_OUTPUT
+          echo "### Changes since $previous_tag" >> $GITHUB_OUTPUT
           git log --pretty=format:"- %s" $previous_tag..HEAD >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
