@@ -16,6 +16,7 @@ function loadVersion() {
             if (manifest && manifest.version) {
                 versionElement.textContent = `v${manifest.version}`;
                 versionElement.style.display = 'inline';
+                versionElement.title = 'Click to view changelog';
             } else {
                 // Hide the version element if version can't be retrieved
                 versionElement.style.display = 'none';
@@ -244,6 +245,12 @@ function setupEventListeners() {
     
     // Help button for issue reporting
     document.getElementById('helpButton').addEventListener('click', handleHelpButtonClick);
+    
+    // Version number click to open changelog
+    const versionElement = document.getElementById('version');
+    if (versionElement) {
+        versionElement.addEventListener('click', handleVersionClick);
+    }
 }
 
 async function copyWithFormat(formatKey) {
@@ -380,6 +387,20 @@ async function handleHelpButtonClick() {
     } catch (error) {
         console.error('Error generating issue report:', error);
         showNotification('Error generating issue report', 'error');
+    }
+}
+
+async function handleVersionClick() {
+    try {
+        const manifest = browser.runtime.getManifest();
+        if (manifest && manifest.version) {
+            const changelogUrl = `https://github.com/evanwon/fancy-links/releases/tag/v${manifest.version}`;
+            browser.tabs.create({ url: changelogUrl });
+            window.close();
+        }
+    } catch (error) {
+        console.error('Error opening changelog:', error);
+        showNotification('Error opening changelog', 'error');
     }
 }
 
