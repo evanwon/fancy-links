@@ -86,22 +86,22 @@ async function copyFancyLink(formatType = null) {
         (async function() {
           try {
             const text = ${JSON.stringify(formattedLink)};
-            const isRichText = ${format === 'html' || format === 'rtf'};
+            const isRichText = ${format === 'rtf'};
             
-            if (isRichText && ${format === 'html'}) {
-              // For HTML, try to copy as rich text
-              const htmlBlob = new Blob([text], { type: 'text/html' });
-              const plainText = text.replace(/<[^>]*>/g, ''); // Strip HTML for plain text
+            if (isRichText) {
+              // For RTF, try to copy as rich text
+              const rtfBlob = new Blob([text], { type: 'text/rtf' });
+              const plainText = text.replace(/<[^>]*>/g, ''); // Strip RTF for plain text
               const plainBlob = new Blob([plainText], { type: 'text/plain' });
               
               const clipboardItem = new ClipboardItem({
-                'text/html': htmlBlob,
+                'text/rtf': rtfBlob,
                 'text/plain': plainBlob
               });
               
               await navigator.clipboard.write([clipboardItem]);
             } else {
-              // For plain text formats
+              // For all other formats
               await navigator.clipboard.writeText(text);
             }
             
