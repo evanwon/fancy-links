@@ -14,7 +14,7 @@ Interested in other browsers? Please vote for [Chrome support](https://github.co
 - **HTML**: `<a href="URL">Title</a>`
 - **Plain Text**: `Title - URL`
 - **URL Parameters**: `URL?_title=Title`
-- **Rich Text Format (RTF)** (Word, Outlook, etc.): `{\rtf1\ansi\deff0 {\fonttbl {\f0 Times New Roman;}} {\field {\*\fldinst HYPERLINK "URL"} {\fldrslt {\ul\cf1 Title}}}}`
+- **Rich Text Format (RTF)** (Word, Outlook, etc.): `{\rtf1\ansi\deff0 {\field {\*\fldinst HYPERLINK "URL"} {\fldrslt {\ul\cf1 Title}}}}`
 
 ### How to Use
 - **Toolbar Button**: Click to open popup with all format options
