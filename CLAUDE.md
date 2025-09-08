@@ -13,7 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 web-ext run --source-dir=src
 
 # Run all tests (REQUIRED after functional changes)
-node test/test-clean-url.js && node test/test-formats.js && node test/test-truncation.js && node test/test-diagnostics.js
+TODO: We're going to create automated tests soon.
 
 # Build for distribution
 web-ext build --source-dir=src --artifacts-dir=dist
@@ -31,10 +31,7 @@ web-ext lint --source-dir=src
 
 **CRITICAL**: After every functional change, Claude Code must:
 
-1. **Run Tests** - All tests must pass:
-   ```bash
-   node test/test-clean-url.js && node test/test-formats.js && node test/test-truncation.js && node test/test-diagnostics.js
-   ```
+1. **Run Tests** - TODO: We're going to create automated tests soon.
 
 2. **Run Linting** - Extension must pass web-ext linting:
    ```bash
@@ -103,4 +100,3 @@ Consolidated registry with 6 formats:
 ### Labels
 - `enhancement` / `bug` / `documentation` 
 - `priority: high|medium|low`
-
