@@ -43,9 +43,9 @@ cd fancy-links
 # Install web-ext (if not already installed)
 npm install -g web-ext
 
-# Run tests
-# TODO: I plan to move this over to a standard test framework and then have a simpler command to run, see: https://github.com/evanwon/fancy-links/issues/41
-node test/test-clean-url.js && node test/test-formats.js && node test/test-truncation.js && node test/test-diagnostics.js
+# Install dependencies and run tests
+npm install
+npm test
 
 # Run in development mode (will hot reload if you make any changes!)
 web-ext run --source-dir=src
@@ -90,8 +90,14 @@ The default keyboard shortcut is `Ctrl+Alt+C` (or `Cmd+Option+C` on Mac), but yo
 
 ### Automated Testing
 ```bash
-# TODO: I plan to move this over to a standard test framework and then have a simpler command to run, see: https://github.com/evanwon/fancy-links/issues/41
-node test/test-clean-url.js && node test/test-formats.js && node test/test-truncation.js && node test/test-diagnostics.js
+# Run all tests
+npm test
+
+# Run tests with coverage report
+npm run test:coverage
+
+# Run tests in watch mode during development
+npm run test:watch
 ```
 
 ## Contributing

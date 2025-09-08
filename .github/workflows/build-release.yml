@@ -30,6 +30,12 @@ jobs:
       with:
         node-version: '20'
         
+    - name: Install dependencies
+      run: npm ci
+        
+    - name: Run tests with coverage
+      run: npm run test:ci
+        
     - name: Install build tools
       run: |
         npm install -g web-ext  # Firefox extension tool
@@ -47,12 +53,6 @@ jobs:
             console.warn('Firefox build using Manifest V2');
           }
         "
-        
-    - name: Run cross-browser tests
-      run: |
-        echo "Running test suite (browser-agnostic)..."
-        node test/test-clean-url.js
-        node test/test-formats.js
         
     - name: Firefox - Lint extension
       if: matrix.browser == 'firefox'
