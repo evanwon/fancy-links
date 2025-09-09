@@ -1,5 +1,5 @@
 /**
- * Utility functions for handling keyboard shortcuts across the extension
+ * Utility functions for handling keyboard shortcuts across the extension 
  */
 
 /**
