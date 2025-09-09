@@ -215,28 +215,6 @@ describe('Background Script', () => {
         expect(global.window.FancyLinkCleanUrl.cleanUrl).not.toHaveBeenCalled();
       });
 
-      test('should handle RTF format with ClipboardItem API', async () => {
-        browser.storage.sync.get.mockResolvedValue({
-          defaultFormat: 'rtf',
-          cleanUrls: false,
-          showNotifications: false,
-          showBadge: true
-        });
-        global.window.FancyLinkFormatConfig.getFormatConfig.mockReturnValue({
-          format: jest.fn(() => '{\\rtf1\\ansi\\deff0 {\\fonttbl {\\f0 Times New Roman;}} Example}')
-        });
-
-        const result = await global.copyFancyLink('rtf');
-
-        expect(result.success).toBe(true);
-        expect(browser.tabs.executeScript).toHaveBeenCalledWith(
-          1,
-          expect.objectContaining({
-            code: expect.stringContaining('isRichText = true')
-          })
-        );
-      });
-
       test('should handle invalid URLs (about:, chrome:)', async () => {
         const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
         browser.tabs.query.mockResolvedValue([mockTab({ url: 'about:blank' })]);

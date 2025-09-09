@@ -139,34 +139,4 @@ describe('Format Registry', () => {
       expect(result).toBe('https://example.com?_title=Title %26 Description');
     });
   });
-
-  describe('RTF Format', () => {
-    test('should format basic link correctly', () => {
-      const result = formatRegistry.formatConfig.rtf.format(
-        'Test Title',
-        'https://example.com'
-      );
-      expect(result).toContain('{\\rtf1');
-      expect(result).toContain('Test Title');
-      expect(result).toContain('https://example.com');
-      expect(result).toContain('HYPERLINK');
-    });
-
-    test('should escape RTF special characters', () => {
-      const result = formatRegistry.formatConfig.rtf.format(
-        'Title with {braces} and \\backslash',
-        'https://example.com'
-      );
-      expect(result).toContain('Title with \\{braces\\} and \\\\backslash');
-    });
-
-    test('should handle unicode characters', () => {
-      const result = formatRegistry.formatConfig.rtf.format(
-        'Title with émoji 😀',
-        'https://example.com'
-      );
-      expect(result).toContain('{\\rtf1');
-      expect(result).toContain('HYPERLINK');
-    });
-  });
 });

@@ -73,12 +73,11 @@ web-ext lint --source-dir=src
 ## Technical Details
 
 ### Format Registry (`src/formats/format-registry.js`)
-Consolidated registry with 6 formats:
+Consolidated registry with 5 formats:
 - `slack` - `<URL|Title>`
 - `html` - `<a href="URL">Title</a>`  
 - `markdown` - `[Title](URL)` (Discord, Reddit, GitHub, Notion)
 - `plaintext` - `Title - URL`
-- `rtf` - Rich Text Format for Word/Outlook
 - `urlparams` - `URL?_title=Title`
 
 ### Browser Requirements

@@ -17,7 +17,7 @@ global.navigator.clipboard = {
 // Mock ClipboardItem
 global.ClipboardItem = jest.fn((items) => items);
 
-// Mock Blob for RTF testing
+// Mock Blob for testing
 global.Blob = jest.fn((content, options) => ({
   type: options.type,
   content: content
