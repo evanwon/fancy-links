@@ -87,11 +87,13 @@ describe('Background Script', () => {
       });
 
       test('should return DEFAULT_FORMAT on storage error', async () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
         browser.storage.sync.get.mockRejectedValue(new Error('Storage error'));
         
         const result = await global.getCurrentFormat();
         
         expect(result).toBe('markdown');
+        consoleSpy.mockRestore();
       });
     });
 
@@ -127,6 +129,7 @@ describe('Background Script', () => {
       });
 
       test('should return defaults on storage API failure', async () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
         browser.storage.sync.get.mockRejectedValue(new Error('API unavailable'));
         
         const result = await global.getSettings();
@@ -137,6 +140,7 @@ describe('Background Script', () => {
           showNotifications: false,
           showBadge: true
         });
+        consoleSpy.mockRestore();
       });
     });
   });
@@ -234,33 +238,40 @@ describe('Background Script', () => {
       });
 
       test('should handle invalid URLs (about:, chrome:)', async () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
         browser.tabs.query.mockResolvedValue([mockTab({ url: 'about:blank' })]);
 
         const result = await global.copyFancyLink();
 
         expect(result.success).toBe(false);
         expect(result.error).toBe('Cannot copy this type of URL');
+        consoleSpy.mockRestore();
       });
 
       test('should handle no active tab', async () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
         browser.tabs.query.mockResolvedValue([]);
 
         const result = await global.copyFancyLink();
 
         expect(result.success).toBe(false);
         expect(result.error).toBe('No active tab found');
+        consoleSpy.mockRestore();
       });
 
       test('should handle missing tab information', async () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
         browser.tabs.query.mockResolvedValue([mockTab({ title: '', url: '' })]);
 
         const result = await global.copyFancyLink();
 
         expect(result.success).toBe(false);
         expect(result.error).toBe('Cannot copy this type of URL');
+        consoleSpy.mockRestore();
       });
 
       test('should handle unknown format type', async () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
         browser.storage.sync.get.mockResolvedValue({
           defaultFormat: 'markdown',
           cleanUrls: false,
@@ -273,6 +284,7 @@ describe('Background Script', () => {
 
         expect(result.success).toBe(false);
         expect(result.error).toBe('Unknown format: unknown');
+        consoleSpy.mockRestore();
       });
 
       test('should handle clipboard API failure with fallback', async () => {
@@ -296,6 +308,7 @@ describe('Background Script', () => {
       });
 
       test('should handle script execution failure', async () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
         browser.storage.sync.get.mockResolvedValue({
           defaultFormat: 'markdown',
           cleanUrls: false,
@@ -309,6 +322,7 @@ describe('Background Script', () => {
 
         expect(result.success).toBe(false);
         expect(result.error).toBe('Script execution failed');
+        consoleSpy.mockRestore();
       });
     });
   });
@@ -354,6 +368,7 @@ describe('Background Script', () => {
     });
 
     test('should handle cleanUrl action error gracefully', async () => {
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
       const mockRequest = { action: 'cleanUrl', url: 'https://example.com' };
       global.window.FancyLinkCleanUrl = {
         cleanUrl: jest.fn().mockImplementation(() => {
@@ -365,6 +380,7 @@ describe('Background Script', () => {
       const result = await messageHandler(mockRequest);
       expect(result).toEqual({ cleanedUrl: 'https://example.com' });
       expect(global.window.FancyLinkCleanUrl.cleanUrl).toHaveBeenCalledWith('https://example.com');
+      consoleSpy.mockRestore();
     });
 
     test('should handle keyboard command copy-fancy-link', async () => {
@@ -476,6 +492,7 @@ describe('Background Script', () => {
       });
 
       test('should handle notification errors gracefully', async () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
         const settings = { showBadge: true, showNotifications: true };
         browser.browserAction.setBadgeText.mockRejectedValue(new Error('Badge error'));
         browser.notifications.create.mockRejectedValue(new Error('Notification error'));
@@ -485,6 +502,7 @@ describe('Background Script', () => {
         await expect(async () => {
           await global.showNotification('success', 'Test Title', 'Test Message', settings);
         }).not.toThrow();
+        consoleSpy.mockRestore();
       });
 
       test('should clear badge after timeout', async () => {

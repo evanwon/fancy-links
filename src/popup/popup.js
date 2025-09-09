@@ -229,22 +229,31 @@ async function updatePreviews() {
 
 function setupEventListeners() {
     // Format button clicks - use event delegation since buttons are dynamically created
-    document.getElementById('formatButtons').addEventListener('click', async (e) => {
-        const button = e.target.closest('.format-btn');
-        if (button) {
-            const format = button.getAttribute('data-format');
-            await copyWithFormat(format);
-        }
-    });
+    const formatButtons = document.getElementById('formatButtons');
+    if (formatButtons) {
+        formatButtons.addEventListener('click', async (e) => {
+            const button = e.target.closest('.format-btn');
+            if (button) {
+                const format = button.getAttribute('data-format');
+                await copyWithFormat(format);
+            }
+        });
+    }
     
     // Header settings button
-    document.getElementById('headerOptionsBtn').addEventListener('click', () => {
-        browser.runtime.openOptionsPage();
-        window.close();
-    });
+    const headerOptionsBtn = document.getElementById('headerOptionsBtn');
+    if (headerOptionsBtn) {
+        headerOptionsBtn.addEventListener('click', () => {
+            browser.runtime.openOptionsPage();
+            window.close();
+        });
+    }
     
     // Help button for issue reporting
-    document.getElementById('helpButton').addEventListener('click', handleHelpButtonClick);
+    const helpButton = document.getElementById('helpButton');
+    if (helpButton) {
+        helpButton.addEventListener('click', handleHelpButtonClick);
+    }
     
     // Version number click to open changelog
     const versionElement = document.getElementById('version');

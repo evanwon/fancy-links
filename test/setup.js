@@ -1,6 +1,13 @@
 // Mock browser APIs
 require('jest-webextension-mock');
 
+// Add polyfills for TextEncoder/TextDecoder if needed
+if (typeof TextEncoder === 'undefined') {
+  const { TextEncoder, TextDecoder } = require('util');
+  global.TextEncoder = TextEncoder;
+  global.TextDecoder = TextDecoder;
+}
+
 // Mock clipboard API
 global.navigator.clipboard = {
   writeText: jest.fn(() => Promise.resolve()),
