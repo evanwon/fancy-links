@@ -135,7 +135,13 @@ async function copyFancyLink(formatType = null) {
   } catch (error) {
     console.error('Error copying fancy link:', error);
     // Load settings for notification, or use defaults if not available
-    const notificationSettings = settings || await getSettings();
+    let notificationSettings;
+    try {
+      notificationSettings = await getSettings();
+    } catch (settingsError) {
+      console.error('Error getting notification settings:', settingsError);
+      notificationSettings = { defaultFormat: DEFAULT_FORMAT, cleanUrls: false, showNotifications: false, showBadge: true };
+    }
     await showNotification('error', 'Failed to copy link', error.message, notificationSettings);
     return { success: false, error: error.message };
   }
@@ -214,3 +220,11 @@ browser.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
 browser.browserAction.onClicked.addListener(async () => {
   await copyFancyLink();
 });
+
+// Export functions for testing
+if (typeof global !== 'undefined') {
+  global.getCurrentFormat = getCurrentFormat;
+  global.getSettings = getSettings;
+  global.copyFancyLink = copyFancyLink;
+  global.showNotification = showNotification;
+}
