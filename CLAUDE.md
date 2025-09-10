@@ -12,8 +12,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Test extension in Firefox
 web-ext run --source-dir=src
 
-# Run all tests (REQUIRED after functional changes)
-npm test
+# Run tests (multiple options available)
+npm test                 # Run all tests
+npm run test:watch       # Watch mode for development
+npm run test:coverage    # Generate coverage report
+npm run test:ci          # CI optimized
 
 # Build for distribution
 web-ext build --source-dir=src --artifacts-dir=dist
@@ -27,43 +30,56 @@ web-ext lint --source-dir=src
 - `src/background/background.js` - Main extension logic
 - `src/manifest.json` - Extension configuration and version
 
-## Post-Change Checklist
+## Claude Workflow Triggers
 
-**CRITICAL**: After every functional change, Claude Code must:
+**ALWAYS execute Post-Change Workflow after:**
+- Modifying any `.js` files in `src/`
+- Changing `src/manifest.json` 
+- Adding/removing formats in `src/formats/format-registry.js`
+- Updating package.json dependencies or build configuration
+- Making functional changes to extension behavior
 
-1. **Run Tests** - REQUIRED after functional changes:
-   ```bash
-   npm test
-   ```
+**Exception:** Documentation-only changes to `.md` files (skip workflow)
 
-2. **Run Linting** - Extension must pass web-ext linting:
-   ```bash
-   web-ext lint --source-dir=src
-   ```
+## Post-Change Workflow
 
-3. **Consider Committing** - If tests and linting pass and changes are complete:
-   - Reference GitHub issues in commit message if resolving them
-   - Follow existing commit message style (`git log --oneline`)
-   - Include concise Claude attribution for AI-assisted changes (i.e. Co-Author syntax)
+**CRITICAL**: After triggering changes above, Claude Code must execute this sequence:
 
-4. **Version Bump** - Update `src/manifest.json` version for releases:
-   - PATCH: Bug fixes, documentation
-   - MINOR: New features, format additions
-   - MAJOR: Breaking changes
+### 1. Validate Changes
+```bash
+# Test functionality (REQUIRED for all functional changes)
+npm test
 
-5. **Consider Publishing** - For version bumps, consider creating a release:
-   - Create git tag: `git tag v<version>` (triggers automated GitHub Actions build)
-   - Push tag: `git push origin v<version>` 
-   - GitHub Actions will automatically build and sign the extension for Mozilla AMO
+# Check extension compliance
+web-ext lint --source-dir=src
+```
+
+### 2. Commit Changes (if validation passes)
+- Reference GitHub issues in commit message if resolving them
+- Follow existing commit message style (`git log --oneline`)
+- Include concise Claude attribution: `Co-Authored-By: Claude <noreply@anthropic.com>`
+
+### 3. Version Management (for releases)
+**Update `src/manifest.json` version:**
+- PATCH: Bug fixes, documentation
+- MINOR: New features, format additions  
+- MAJOR: Breaking changes
+
+**Publish release:**
+```bash
+git tag v<version>    # Triggers automated GitHub Actions build
+git push origin v<version>
+```
 
 ## Project Structure
 
 **Production Code** (`src/`):
-- `background/` - Clipboard operations and format logic  
+- `background/` - Main extension logic and clipboard operations  
 - `popup/` - Toolbar UI
 - `options/` - Settings page
 - `formats/` - Centralized format registry
-- `utils/` - Shared utilities (browser API, clipboard, sanitization)
+- `utils/` - Shared utilities (browser API, clipboard, URL cleaning, diagnostics, keyboard shortcuts)
+- `icons/` - Extension icons and assets
 
 **Development** (root):
 - `test/` - Automated test suites
