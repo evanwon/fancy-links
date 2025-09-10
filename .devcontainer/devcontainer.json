@@ -1,0 +1,37 @@
+{
+  "name": "Fancy Links Development",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "remoteUser": "node",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/firefox": "latest"
+  },
+  
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "firefox-devtools.vscode-firefox-debug",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+      }
+    }
+  },
+  
+  "forwardPorts": [8080],
+  "portsAttributes": {
+    "8080": {
+      "label": "web-ext",
+      "onAutoForward": "notify"
+    }
+  },
+  
+  "postCreateCommand": "npm ci --ignore-scripts && npm install -g web-ext",
+  
+  "mounts": [],
+  "runArgs": ["--shm-size=2gb"]
+}

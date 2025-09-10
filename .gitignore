@@ -20,7 +20,8 @@ npm-debug.log*
 Thumbs.db
 
 # Editor files
-.vscode/
+.vscode/*
+!.vscode/extensions.json
 .idea/
 *.swp
 *.swo
@@ -42,3 +43,7 @@ coverage/
 
 # Claude Code settings
 .claude/
+
+# GitHub Codespaces
+.devcontainer/Dockerfile.local
+.devcontainer/devcontainer.local.json
