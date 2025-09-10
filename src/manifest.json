@@ -1,28 +1,27 @@
 {
   "manifest_version": 2,
   "name": "Fancy Links",
-  "version": "1.3.11",
+  "version": "1.3.12",
   "description": "Copy friendly links with titles instead of plain URLs",
-  
+
   "browser_specific_settings": {
     "gecko": {
       "id": "fancy-links@evanw.com",
       "strict_min_version": "109.0"
     }
   },
-  
-  "permissions": [
-    "clipboardWrite",
-    "activeTab",
-    "storage",
-    "notifications"
-  ],
-  
+
+  "permissions": ["clipboardWrite", "activeTab", "storage", "notifications"],
+
   "background": {
-    "scripts": ["utils/clean-url.js", "formats/format-registry.js", "background/background.js"],
+    "scripts": [
+      "utils/clean-url.js",
+      "formats/format-registry.js",
+      "background/background.js"
+    ],
     "persistent": false
   },
-  
+
   "browser_action": {
     "default_popup": "popup/popup.html",
     "default_icon": {
@@ -33,7 +32,7 @@
     },
     "default_title": "Copy Fancy Link"
   },
-  
+
   "commands": {
     "copy-fancy-link": {
       "suggested_key": {
@@ -43,12 +42,12 @@
       "description": "Copy the current page as a fancy link"
     }
   },
-  
+
   "options_ui": {
     "page": "options/options.html",
     "open_in_tab": true
   },
-  
+
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
