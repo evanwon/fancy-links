@@ -23,7 +23,7 @@
             };
             return entities[match];
         }),
-        urlParam: (text) => text.replace(/[&=+#%]/g, encodeURIComponent)
+        urlParam: (text) => text.replace(/\s+/g, '_').replace(/[&=+#%]/g, encodeURIComponent)
     };
 
     const truncateText = (text, maxLength = 500) => {
@@ -91,7 +91,7 @@
         urlparams: {
             name: 'URL + Title',
             description: 'URL with title as parameter',
-            example: 'https://example.com?_title=Page%20Title',
+            example: 'https://example.com?_title=Page_Title',
             worksWith: [],
             format: (title, url) => {
                 const displayText = title || url;

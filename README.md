@@ -13,7 +13,7 @@ Interested in other browsers? Please vote for [Chrome support](https://github.co
 - **Slack**: `<URL|Title>`
 - **HTML**: `<a href="URL">Title</a>`
 - **Plain Text**: `Title - URL`
-- **URL Parameters**: `URL?_title=Title`
+- **URL Parameters**: `URL?_title=Page_Title`
 
 ### How to Use
 - **Toolbar Button**: Click to open popup with all format options

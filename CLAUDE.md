@@ -94,7 +94,7 @@ Consolidated registry with 5 formats:
 - `html` - `<a href="URL">Title</a>`  
 - `markdown` - `[Title](URL)` (Discord, Reddit, GitHub, Notion)
 - `plaintext` - `Title - URL`
-- `urlparams` - `URL?_title=Title`
+- `urlparams` - `URL?_title=Page_Title`
 
 ### Browser Requirements
 - Firefox 109+ with Manifest V2

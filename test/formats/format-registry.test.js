@@ -120,7 +120,7 @@ describe('Format Registry', () => {
         'Test Title',
         'https://example.com'
       );
-      expect(result).toBe('https://example.com?_title=Test Title');
+      expect(result).toBe('https://example.com?_title=Test_Title');
     });
 
     test('should append to existing query parameters', () => {
@@ -128,7 +128,7 @@ describe('Format Registry', () => {
         'Test Title',
         'https://example.com?existing=param'
       );
-      expect(result).toBe('https://example.com?existing=param&_title=Test Title');
+      expect(result).toBe('https://example.com?existing=param&_title=Test_Title');
     });
 
     test('should encode special characters in title', () => {
@@ -136,7 +136,7 @@ describe('Format Registry', () => {
         'Title & Description',
         'https://example.com'
       );
-      expect(result).toBe('https://example.com?_title=Title %26 Description');
+      expect(result).toBe('https://example.com?_title=Title_%26_Description');
     });
   });
 });
