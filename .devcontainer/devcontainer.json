@@ -4,6 +4,7 @@
   "remoteUser": "node",
   
   "features": {
+    "ghcr.io/devcontainers/features/firefox": "latest",
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
   
