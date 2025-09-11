@@ -53,6 +53,30 @@ web-ext run --source-dir=src
 web-ext build --source-dir=src --artifacts-dir=dist
 ```
 
+### Debugging with VSCode
+
+This project includes VSCode debugging configuration for the [Debugger for Firefox](https://marketplace.visualstudio.com/items?itemName=firefox-devtools.vscode-firefox-debug) extension.
+
+#### Prerequisites
+1. Install the "Debugger for Firefox" extension in VSCode if not already installed
+
+#### How to Debug
+1. Open the project in VSCode
+2. Press `F5` or go to Run and Debug panel (`Ctrl+Shift+D`)
+3. The default "Debug Fancy Links (Auto-Reload)" configuration will:
+   - Start Firefox with the extension loaded
+   - Automatically reload the extension when you save changes
+   - Allow you to set breakpoints in any JavaScript file
+
+#### Available Debug Configurations
+- **Debug Fancy Links (Auto-Reload)** (default): Best for development - auto-reloads on file changes
+- **Debug Fancy Links**: Basic debugging without auto-reload
+
+#### Tips
+- Breakpoints work in all extension scripts (background, popup, content scripts)
+- The extension popup won't auto-hide during debugging for easier inspection
+- Use the Debug Console to execute commands in the extension context
+
 ## Usage
 
 ### Quick Copy (Keyboard Shortcut)

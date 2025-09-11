@@ -1,0 +1,30 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Fancy Links (Auto-Reload)",
+      "type": "firefox",
+      "request": "launch",
+      "reAttach": true,
+      "addonPath": "${workspaceFolder}/src",
+      "reloadOnChange": {
+        "watch": [
+          "${workspaceFolder}/src/**/*.js",
+          "${workspaceFolder}/src/**/*.json",
+          "${workspaceFolder}/src/**/*.html",
+          "${workspaceFolder}/src/**/*.css"
+        ],
+        "ignore": [
+          "${workspaceFolder}/src/**/*.git/**"
+        ]
+      }
+    },
+    {
+      "name": "Debug Fancy Links",
+      "type": "firefox",
+      "request": "launch",
+      "reAttach": true,
+      "addonPath": "${workspaceFolder}/src"
+    }
+  ]
+}
