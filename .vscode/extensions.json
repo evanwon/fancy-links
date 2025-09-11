@@ -1,9 +1,8 @@
 {
   "recommendations": [
-    "dbaeumer.vscode-eslint",
     "firefox-devtools.vscode-firefox-debug",
-    "esbenp.prettier-vscode",
-    "github.copilot",
-    "github.vscode-pull-request-github"
+    "github.vscode-pull-request-github",
+    "orta.vscode-jest",
+    "streetsidesoftware.code-spell-checker"
   ]
 }
