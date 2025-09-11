@@ -12,7 +12,8 @@
       "extensions": [
         "dbaeumer.vscode-eslint",
         "firefox-devtools.vscode-firefox-debug",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        "anthropic.claude-code"
       ],
       "settings": {
         "terminal.integrated.defaultProfile.linux": "bash",
