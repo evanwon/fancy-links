@@ -4,7 +4,6 @@
   "remoteUser": "node",
   
   "features": {
-    "ghcr.io/devcontainers/features/firefox": "latest",
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
   
@@ -31,7 +30,7 @@
     }
   },
   
-  "postCreateCommand": "npm ci --ignore-scripts && npm install -g web-ext",
+  "postCreateCommand": "npm ci --ignore-scripts && npm install -g web-ext && sudo apt-get update && sudo apt-get install -y firefox",
   
   "mounts": [],
   "runArgs": ["--shm-size=2gb"]
