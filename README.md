@@ -6,6 +6,9 @@ A browser extension that allows you to copy formatted links with titles instead 
 
 Interested in other browsers? Please vote for [Chrome support](https://github.com/evanwon/fancy-links/issues/15) or [suggest a new browser](https://github.com/evanwon/fancy-links/issues/new/choose)!
 
+## Screenshots
+![](images/fancy-links-popup.png)
+
 ## Features
 
 ### Supported Link Formats
