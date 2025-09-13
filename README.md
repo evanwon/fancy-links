@@ -20,7 +20,7 @@ Interested in other browsers? Please vote for [Chrome support](https://github.co
 
 ### Additional features
 - **Toolbar Button**: Click to open popup with all format options
-- **Keyboard Shortcut**: `Alt+Shift+C` for quick copy with default format (can be changed)
+- **Keyboard Shortcut**: `Alt+Shift+C` (Windows/Linux) / `Opt+Shift+C` (macOS) for quick copy with default format (can be changed in Settings)
 - **Live Previews**: See exactly how each format will look before copying
 - **Settings Page**: Configure default format, notifications, and clean URL feature
 - **Clean URLs**: Optional removal of tracking parameters (UTM, Facebook, etc.)
@@ -34,7 +34,7 @@ Interested in other browsers? Please vote for [Chrome support](https://github.co
 
 ### Quick copy via keyboard shortcut
 1. Navigate to any webpage
-2. Press `Alt+Shift+C`
+2. Press `Alt+Shift+C` (Windows/Linux) / `Opt+Shift+C` (macOS)
 3. The formatted link is copied using your default format
 
 ### Settings
@@ -44,7 +44,7 @@ Interested in other browsers? Please vote for [Chrome support](https://github.co
 4. Enable/disable clean URL feature to remove tracking parameters
 
 ### Customizing keyboard shortcuts
-The default keyboard shortcut is `Alt+Shift+C`, but you can customize it:
+The default keyboard shortcut is `Alt+Shift+C` (Windows/Linux) / `Opt+Shift+C` (macOS), but you can customize it:
 
 1. Go to `about:addons` in Firefox
 2. Click Extensions in the sidebar
