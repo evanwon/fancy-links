@@ -11,22 +11,48 @@ Interested in other browsers? Please vote for [Chrome support](https://github.co
 
 ## Features
 
-### Supported Link Formats
+### Supported link formats
 - **Markdown** (Reddit, Discord, Obsidian, Notion, etc.): `[Title](URL)`
 - **Slack**: `<URL|Title>`
 - **HTML**: `<a href="URL">Title</a>`
 - **Plain Text**: `Title - URL`
 - **URL Parameters**: `URL?_title=Page_Title`
 
-### How to Use
+### Additional features
 - **Toolbar Button**: Click to open popup with all format options
 - **Keyboard Shortcut**: `Alt+Shift+C` for quick copy with default format (can be changed)
 - **Live Previews**: See exactly how each format will look before copying
 - **Settings Page**: Configure default format, notifications, and clean URL feature
 - **Clean URLs**: Optional removal of tracking parameters (UTM, Facebook, etc.)
-- **Cross-Platform**: Works consistently on Windows, macOS, and Linux
+- **Cross-Platform**: Works on Windows, macOS, and Linux
 
-## How to Install
+## Usage
+### Toolbar button
+1. Click the Fancy Links icon in the toolbar
+2. Choose from the different link formats
+3. Click any format button to copy instantly
+
+### Quick copy via keyboard shortcut
+1. Navigate to any webpage
+2. Press `Alt+Shift+C`
+3. The formatted link is copied using your default format
+
+### Settings
+1. Right-click the extension icon → "Preferences"
+2. Choose your default format
+3. Configure notification preferences
+4. Enable/disable clean URL feature to remove tracking parameters
+
+### Customizing keyboard shortcuts
+The default keyboard shortcut is `Alt+Shift+C`, but you can customize it:
+
+1. Go to `about:addons` in Firefox
+2. Click Extensions in the sidebar
+3. Click the gear icon (⚙️) → "Manage Extension Shortcuts"
+4. Find "Fancy Links" and customize the shortcut
+5. The popup will automatically show your custom shortcut
+
+## How to install
 Note: We're working on publishing this as an [official Firefox extension](https://github.com/evanwon/fancy-links/issues/23), but in the meantime, you can install it following the instructions below.
 
 1. Download the latest `.xpi` file from [Releases](https://github.com/evanwon/fancy-links/releases)
@@ -36,7 +62,7 @@ Note: We're working on publishing this as an [official Firefox extension](https:
 
 Note that using this `about:debugging` approach will only load the plugin for your current session. Once we get this published as an official Firefox extension this will no longer be an issue.
 
-### Development Installation
+### Development installation
 ```bash
 # Clone the repository
 git clone https://github.com/evanwon/fancy-links.git
@@ -79,33 +105,6 @@ This project includes VSCode debugging configuration for the [Debugger for Firef
 - Breakpoints work in all extension scripts (background, popup, content scripts)
 - The extension popup won't auto-hide during debugging for easier inspection
 - Use the Debug Console to execute commands in the extension context
-
-## Usage
-
-### Quick Copy (Keyboard Shortcut)
-1. Navigate to any webpage
-2. Press `Alt+Shift+C`
-3. The formatted link is copied using your default format
-
-### Format Selection (Popup)
-1. Click the Fancy Links icon in the toolbar
-2. Choose from the different link formats
-3. Click any format button to copy instantly
-
-### Settings
-1. Right-click the extension icon → "Preferences"
-2. Choose your default format
-3. Configure notification preferences
-4. Enable/disable clean URL feature to remove tracking parameters
-
-### Customizing Keyboard Shortcuts
-The default keyboard shortcut is `Alt+Shift+C`, but you can customize it:
-
-1. Go to `about:addons` in Firefox
-2. Click Extensions in the sidebar
-3. Click the gear icon (⚙️) → "Manage Extension Shortcuts"
-4. Find "Fancy Links" and customize the shortcut
-5. The popup will automatically show your custom shortcut
 
 ## Testing
 
