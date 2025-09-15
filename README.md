@@ -1,8 +1,8 @@
 # Fancy Links
-A browser extension that allows you to copy formatted links with titles instead of plain URLs. Perfect for sharing links in chat apps, documentation, and anywhere formatted links look better than bare URLs.
+Fancy Links is a browser extension that transforms plain URLs into friendly links with included page titles. Perfect for sharing in chat apps, Reddit, GitHub, Slack, documentation, and anywhere formatted links look better than bare URLs.
 
 **Browser Support:**
-- [Firefox](https://www.firefox.com/) (minimum version 109)
+- [Firefox](https://www.firefox.com/) (minimum version 109): :arrow_down: [Install Fancy Links for Firefox here](https://addons.mozilla.org/en-US/firefox/addon/fancy-links/)
 
 Interested in other browsers? Please vote for [Chrome support](https://github.com/evanwon/fancy-links/issues/15) or [suggest a new browser](https://github.com/evanwon/fancy-links/issues/new/choose)!
 
@@ -53,16 +53,11 @@ The default keyboard shortcut is `Alt+Shift+C` (Windows/Linux) / `Opt+Shift+C` (
 5. The popup will automatically show your custom shortcut
 
 ## How to install
-Note: We're working on publishing this as an [official Firefox extension](https://github.com/evanwon/fancy-links/issues/23), but in the meantime, you can install it following the instructions below.
+Visit [Fancy Links - Firefox Browser Add-ons](https://addons.mozilla.org/en-US/firefox/addon/fancy-links/) to install.
 
-1. Download the latest `.xpi` file from [Releases](https://github.com/evanwon/fancy-links/releases)
-2. Open Firefox and navigate to [about:debugging#/runtime/this-firefox](about:debugging#/runtime/this-firefox)
-3. Click "Load Temporary Add-on"
-4. Select the downloaded `.xpi` file
+## Development Guide
 
-Note that using this `about:debugging` approach will only load the plugin for your current session. Once we get this published as an official Firefox extension this will no longer be an issue.
-
-### Development installation
+### Building and running locally
 ```bash
 # Clone the repository
 git clone https://github.com/evanwon/fancy-links.git
@@ -82,8 +77,16 @@ web-ext run --source-dir=src
 web-ext build --source-dir=src --artifacts-dir=dist
 ```
 
-### Debugging with VSCode
+If you want to run local builds of the extension in your regular browser (not the sandbox test browser), you can install it for your current browsing session by following these instructions:
 
+1. Build the `.xpi` as shown above, or download the latest `.xpi` file from [Releases](https://github.com/evanwon/fancy-links/releases).
+2. Open Firefox and navigate to [about:debugging#/runtime/this-firefox](about:debugging#/runtime/this-firefox)
+3. Click "Load Temporary Add-on"
+4. Select the downloaded `.xpi` file
+
+Note that using this `about:debugging` approach will only load the plugin for your current session.
+
+### Debugging with VSCode
 This project includes VSCode debugging configuration for the [Debugger for Firefox](https://marketplace.visualstudio.com/items?itemName=firefox-devtools.vscode-firefox-debug) extension.
 
 #### Prerequisites
@@ -106,14 +109,14 @@ This project includes VSCode debugging configuration for the [Debugger for Firef
 - The extension popup won't auto-hide during debugging for easier inspection
 - Use the Debug Console to execute commands in the extension context
 
-## Testing
+### Testing
 
-### Manual Testing
+#### Manual Testing
 1. Run `web-ext run --source-dir=src` to start development Firefox
 2. Open `test/manual.html` for comprehensive testing scenarios
 3. Test all format buttons and keyboard shortcut
 
-### Automated Testing
+#### Automated Testing
 ```bash
 # Run all tests
 npm test
@@ -125,7 +128,7 @@ npm run test:coverage
 npm run test:watch
 ```
 
-## Contributing
+### Contributing
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/your-feature-name`
 3. Make your changes
@@ -134,7 +137,7 @@ npm run test:watch
 6. Push: `git push origin feature/your-feature-name`
 7. Open a Pull Request
 
-## Project Structure
+### Project Structure
 
 ```
 fancy-links/
@@ -153,7 +156,7 @@ fancy-links/
 └── dist/                 # Build output (generated)
 ```
 
-## Development Notes
+### Development Notes
 - Uses **Manifest V2** (Firefox still prefers MV2 over MV3)
 - **No external dependencies** - pure HTML/CSS/JS
 - **Modular architecture** for easy format addition
@@ -161,11 +164,13 @@ fancy-links/
 - **Clean separation** between extension code (`src/`) and development files
 - **Comprehensive sanitization** prevents XSS and format-breaking
 
-## Permissions
+### Permissions
 - `clipboardWrite`: Copy formatted text to clipboard
 - `activeTab`: Access current tab's title and URL
 - `storage`: Save user preferences
 - `notifications`: Show copy confirmation messages
+
+---
 
 ## License
 This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
