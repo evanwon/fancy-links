@@ -77,6 +77,7 @@ web-ext run --source-dir=src
 web-ext build --source-dir=src --artifacts-dir=dist
 ```
 
+### Testing in your regular browser 
 If you want to run local builds of the extension in your regular browser (not the sandbox test browser), you can install it for your current browsing session by following these instructions:
 
 1. Build the `.xpi` as shown above, or download the latest `.xpi` file from [Releases](https://github.com/evanwon/fancy-links/releases).
