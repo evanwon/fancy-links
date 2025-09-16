@@ -37,11 +37,16 @@ Interested in other browsers? Please vote for [Chrome support](https://github.co
 2. Press the keyboard shortcut (default: `Alt+Shift+C` on Windows/Linux, `Opt+Shift+C` on macOS)
 3. The formatted link is copied using your default format
 
+You can change your default format by clicking the Fancy Links toolbar icon and then selecting "Set Default" on your preferred link format.
+
 ### Settings
-1. Right-click the extension icon → "Preferences"
-2. Choose your default format
-3. Configure notification preferences
-4. Enable/disable clean URL feature to remove tracking parameters
+Click the Fancy Links toolbar icon and select the Gear icon to see all available settings, including:
+- Notifications
+- Toolbar button badges
+- View keyboard shortcuts
+- Enable/disable the clean URL feature to remove tracking parameters
+- Enable Debug mode
+- Customize bug reporting
 
 ### Customizing keyboard shortcuts
 To customize the keyboard shortcut:
@@ -51,7 +56,6 @@ To customize the keyboard shortcut:
 3. Click the gear icon (⚙️) → "Manage Extension Shortcuts"
 4. Find "Fancy Links" and customize the shortcut
 5. The popup will automatically show your custom shortcut
-
 
 ## Development Guide
 
