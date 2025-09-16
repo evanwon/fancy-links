@@ -129,6 +129,67 @@ npm run test:coverage
 npm run test:watch
 ```
 
+### Release Process
+
+#### Setup for AMO Submission (one-time)
+1. **Configure GitHub Secrets** (Settings → Secrets and variables → Actions → Secrets):
+   - `AMO_API_KEY`: Your AMO API issuer ID
+   - `AMO_API_SECRET`: Your AMO API secret
+
+2. **Configure GitHub Variables** (Settings → Secrets and variables → Actions → Variables):
+   - `AMO_SUBMISSION_ENABLED`: Set to `true` to enable automatic AMO submission on tags
+
+#### Automatic Release (via git tag)
+Releases are automatically built and optionally submitted to AMO when you push a version tag:
+
+```bash
+# 1. Update version in src/manifest.json
+# 2. Commit changes
+git add -A && git commit -m "Version X.Y.Z"
+
+# 3. Create and push tag (triggers GitHub Actions)
+git tag vX.Y.Z
+git push origin vX.Y.Z
+```
+
+The workflow will:
+- Run tests and linting
+- Build the extension
+- Create a GitHub release
+- Submit to AMO (if `AMO_SUBMISSION_ENABLED` variable is `true`)
+
+#### Manual Build (via GitHub Actions)
+For testing builds without creating a release:
+
+1. Go to [Actions tab](../../actions)
+2. Select "Build and Release" workflow
+3. Click "Run workflow"
+4. Configure options:
+   - `create_release`: Create GitHub release (default: false)
+   - `submit_to_amo`: Submit to AMO (default: false)
+   - `channel`: AMO channel - `listed` (public) or `unlisted` (self-distribution)
+5. Click "Run workflow"
+
+#### Local Development
+```bash
+# Install dependencies
+npm install
+
+# Run tests
+npm test                 # Run all tests
+npm run test:watch      # Watch mode
+npm run test:coverage   # Coverage report
+
+# Build extension
+npm run build           # Build .zip file
+npm run build:firefox   # Lint and build
+npm run test:build      # Test, lint, and build
+
+# Development
+npm run dev            # Run extension in Firefox for testing
+npm run lint:firefox   # Check for issues
+```
+
 ### Contributing
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/your-feature-name`

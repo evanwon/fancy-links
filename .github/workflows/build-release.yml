@@ -5,6 +5,28 @@ on:
     tags:
       - 'v*'  # Trigger on version tags like v1.1.0
 
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Create GitHub release (only for manual builds)'
+        type: boolean
+        default: false
+      submit_to_amo:
+        description: 'Submit to AMO for public distribution'
+        type: boolean
+        default: false
+      channel:
+        description: 'AMO submission channel'
+        type: choice
+        options:
+          - listed
+          - unlisted
+        default: listed
+      version_notes:
+        description: 'Version notes for AMO submission'
+        type: string
+        required: false
+
 permissions:
   contents: write  # Required for creating releases and uploading assets
 
@@ -66,32 +88,119 @@ jobs:
         echo "Firefox: Building extension with web-ext..."
         web-ext build --source-dir=src --artifacts-dir=dist --overwrite-dest
         
-    - name: Firefox - Sign extension (optional)
-      if: matrix.browser == 'firefox' && env.AMO_API_KEY != '' && env.AMO_API_SECRET != ''
+    - name: Firefox - Determine AMO submission
+      if: matrix.browser == 'firefox'
+      id: amo_config
+      run: |
+        # Check if AMO submission should be performed
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          # Manual trigger - use provided inputs
+          echo "submit=${{ github.event.inputs.submit_to_amo }}" >> $GITHUB_OUTPUT
+          echo "channel=${{ github.event.inputs.channel }}" >> $GITHUB_OUTPUT
+        elif [[ "${{ github.event_name }}" == "push" && "${{ vars.AMO_SUBMISSION_ENABLED }}" == "true" ]]; then
+          # Tag trigger with AMO auto-submission enabled - submit to listed channel
+          echo "submit=true" >> $GITHUB_OUTPUT
+          echo "channel=listed" >> $GITHUB_OUTPUT
+        else
+          # Default: build without AMO submission
+          echo "submit=false" >> $GITHUB_OUTPUT
+          echo "channel=unlisted" >> $GITHUB_OUTPUT
+        fi
+
+        # Log configuration for debugging
+        echo "AMO_SUBMISSION_ENABLED variable: ${{ vars.AMO_SUBMISSION_ENABLED }}"
+        echo "Event type: ${{ github.event_name }}"
+        echo "Will submit to AMO: $(cat $GITHUB_OUTPUT | grep submit | cut -d= -f2)"
+        echo "Channel: $(cat $GITHUB_OUTPUT | grep channel | cut -d= -f2)"
+
+    - name: Firefox - Submit to AMO (listed channel)
+      if: matrix.browser == 'firefox' && steps.amo_config.outputs.submit == 'true' && steps.amo_config.outputs.channel == 'listed'
       env:
         AMO_API_KEY: ${{ secrets.AMO_API_KEY }}
         AMO_API_SECRET: ${{ secrets.AMO_API_SECRET }}
       run: |
+        # Check if AMO credentials are configured
+        if [[ -z "$AMO_API_KEY" || -z "$AMO_API_SECRET" ]]; then
+          echo "❌ AMO credentials not configured. Please set AMO_API_KEY and AMO_API_SECRET secrets."
+          echo "amo_submitted=false" >> $GITHUB_ENV
+          exit 1
+        fi
+
+        echo "Firefox: Submitting to AMO for public distribution..."
+
+        # Prepare submission notes
+        if [[ -n "${{ github.event.inputs.version_notes }}" ]]; then
+          NOTES="${{ github.event.inputs.version_notes }}"
+        else
+          NOTES="Automated submission for version ${{ steps.get_version.outputs.version }}"
+        fi
+
+        # Create source code archive for AMO review (required for listed submissions)
+        echo "Creating source code archive..."
+        git archive -o dist/source-code.zip HEAD
+
+        # Submit to AMO listed channel (public distribution)
+        web-ext sign --source-dir=src --artifacts-dir=dist-amo \
+          --api-key="$AMO_API_KEY" --api-secret="$AMO_API_SECRET" \
+          --channel=listed \
+          --upload-source-code=dist/source-code.zip || {
+            echo "⚠️ AMO submission failed - continuing with unsigned build"
+            echo "amo_submitted=false" >> $GITHUB_ENV
+            exit 0
+        }
+
+        if ls dist-amo/*.xpi 1> /dev/null 2>&1; then
+          echo "✅ Successfully submitted to AMO for review"
+          echo "amo_submitted=true" >> $GITHUB_ENV
+        else
+          echo "amo_submitted=false" >> $GITHUB_ENV
+        fi
+
+    - name: Firefox - Sign extension (unlisted/self-distribution)
+      if: matrix.browser == 'firefox' && (steps.amo_config.outputs.submit == 'false' || steps.amo_config.outputs.channel == 'unlisted')
+      env:
+        AMO_API_KEY: ${{ secrets.AMO_API_KEY }}
+        AMO_API_SECRET: ${{ secrets.AMO_API_SECRET }}
+      run: |
+        # Check if AMO credentials are configured
+        if [[ -z "$AMO_API_KEY" || -z "$AMO_API_SECRET" ]]; then
+          echo "⚠️ AMO credentials not configured. Skipping signing."
+          echo "Extension will be unsigned (requires Developer Edition or temporary installation)"
+          exit 0
+        fi
+
         echo "Firefox: Signing extension for self-distribution..."
         web-ext sign --source-dir=src --artifacts-dir=dist-signed \
           --api-key="$AMO_API_KEY" --api-secret="$AMO_API_SECRET" \
-          --channel=unlisted || echo "Signing failed or not configured"
+          --channel=unlisted || echo "⚠️ Signing failed"
         
     # Future Chrome/Edge build steps would go here:
     # - name: Chrome - Build extension
     #   if: matrix.browser == 'chrome'
     #   run: echo "Chrome build steps..."
         
-    - name: Extract version from tag
+    - name: Extract version
       id: get_version
-      run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      run: |
+        if [[ "${{ github.event_name }}" == "push" ]]; then
+          # Extract from tag
+          echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        else
+          # Extract from manifest.json for manual builds
+          version=$(node -e "console.log(JSON.parse(require('fs').readFileSync('src/manifest.json', 'utf8')).version)")
+          echo "version=$version" >> $GITHUB_OUTPUT
+        fi
       
     - name: Firefox - Get build artifact
       if: matrix.browser == 'firefox'
       id: get_firefox_artifact
       run: |
-        # Check for signed version first, fall back to unsigned
-        if [ -d "dist-signed" ] && [ "$(ls -A dist-signed/*.xpi 2>/dev/null)" ]; then
+        # Check for AMO submitted version, then signed version, then fall back to unsigned
+        if [ "${{ env.amo_submitted }}" == "true" ] && [ -d "dist-amo" ] && [ "$(ls -A dist-amo/*.xpi 2>/dev/null)" ]; then
+          filename=$(ls dist-amo/*.xpi | head -1 | xargs basename)
+          filepath="dist-amo/$filename"
+          echo "signed=amo" >> $GITHUB_OUTPUT
+        elif [ -d "dist-signed" ] && [ "$(ls -A dist-signed/*.xpi 2>/dev/null)" ]; then
           filename=$(ls dist-signed/*.xpi | head -1 | xargs basename)
           filepath="dist-signed/$filename"
           echo "signed=true" >> $GITHUB_OUTPUT
@@ -128,12 +237,16 @@ jobs:
         fi
         
     - name: Create Release with Asset (Firefox)
-      if: matrix.browser == 'firefox'
+      if: matrix.browser == 'firefox' && (github.event_name == 'push' || github.event.inputs.create_release == 'true')
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         # Use appropriate source path and extension
-        if [ "${{ steps.get_firefox_artifact.outputs.signed }}" == "true" ]; then
+        if [ "${{ steps.get_firefox_artifact.outputs.signed }}" == "amo" ]; then
+          # AMO submitted version
+          cp "${{ steps.get_firefox_artifact.outputs.filepath }}" "dist/fancy-links-firefox-v${{ steps.get_version.outputs.version }}-amo.xpi"
+          xpi_file="dist/fancy-links-firefox-v${{ steps.get_version.outputs.version }}-amo.xpi"
+        elif [ "${{ steps.get_firefox_artifact.outputs.signed }}" == "true" ]; then
           # Already has .xpi extension from signing
           cp "${{ steps.get_firefox_artifact.outputs.filepath }}" "dist/fancy-links-firefox-v${{ steps.get_version.outputs.version }}-signed.xpi"
           xpi_file="dist/fancy-links-firefox-v${{ steps.get_version.outputs.version }}-signed.xpi"
@@ -154,7 +267,16 @@ jobs:
         EOF
         
         # Add appropriate installation instructions based on signing status
-        if [ "${{ steps.get_firefox_artifact.outputs.signed }}" == "true" ]; then
+        if [ "${{ steps.get_firefox_artifact.outputs.signed }}" == "amo" ]; then
+          cat >> release_notes.md << 'EOF'
+        **🎉 This release has been submitted to addons.mozilla.org for public distribution!**
+
+        The extension will be available on AMO after review. In the meantime, you can:
+        1. Download the `.xpi` file below for immediate installation
+        2. Wait for it to appear on [addons.mozilla.org](https://addons.mozilla.org)
+
+        EOF
+        elif [ "${{ steps.get_firefox_artifact.outputs.signed }}" == "true" ]; then
           cat >> release_notes.md << 'EOF'
         **✅ This release is signed by Mozilla and can be installed directly.**
         
@@ -193,19 +315,48 @@ jobs:
         EOF
         
         # Create release with asset using GitHub CLI
-        gh release create "${{ github.ref_name }}" \
-          --title "Fancy Links v${{ steps.get_version.outputs.version }}" \
-          --notes-file release_notes.md \
-          "$xpi_file"
+        if [[ "${{ github.event_name }}" == "push" ]]; then
+          # Tag-triggered release
+          gh release create "${{ github.ref_name }}" \
+            --title "Fancy Links v${{ steps.get_version.outputs.version }}" \
+            --notes-file release_notes.md \
+            "$xpi_file"
+        else
+          # Manual trigger - create release with current commit
+          gh release create "v${{ steps.get_version.outputs.version }}-manual-$(date +%Y%m%d%H%M%S)" \
+            --title "Fancy Links v${{ steps.get_version.outputs.version }} (Manual Build)" \
+            --notes-file release_notes.md \
+            --prerelease \
+            "$xpi_file"
+        fi
         
     - name: Build Summary
       run: |
         echo "🎉 ${{ matrix.browser }} build completed for v${{ steps.get_version.outputs.version }}!"
         if [ "${{ matrix.browser }}" == "firefox" ]; then
-          if [ "${{ steps.get_firefox_artifact.outputs.signed }}" == "true" ]; then
-            echo "✅ Firefox Asset: fancy-links-firefox-v${{ steps.get_version.outputs.version }}-signed.xpi (SIGNED)"
+          if [ "${{ steps.get_firefox_artifact.outputs.signed }}" == "amo" ]; then
+            echo "🎉 Firefox Asset: fancy-links-firefox-v${{ steps.get_version.outputs.version }}-amo.xpi (Submitted to AMO)"
+            echo "📦 AMO Status: Submitted for review on addons.mozilla.org"
+          elif [ "${{ steps.get_firefox_artifact.outputs.signed }}" == "true" ]; then
+            echo "✅ Firefox Asset: fancy-links-firefox-v${{ steps.get_version.outputs.version }}-signed.xpi (SIGNED for self-distribution)"
           else
             echo "⚠️ Firefox Asset: fancy-links-firefox-v${{ steps.get_version.outputs.version }}.xpi (unsigned)"
           fi
-          echo "🔗 Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}"
+          if [[ "${{ github.event_name }}" == "push" || "${{ github.event.inputs.create_release }}" == "true" ]]; then
+            echo "🔗 Release URL: https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}"
+          else
+            echo "📦 Build artifacts available in workflow run"
+          fi
         fi
+
+    - name: Upload artifacts (manual builds)
+      if: github.event_name == 'workflow_dispatch' && github.event.inputs.create_release != 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: firefox-extension-v${{ steps.get_version.outputs.version }}
+        path: |
+          dist/*.zip
+          dist/*.xpi
+          dist-signed/*.xpi
+          dist-amo/*.xpi
+        retention-days: 30

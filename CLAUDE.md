@@ -62,7 +62,7 @@ web-ext lint --source-dir=src
 ### 3. Version Management (for releases)
 **Update `src/manifest.json` version:**
 - PATCH: Bug fixes, documentation
-- MINOR: New features, format additions  
+- MINOR: New features, format additions
 - MAJOR: Breaking changes
 
 **Publish release:**
@@ -70,6 +70,9 @@ web-ext lint --source-dir=src
 git tag v<version>    # Triggers automated GitHub Actions build
 git push origin v<version>
 ```
+
+**Note:** AMO submission is controlled by the `AMO_SUBMISSION_ENABLED` GitHub Variable.
+Set to `true` in repository settings to enable automatic submission to addons.mozilla.org.
 
 ## Project Structure
 
