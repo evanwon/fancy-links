@@ -34,7 +34,7 @@ Interested in other browsers? Please vote for [Chrome support](https://github.co
 
 ### Quick copy via keyboard shortcut
 1. Navigate to any webpage
-2. Press `Alt+Shift+C` (Windows/Linux) / `Opt+Shift+C` (macOS)
+2. Press the keyboard shortcut (default: `Alt+Shift+C` on Windows/Linux, `Opt+Shift+C` on macOS)
 3. The formatted link is copied using your default format
 
 ### Settings
@@ -44,7 +44,7 @@ Interested in other browsers? Please vote for [Chrome support](https://github.co
 4. Enable/disable clean URL feature to remove tracking parameters
 
 ### Customizing keyboard shortcuts
-The default keyboard shortcut is `Alt+Shift+C` (Windows/Linux) / `Opt+Shift+C` (macOS), but you can customize it:
+To customize the keyboard shortcut:
 
 1. Go to `about:addons` in Firefox
 2. Click Extensions in the sidebar
@@ -52,29 +52,41 @@ The default keyboard shortcut is `Alt+Shift+C` (Windows/Linux) / `Opt+Shift+C` (
 4. Find "Fancy Links" and customize the shortcut
 5. The popup will automatically show your custom shortcut
 
-## How to install
-Visit [Fancy Links - Firefox Browser Add-ons](https://addons.mozilla.org/en-US/firefox/addon/fancy-links/) to install.
 
 ## Development Guide
 
-### Building and running locally
+### Local Development
+
+#### Setup
 ```bash
 # Clone the repository
 git clone https://github.com/evanwon/fancy-links.git
 cd fancy-links
 
-# Install web-ext (if not already installed)
-npm install -g web-ext
-
-# Install dependencies and run tests
+# Install dependencies
 npm install
-npm test
 
-# Run in development mode (will hot reload if you make any changes!)
+# Install web-ext globally (if not already installed)
+npm install -g web-ext
+```
+
+#### Development Commands
+```bash
+# Run in development mode (hot reloads on changes)
 web-ext run --source-dir=src
+# Or use npm script:
+npm run dev
 
-# Package the extension
-web-ext build --source-dir=src --artifacts-dir=dist
+# Run tests
+npm test                 # Run all tests
+npm run test:watch       # Watch mode
+npm run test:coverage    # Coverage report
+
+# Lint and build
+npm run lint:firefox     # Check for issues
+npm run build            # Build .zip file
+npm run build:firefox    # Lint and build
+npm run test:build       # Test, lint, and build
 ```
 
 ### Testing in your regular browser 
@@ -117,17 +129,6 @@ This project includes VSCode debugging configuration for the [Debugger for Firef
 2. Open `test/manual.html` for comprehensive testing scenarios
 3. Test all format buttons and keyboard shortcut
 
-#### Automated Testing
-```bash
-# Run all tests
-npm test
-
-# Run tests with coverage report
-npm run test:coverage
-
-# Run tests in watch mode during development
-npm run test:watch
-```
 
 ### Release Process
 
@@ -170,25 +171,6 @@ For testing builds without creating a release:
    - `channel`: AMO channel - `listed` (public) or `unlisted` (self-distribution)
 5. Click "Run workflow"
 
-#### Local Development
-```bash
-# Install dependencies
-npm install
-
-# Run tests
-npm test                 # Run all tests
-npm run test:watch      # Watch mode
-npm run test:coverage   # Coverage report
-
-# Build extension
-npm run build           # Build .zip file
-npm run build:firefox   # Lint and build
-npm run test:build      # Test, lint, and build
-
-# Development
-npm run dev            # Run extension in Firefox for testing
-npm run lint:firefox   # Check for issues
-```
 
 ### Contributing
 1. Fork the repository
