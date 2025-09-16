@@ -260,7 +260,7 @@ jobs:
         cat > release_notes.md << 'EOF'
         # Fancy Links v${{ steps.get_version.outputs.version }}
 
-        Browser extension for copying formatted links with titles.
+        Fancy Links is a browser extension that transforms plain URLs into friendly links with included page titles. Perfect for sharing in chat apps, Reddit, GitHub, Slack, documentation, and anywhere formatted links look better than bare URLs.
 
         ## Firefox Installation
         
@@ -273,7 +273,7 @@ jobs:
 
         The extension will be available on AMO after review. In the meantime, you can:
         1. Download the `.xpi` file below for immediate installation
-        2. Wait for it to appear on [addons.mozilla.org](https://addons.mozilla.org)
+        2. Wait for it to appear on [the Fancy Links page at addons.mozilla.org](https://addons.mozilla.org/en-US/firefox/addon/fancy-links/)
 
         EOF
         elif [ "${{ steps.get_firefox_artifact.outputs.signed }}" == "true" ]; then
