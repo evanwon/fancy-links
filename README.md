@@ -123,7 +123,6 @@ This project includes VSCode debugging configuration for the [Debugger for Firef
 
 #### Tips
 - Breakpoints work in all extension scripts (background, popup, content scripts)
-- The extension popup won't auto-hide during debugging for easier inspection
 - Use the Debug Console to execute commands in the extension context
 
 ### Testing
