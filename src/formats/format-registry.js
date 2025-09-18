@@ -75,7 +75,7 @@
         },
         
         urlparams: {
-            name: 'URL + Title',
+            name: 'URL with Title Parameter',
             description: 'URL with title as parameter',
             example: 'https://example.com?_title=Page_Title',
             worksWith: [],

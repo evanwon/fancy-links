@@ -15,7 +15,7 @@ Interested in other browsers? Please vote for [Chrome support](https://github.co
 - **Markdown** (Reddit, Discord, Obsidian, Notion, etc.): `[Title](URL)`
 - **HTML**: `<a href="URL">Title</a>`
 - **Plain Text**: `Title - URL`
-- **URL Parameters**: `URL?_title=Page_Title`
+- **URL with Title Parameter**: `URL?_title=Page_Title`
 
 ### Additional features
 - **Toolbar Button**: Click to open popup with all format options

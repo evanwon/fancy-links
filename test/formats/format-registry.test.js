@@ -98,7 +98,7 @@ describe('Format Registry', () => {
     });
   });
 
-  describe('URL Params Format', () => {
+  describe('URL with Title Parameter Format', () => {
     test('should format basic link correctly', () => {
       const result = formatRegistry.formatConfig.urlparams.format(
         'Test Title',
