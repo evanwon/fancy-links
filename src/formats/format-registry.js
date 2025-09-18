@@ -11,7 +11,6 @@
     
     // Sanitization utilities
     const sanitizers = {
-        slack: (text) => text.replace(/[<>|[\]]/g, ''),
         markdown: (text) => text.replace(/[()\\]/g, '\\$&'),
         html: (text) => text.replace(/[<>&"']/g, (match) => {
             const entities = {
@@ -49,19 +48,6 @@
             }
         },
 
-        slack: {
-            name: 'Slack',
-            description: 'Slack-compatible link format',
-            example: '<https://example.com|Page Title>',
-            worksWith: [], // Slack doesn't need a "works with" list
-            format: (title, url) => {
-                const displayText = title || url;
-                const truncated = truncateText(displayText);
-                const sanitized = sanitizers.slack(truncated);
-                return `<${url}|${sanitized}>`;
-            }
-        },
-        
         html: {
             name: 'HTML',
             description: 'HTML anchor tag',

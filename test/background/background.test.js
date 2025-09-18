@@ -70,11 +70,11 @@ describe('Background Script', () => {
   describe('Storage Operations', () => {
     describe('getCurrentFormat()', () => {
       test('should return stored format when available', async () => {
-        browser.storage.sync.get.mockResolvedValue({ defaultFormat: 'slack' });
-        
+        browser.storage.sync.get.mockResolvedValue({ defaultFormat: 'markdown' });
+
         const result = await global.getCurrentFormat();
-        
-        expect(result).toBe('slack');
+
+        expect(result).toBe('markdown');
         expect(browser.storage.sync.get).toHaveBeenCalledWith('defaultFormat');
       });
 
@@ -119,12 +119,12 @@ describe('Background Script', () => {
       });
 
       test('should return defaults for missing settings', async () => {
-        browser.storage.sync.get.mockResolvedValue({ defaultFormat: 'slack' });
-        
+        browser.storage.sync.get.mockResolvedValue({ defaultFormat: 'markdown' });
+
         const result = await global.getSettings();
-        
+
         expect(result).toEqual({
-          defaultFormat: 'slack'
+          defaultFormat: 'markdown'
         });
       });
 
@@ -183,9 +183,9 @@ describe('Background Script', () => {
           showBadge: true
         });
 
-        await global.copyFancyLink('slack');
+        await global.copyFancyLink('markdown');
 
-        expect(global.window.FancyLinkFormatConfig.getFormatConfig).toHaveBeenCalledWith('slack');
+        expect(global.window.FancyLinkFormatConfig.getFormatConfig).toHaveBeenCalledWith('markdown');
       });
 
       test('should clean URLs when cleanUrls enabled', async () => {
@@ -307,22 +307,22 @@ describe('Background Script', () => {
 
   describe('Message Handlers', () => {
     test('should handle copyLink action', async () => {
-      const mockRequest = { action: 'copyLink', format: 'slack' };
-      
+      const mockRequest = { action: 'copyLink', format: 'markdown' };
+
       // Mock the necessary dependencies for copyFancyLink
       browser.storage.sync.get.mockResolvedValue({ defaultFormat: 'markdown' });
       browser.tabs.query.mockResolvedValue([mockTab()]);
       browser.tabs.executeScript.mockResolvedValue([{ success: true }]);
       global.window.FancyLinkFormatConfig.getFormatConfig.mockReturnValue({
-        format: jest.fn((title, url) => `<${url}|${title}>`)
+        format: jest.fn((title, url) => `[${title}](${url})`)
       });
-      
+
       // Get message handler - it should have been registered when background.js loaded
       const messageHandler = browser.runtime.onMessage.addListener.mock.calls[0][0];
       const result = await messageHandler(mockRequest);
 
       expect(result.success).toBe(true);
-      expect(global.window.FancyLinkFormatConfig.getFormatConfig).toHaveBeenCalledWith('slack');
+      expect(global.window.FancyLinkFormatConfig.getFormatConfig).toHaveBeenCalledWith('markdown');
     });
 
     test('should handle cleanUrl action with FancyLinkCleanUrl available', async () => {

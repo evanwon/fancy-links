@@ -26,7 +26,7 @@ web-ext lint --source-dir=src
 ```
 
 ### Critical Files
-- `src/formats/format-registry.js` - All format logic (slack, html, markdown, etc.)
+- `src/formats/format-registry.js` - All format logic (html, markdown, etc.)
 - `src/background/background.js` - Main extension logic
 - `src/manifest.json` - Extension configuration and version
 
@@ -92,9 +92,8 @@ Set to `true` in repository settings to enable automatic submission to addons.mo
 ## Technical Details
 
 ### Format Registry (`src/formats/format-registry.js`)
-Consolidated registry with 5 formats:
-- `slack` - `<URL|Title>`
-- `html` - `<a href="URL">Title</a>`  
+Consolidated registry with 4 formats:
+- `html` - `<a href="URL">Title</a>`
 - `markdown` - `[Title](URL)` (Discord, Reddit, GitHub, Notion)
 - `plaintext` - `Title - URL`
 - `urlparams` - `URL?_title=Page_Title`

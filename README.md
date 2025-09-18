@@ -1,5 +1,5 @@
 # Fancy Links
-Fancy Links is a browser extension that transforms plain URLs into friendly links with included page titles. Perfect for sharing in chat apps, Reddit, GitHub, Slack, documentation, and anywhere formatted links look better than bare URLs.
+Fancy Links is a browser extension that transforms plain URLs into friendly links with included page titles. Perfect for sharing in chat apps, Reddit, GitHub, documentation, and anywhere formatted links look better than bare URLs.
 
 **Browser Support:**
 - [Firefox](https://www.firefox.com/) (minimum version 109): :arrow_down: [Install Fancy Links for Firefox here](https://addons.mozilla.org/en-US/firefox/addon/fancy-links/)
@@ -13,7 +13,6 @@ Interested in other browsers? Please vote for [Chrome support](https://github.co
 
 ### Supported link formats
 - **Markdown** (Reddit, Discord, Obsidian, Notion, etc.): `[Title](URL)`
-- **Slack**: `<URL|Title>`
 - **HTML**: `<a href="URL">Title</a>`
 - **Plain Text**: `Title - URL`
 - **URL Parameters**: `URL?_title=Page_Title`

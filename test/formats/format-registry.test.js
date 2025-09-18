@@ -43,31 +43,6 @@ describe('Format Registry', () => {
     });
   });
 
-  describe('Slack Format', () => {
-    test('should format basic link correctly', () => {
-      const result = formatRegistry.formatConfig.slack.format(
-        'Test Title',
-        'https://example.com'
-      );
-      expect(result).toBe('<https://example.com|Test Title>');
-    });
-
-    test('should escape HTML entities', () => {
-      const result = formatRegistry.formatConfig.slack.format(
-        'Title & Description',
-        'https://example.com'
-      );
-      expect(result).toBe('<https://example.com|Title & Description>');
-    });
-
-    test('should handle URLs with special characters', () => {
-      const result = formatRegistry.formatConfig.slack.format(
-        'Test Title',
-        'https://example.com?param=value&other=test'
-      );
-      expect(result).toBe('<https://example.com?param=value&other=test|Test Title>');
-    });
-  });
 
   describe('HTML Format', () => {
     test('should format basic link correctly', () => {
