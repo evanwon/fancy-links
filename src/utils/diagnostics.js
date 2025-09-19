@@ -23,7 +23,8 @@ async function collectDiagnostics(includeCurrentPage = false) {
   if (api) {
     const manifest = api.runtime.getManifest();
     diagnostics.extension = {
-      version: manifest.version
+      // Use version_name for clear version display (e.g., "1.4.1-rc2" instead of "1.4.0.2")
+      version: manifest.version_name || manifest.version
     };
   } else {
     diagnostics.extension = {
