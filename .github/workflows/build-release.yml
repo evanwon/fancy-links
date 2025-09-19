@@ -92,7 +92,8 @@ jobs:
       id: release_type
       run: |
         VERSION="${{ steps.get_version.outputs.version }}"
-        # Check if version contains pre-release suffix
+        # Check if version contains pre-release suffix (rc, beta, alpha)
+        # Examples: 1.5.0rc1, 1.5.0beta2, 1.5.0alpha3
         if [[ "$VERSION" =~ (rc|beta|pre|alpha)[0-9]*$ ]]; then
           echo "is_prerelease=true" >> $GITHUB_OUTPUT
           echo "Pre-release detected: $VERSION"

@@ -64,9 +64,17 @@ web-ext lint --source-dir=src
 #### Pre-release Versions
 For testing new features before public release:
 
-1. **Version format**: Use suffixes like `rc1`, `beta1`, `alpha1`
-   - Example: `1.5.0rc1` in manifest.json
-   - Git tag: `v1.5.0rc1`
+1. **Version Naming Scheme**:
+   - **Format**: `X.Y.Z<suffix><number>`
+   - **Supported suffixes** (automatically detected by workflow):
+     - `rc` - Release candidate (final testing before stable)
+     - `beta` - Beta version (feature complete, testing needed)
+     - `alpha` - Alpha version (early development, may be unstable)
+   - **Examples**:
+     - `1.5.0rc1` → First release candidate for v1.5.0
+     - `1.5.0rc2` → Second release candidate (fixes from rc1)
+     - `1.5.0beta1` → Beta version for testing
+     - `1.5.0alpha1` → Early alpha for development testing
 
 2. **Create pre-release**:
    ```bash
@@ -79,9 +87,11 @@ For testing new features before public release:
 
 3. **Pre-release behavior**:
    - Automatically signed via AMO unlisted channel
-   - Creates GitHub pre-release
+   - Creates GitHub pre-release (marked as pre-release)
    - NOT submitted to AMO public listing
    - Distributed via GitHub releases page
+   - Includes warning notice in release notes
+   - Auto-updates to stable when released
 
 #### Stable Releases
 **Update `src/manifest.json` version:**

@@ -162,17 +162,43 @@ This project includes VSCode debugging configuration for the [Debugger for Firef
 2. **Configure GitHub Variables** (Settings → Secrets and variables → Actions → Variables):
    - `AMO_SUBMISSION_ENABLED`: Set to `true` to enable automatic AMO submission on tags
 
-#### Automatic Release (via git tag)
+#### Pre-release Versions (Beta Testing)
+
+##### Supported Version Formats
+The build system automatically detects pre-releases based on version suffixes:
+- `rc[0-9]+` - Release candidates (e.g., `1.5.0rc1`, `1.5.0rc2`)
+- `beta[0-9]+` - Beta versions (e.g., `1.5.0beta1`)
+- `alpha[0-9]+` - Alpha versions (e.g., `1.5.0alpha1`)
+
+##### Creating a Pre-release
+```bash
+# 1. Update version in src/manifest.json to include suffix (e.g., 1.5.0rc1)
+# 2. Commit changes
+git add -A && git commit -m "Prepare v1.5.0rc1 pre-release"
+
+# 3. Create and push tag (triggers GitHub Actions)
+git tag v1.5.0rc1
+git push origin v1.5.0rc1
+```
+
+**Pre-release behavior:**
+- ✅ Automatically signed by Mozilla (via unlisted channel)
+- ✅ Creates GitHub pre-release with download link
+- ❌ NOT submitted to AMO public listing
+- 📦 Distributed via GitHub releases page only
+- 🔄 Auto-updates to stable version when released
+
+#### Stable Release (Production)
 Releases are automatically built and optionally submitted to AMO when you push a version tag:
 
 ```bash
-# 1. Update version in src/manifest.json
+# 1. Update version in src/manifest.json (no suffix, e.g., 1.5.0)
 # 2. Commit changes
-git add -A && git commit -m "Version X.Y.Z"
+git add -A && git commit -m "Version 1.5.0"
 
 # 3. Create and push tag (triggers GitHub Actions)
-git tag vX.Y.Z
-git push origin vX.Y.Z
+git tag v1.5.0
+git push origin v1.5.0
 ```
 
 The workflow will:
