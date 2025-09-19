@@ -106,7 +106,7 @@ describe('Diagnostics', () => {
         storage: {
           sync: {
             get: jest.fn().mockResolvedValue({
-              defaultFormat: 'slack',
+              defaultFormat: 'markdown',
               cleanUrls: false
             })
           }
@@ -123,7 +123,7 @@ describe('Diagnostics', () => {
       expect(result.extension.version).toBe('1.3.8');
       expect(result.browser.name).toBe('Chrome');
       expect(result.browser.version).toBe('120.0.0.0');
-      expect(result.settings.defaultFormat).toBe('slack');
+      expect(result.settings.defaultFormat).toBe('markdown');
       expect(result.settings.cleanUrls).toBe(false);
     });
 
@@ -231,7 +231,7 @@ describe('Diagnostics', () => {
       const diagnostics = {
         extension: { version: '1.3.9' },
         browser: { name: 'Firefox', version: '120.0', os: 'macOS' },
-        settings: { defaultFormat: 'slack', cleanUrls: false, debugMode: true },
+        settings: { defaultFormat: 'markdown', cleanUrls: false, debugMode: true },
         currentPage: {
           url: 'https://example.com',
           title: 'Example Page'
@@ -309,7 +309,7 @@ describe('Diagnostics', () => {
       const diagnostics = {
         extension: { version: '1.3.9' },
         browser: { name: 'Firefox', version: '120.0', os: 'macOS' },
-        settings: { defaultFormat: 'slack', cleanUrls: false, debugMode: true },
+        settings: { defaultFormat: 'markdown', cleanUrls: false, debugMode: true },
         currentPage: {
           url: 'https://example.com',
           title: 'Example Page'

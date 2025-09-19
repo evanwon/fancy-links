@@ -30,11 +30,6 @@ describe('Popup', () => {
           example: '[Title](URL)',
           worksWith: ['Discord', 'Reddit']
         },
-        slack: {
-          name: 'Slack',
-          format: jest.fn((title, url) => `<${url}|${title}>`),
-          example: '<URL|Title>'
-        },
         html: {
           name: 'HTML',
           format: jest.fn((title, url) => `<a href="${url}">${title}</a>`),

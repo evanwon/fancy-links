@@ -284,7 +284,7 @@ jobs:
         cat > release_notes.md << 'EOF'
         # Fancy Links v${{ steps.get_version.outputs.version }}
 
-        Fancy Links is a browser extension that transforms plain URLs into friendly links with included page titles. Perfect for sharing in chat apps, Reddit, GitHub, Slack, documentation, and anywhere formatted links look better than bare URLs.
+        Fancy Links is a browser extension that transforms plain URLs into friendly links with included page titles. Perfect for sharing in chat apps, Reddit, GitHub, documentation, and anywhere formatted links look better than bare URLs.
 
         ## Firefox Installation
         
