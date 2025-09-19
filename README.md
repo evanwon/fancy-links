@@ -15,7 +15,7 @@ Install the latest stable version from the [Firefox Add-ons store](https://addon
 Want to test new features before they're released? You can install pre-release versions:
 
 1. Visit our [Releases page](https://github.com/evanwon/fancy-links/releases)
-2. Look for versions marked as "Pre-release" (e.g., v1.5.0rc1)
+2. Look for versions marked as "Pre-release" (e.g., v1.5.0-rc1)
 3. Download the `.xpi` file from the pre-release
 4. Open Firefox and drag the downloaded file into the browser window
 5. Click "Add" when prompted to install
@@ -166,20 +166,24 @@ This project includes VSCode debugging configuration for the [Debugger for Firef
 
 ##### Supported Version Formats
 The build system automatically detects pre-releases based on version suffixes:
-- `rc[0-9]+` - Release candidates (e.g., `1.5.0rc1`, `1.5.0rc2`)
-- `beta[0-9]+` - Beta versions (e.g., `1.5.0beta1`)
-- `alpha[0-9]+` - Alpha versions (e.g., `1.5.0alpha1`)
+- `rc[0-9]+` - Release candidates (e.g., `1.5.0-rc1`, `1.5.0-rc2`)
+- `beta[0-9]+` - Beta versions (e.g., `1.5.0-beta1`)
+- `alpha[0-9]+` - Alpha versions (e.g., `1.5.0-alpha1`)
 
 ##### Creating a Pre-release
 ```bash
-# 1. Update version in src/manifest.json to include suffix (e.g., 1.5.0rc1)
+# 1. Update src/manifest.json with BOTH version fields:
+#    - "version": Use PREVIOUS stable + .9.N (e.g., "1.4.9.1" for 1.5.0-rc1)
+#    - "version_name": Target version with suffix (e.g., "1.5.0-rc1")
 # 2. Commit changes
-git add -A && git commit -m "Prepare v1.5.0rc1 pre-release"
+git add -A && git commit -m "Prepare v1.5.0-rc1 pre-release"
 
 # 3. Create and push tag (triggers GitHub Actions)
-git tag v1.5.0rc1
-git push origin v1.5.0rc1
+git tag v1.5.0-rc1
+git push origin v1.5.0-rc1
 ```
+
+**Important:** The `version` field must use the PREVIOUS stable version as base to ensure proper update paths. See [VERSIONING.md](VERSIONING.md) for detailed examples.
 
 **Pre-release behavior:**
 - ✅ Automatically signed by Mozilla (via unlisted channel)

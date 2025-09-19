@@ -65,24 +65,31 @@ web-ext lint --source-dir=src
 For testing new features before public release:
 
 1. **Version Naming Scheme**:
-   - **Format**: `X.Y.Z<suffix><number>`
-   - **Supported suffixes** (automatically detected by workflow):
+   - **manifest.json**: Use two fields:
+     - `version`: PREVIOUS stable + .9.N for RCs (e.g., `1.4.9.1` for 1.5.0-rc1)
+     - `version_name`: Target version with suffix (e.g., `1.5.0-rc1`)
+   - **Supported suffixes** (automatically detected from version_name):
      - `rc` - Release candidate (final testing before stable)
      - `beta` - Beta version (feature complete, testing needed)
      - `alpha` - Alpha version (early development, may be unstable)
-   - **Examples**:
-     - `1.5.0rc1` → First release candidate for v1.5.0
-     - `1.5.0rc2` → Second release candidate (fixes from rc1)
-     - `1.5.0beta1` → Beta version for testing
-     - `1.5.0alpha1` → Early alpha for development testing
+   - **Examples** (for 1.4.0 → 1.5.0):
+     ```json
+     "version": "1.4.9.1",      // Previous stable + .9.1
+     "version_name": "1.5.0-rc1"  // Target version with RC suffix
+     ```
+   - **Critical**: Using previous version ensures 1.4.9.1 < 1.5.0 for proper auto-updates
 
 2. **Create pre-release**:
    ```bash
-   # Update manifest.json version to X.Y.Zrc1
+   # Update manifest.json with BOTH fields (see VERSIONING.md for details)
+   # Example for 1.5.0-rc1 (assuming previous stable is 1.4.0):
+   #   "version": "1.4.9.1"
+   #   "version_name": "1.5.0-rc1"
+
    # Commit changes
-   git commit -am "Prepare v1.5.0rc1 pre-release"
-   git tag v1.5.0rc1
-   git push origin v1.5.0rc1
+   git commit -am "Prepare v1.5.0-rc1 pre-release"
+   git tag v1.5.0-rc1
+   git push origin v1.5.0-rc1
    ```
 
 3. **Pre-release behavior**:

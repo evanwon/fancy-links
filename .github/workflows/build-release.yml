@@ -88,15 +88,22 @@ jobs:
           echo "version=$version" >> $GITHUB_OUTPUT
         fi
 
+        # Also extract version_name if present (for pre-release detection)
+        version_name=$(node -e "const m = JSON.parse(require('fs').readFileSync('src/manifest.json', 'utf8')); console.log(m.version_name || m.version)")
+        echo "version_name=$version_name" >> $GITHUB_OUTPUT
+
     - name: Determine release type
       id: release_type
       run: |
+        # Check version_name for pre-release indicators
+        VERSION_NAME="${{ steps.get_version.outputs.version_name }}"
         VERSION="${{ steps.get_version.outputs.version }}"
-        # Check if version contains pre-release suffix (rc, beta, alpha)
-        # Examples: 1.5.0rc1, 1.5.0beta2, 1.5.0alpha3
-        if [[ "$VERSION" =~ (rc|beta|pre|alpha)[0-9]*$ ]]; then
+
+        # Check if version_name contains pre-release suffix (rc, beta, alpha)
+        # Examples: 1.5.0-rc1, 1.5.0-beta2, 1.5.0-alpha3
+        if [[ "$VERSION_NAME" =~ -(rc|beta|pre|alpha)[0-9]*$ ]]; then
           echo "is_prerelease=true" >> $GITHUB_OUTPUT
-          echo "Pre-release detected: $VERSION"
+          echo "Pre-release detected: $VERSION_NAME"
         else
           echo "is_prerelease=false" >> $GITHUB_OUTPUT
           echo "Stable release detected: $VERSION"
