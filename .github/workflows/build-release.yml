@@ -296,7 +296,7 @@ jobs:
         **🎉 This release has been submitted to addons.mozilla.org for public distribution!**
 
         The extension will be available on AMO after review. In the meantime, you can:
-        1. Download the `.xpi` file below for immediate installation
+        1. Download the `.xpi` file below under the **Assets** section for immediate installation
         2. Wait for it to appear on [the Fancy Links page at addons.mozilla.org](https://addons.mozilla.org/en-US/firefox/addon/fancy-links/)
 
         EOF
@@ -304,7 +304,12 @@ jobs:
           cat >> release_notes.md << 'EOF'
         **✅ This release is signed by Mozilla and can be installed directly.**
         
-        1. Download the `.xpi` file below
+        To install the extension:
+        1. In the **Assets** section below, select the `.xpi` file. 
+        2. You should receive a Firefox prompt to add the extension; select "Continue to Installation"
+
+        Alternatively, you can install the extension manually:
+        1. Download the `.xpi` file link in the **Assets** section below
         2. Open the file with Firefox or drag it into a Firefox window
         3. Click "Add" when prompted
         
