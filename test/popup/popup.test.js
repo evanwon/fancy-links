@@ -33,7 +33,20 @@ describe('Popup', () => {
         html: {
           name: 'HTML',
           format: jest.fn((title, url) => `<a href="${url}">${title}</a>`),
-          example: '<a href="URL">Title</a>'
+          example: '<a href="URL">Title</a>',
+          worksWith: []
+        },
+        plaintext: {
+          name: 'Plain Text',
+          format: jest.fn((title, url) => `${title} - ${url}`),
+          example: 'Title - URL',
+          worksWith: []
+        },
+        urlparams: {
+          name: 'URL with Title Parameter',
+          format: jest.fn((title, url) => `${url}?_title=${title}`),
+          example: 'URL?_title=Title',
+          worksWith: []
         }
       }
     };
@@ -84,7 +97,7 @@ describe('Popup', () => {
       const container = document.getElementById('formatButtons');
       const buttons = container.querySelectorAll('.format-btn');
       
-      expect(buttons).toHaveLength(3);
+      expect(buttons).toHaveLength(4);
       
       // Check markdown button structure
       const markdownBtn = container.querySelector('[data-format="markdown"]');
