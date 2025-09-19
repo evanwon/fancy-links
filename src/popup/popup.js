@@ -11,10 +11,13 @@ function loadVersion() {
     try {
         const manifest = browser.runtime.getManifest();
         const versionElement = document.getElementById('version');
-        
+
         if (versionElement) {
-            if (manifest && manifest.version) {
-                versionElement.textContent = `v${manifest.version}`;
+            // Use version_name which should always be set (e.g., "1.5.0-rc1" for pre-releases, "1.5.0" for stable)
+            // Fall back to version only if version_name is missing for some reason
+            const displayVersion = manifest.version_name || manifest.version;
+            if (manifest && displayVersion) {
+                versionElement.textContent = `v${displayVersion}`;
                 versionElement.style.display = 'inline';
                 versionElement.title = 'Click to view changelog';
             } else {
@@ -367,8 +370,10 @@ async function handleHelpButtonClick() {
 async function handleVersionClick() {
     try {
         const manifest = browser.runtime.getManifest();
-        if (manifest && manifest.version) {
-            const changelogUrl = `https://github.com/evanwon/fancy-links/releases/tag/v${manifest.version}`;
+        // Use version_name for the tag since that's what we tag releases with (e.g., "v1.5.0-rc1")
+        // Only proceed if version_name exists to ensure we link to a valid release tag
+        if (manifest && manifest.version_name) {
+            const changelogUrl = `https://github.com/evanwon/fancy-links/releases/tag/v${manifest.version_name}`;
             browser.tabs.create({ url: changelogUrl });
             window.close();
         }
