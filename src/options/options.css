@@ -115,17 +115,6 @@ body {
     color: #333;
 }
 
-.format-example {
-    font-size: 12px;
-    color: #666;
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-    background: #f5f5f5;
-    padding: 4px 8px;
-    border-radius: 4px;
-    display: inline-block;
-    margin-bottom: 4px;
-}
-
 .format-apps {
     font-size: 11px;
     color: #888;

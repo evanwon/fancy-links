@@ -85,7 +85,7 @@ function generateFormatButtons() {
             button.appendChild(worksWithSpan);
         }
         
-        // Preview area
+        // Format placeholder display
         const preview = document.createElement('span');
         preview.className = 'format-preview';
         preview.id = `preview-${formatKey}`;
@@ -178,51 +178,16 @@ async function loadCurrentTab() {
 }
 
 async function updatePreviews() {
-    if (!currentTab) return;
-    
-    const title = currentTab.title || 'Untitled Page';
-    let url = currentTab.url || '';
-    
-    // Get settings to check if URL cleaning is enabled
-    try {
-        const settings = await browser.storage.sync.get({
-            defaultFormat: 'markdown',
-            cleanUrls: false
-        });
-        
-        // Clean URL for preview if setting is enabled
-        if (settings.cleanUrls) {
-            // Send message to background script to clean the URL
-            try {
-                const cleanResult = await browser.runtime.sendMessage({
-                    action: 'cleanUrl',
-                    url: url
-                });
-                if (cleanResult && cleanResult.cleanedUrl) {
-                    url = cleanResult.cleanedUrl;
-                }
-            } catch (error) {
-                console.warn('Could not clean URL for preview:', error);
-                // Continue with original URL if cleaning fails
-            }
-        }
-    } catch (error) {
-        console.warn('Could not get settings for preview:', error);
-        // Continue with defaults if settings can't be loaded
-    }
-    
-    // Update each format preview
+    // Update each format preview with the example from the format registry
     Object.keys(formats).forEach(formatKey => {
         const previewElement = document.getElementById(`preview-${formatKey}`);
         const config = formats[formatKey];
-        if (previewElement && config && config.format) {
-            try {
-                const formatted = config.format(title, url);
-                previewElement.textContent = formatted;
-            } catch (error) {
-                console.error(`Error formatting ${formatKey}:`, error);
-                previewElement.textContent = 'Format error';
-            }
+        if (previewElement && config && config.example) {
+            // Use the example directly from the format configuration
+            previewElement.textContent = config.example;
+        } else if (previewElement) {
+            // Fallback if no example is defined
+            previewElement.textContent = 'Format preview';
         }
     });
 }

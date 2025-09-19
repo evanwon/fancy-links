@@ -38,7 +38,7 @@
         markdown: {
             name: 'Markdown',
             description: 'Markdown link format',
-            example: '[Page Title](https://example.com)',
+            example: '[Title](URL)',
             worksWith: ['Discord', 'Reddit', 'GitHub', 'Notion'],
             format: (title, url) => {
                 const displayText = title || url;
@@ -51,7 +51,7 @@
         html: {
             name: 'HTML',
             description: 'HTML anchor tag',
-            example: '<a href="https://example.com">Page Title</a>',
+            example: '<a href="URL">Title</a>',
             worksWith: [],
             format: (title, url) => {
                 const displayText = title || url;
@@ -65,7 +65,7 @@
         plaintext: {
             name: 'Plain Text',
             description: 'Simple text format',
-            example: 'Page Title - https://example.com',
+            example: 'Title - URL',
             worksWith: [],
             format: (title, url) => {
                 const displayText = title || url;
@@ -77,7 +77,7 @@
         urlparams: {
             name: 'URL with Title Parameter',
             description: 'URL with title as parameter',
-            example: 'https://example.com?_title=Page_Title',
+            example: 'URL?_title=Title',
             worksWith: [],
             format: (title, url) => {
                 const displayText = title || url;
