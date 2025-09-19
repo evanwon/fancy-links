@@ -60,6 +60,30 @@ web-ext lint --source-dir=src
 - Include concise Claude attribution: `Co-Authored-By: Claude <noreply@anthropic.com>`
 
 ### 3. Version Management (for releases)
+
+#### Pre-release Versions
+For testing new features before public release:
+
+1. **Version format**: Use suffixes like `rc1`, `beta1`, `alpha1`
+   - Example: `1.5.0rc1` in manifest.json
+   - Git tag: `v1.5.0rc1`
+
+2. **Create pre-release**:
+   ```bash
+   # Update manifest.json version to X.Y.Zrc1
+   # Commit changes
+   git commit -am "Prepare v1.5.0rc1 pre-release"
+   git tag v1.5.0rc1
+   git push origin v1.5.0rc1
+   ```
+
+3. **Pre-release behavior**:
+   - Automatically signed via AMO unlisted channel
+   - Creates GitHub pre-release
+   - NOT submitted to AMO public listing
+   - Distributed via GitHub releases page
+
+#### Stable Releases
 **Update `src/manifest.json` version:**
 - PATCH: Bug fixes, documentation
 - MINOR: New features, format additions

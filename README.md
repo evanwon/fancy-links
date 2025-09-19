@@ -2,9 +2,29 @@
 Fancy Links is a browser extension that transforms plain URLs into friendly links with included page titles. Perfect for sharing in chat apps, Reddit, GitHub, documentation, and anywhere formatted links look better than bare URLs.
 
 **Browser Support:**
-- [Firefox](https://www.firefox.com/) (minimum version 109): :arrow_down: [Install Fancy Links for Firefox here](https://addons.mozilla.org/en-US/firefox/addon/fancy-links/)
+- [Firefox](https://www.firefox.com/) (minimum version 109)
 
 Interested in other browsers? Please vote for [Chrome support](https://github.com/evanwon/fancy-links/issues/15) or [suggest a new browser](https://github.com/evanwon/fancy-links/issues/new/choose)!
+
+## Installation
+
+### Stable Version
+Install the latest stable version from the [Firefox Add-ons store](https://addons.mozilla.org/firefox/addon/fancy-links/).
+
+### Pre-release/Beta Testing
+Want to test new features before they're released? You can install pre-release versions:
+
+1. Visit our [Releases page](https://github.com/evanwon/fancy-links/releases)
+2. Look for versions marked as "Pre-release" (e.g., v1.5.0rc1)
+3. Download the `.xpi` file from the pre-release
+4. Open Firefox and drag the downloaded file into the browser window
+5. Click "Add" when prompted to install
+
+**Note:** Pre-release versions:
+- Are signed by Mozilla and safe to install
+- Will automatically update to the stable version when it's released
+- May contain experimental features or bugs
+- Your feedback is valuable! Please [report any issues](https://github.com/evanwon/fancy-links/issues)
 
 ## Screenshots
 ![](images/fancy-links-popup.png)

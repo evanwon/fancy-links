@@ -75,7 +75,32 @@ jobs:
             console.warn('Firefox build using Manifest V2');
           }
         "
-        
+
+    - name: Extract version
+      id: get_version
+      run: |
+        if [[ "${{ github.event_name }}" == "push" ]]; then
+          # Extract from tag
+          echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        else
+          # Extract from manifest.json for manual builds
+          version=$(node -e "console.log(JSON.parse(require('fs').readFileSync('src/manifest.json', 'utf8')).version)")
+          echo "version=$version" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Determine release type
+      id: release_type
+      run: |
+        VERSION="${{ steps.get_version.outputs.version }}"
+        # Check if version contains pre-release suffix
+        if [[ "$VERSION" =~ (rc|beta|pre|alpha)[0-9]*$ ]]; then
+          echo "is_prerelease=true" >> $GITHUB_OUTPUT
+          echo "Pre-release detected: $VERSION"
+        else
+          echo "is_prerelease=false" >> $GITHUB_OUTPUT
+          echo "Stable release detected: $VERSION"
+        fi
+
     - name: Firefox - Lint extension
       if: matrix.browser == 'firefox'
       run: |
@@ -92,17 +117,20 @@ jobs:
       if: matrix.browser == 'firefox'
       id: amo_config
       run: |
-        # Check if AMO submission should be performed
-        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+        # Pre-releases never go to AMO listed channel
+        if [[ "${{ steps.release_type.outputs.is_prerelease }}" == "true" ]]; then
+          echo "submit=false" >> $GITHUB_OUTPUT
+          echo "channel=unlisted" >> $GITHUB_OUTPUT
+          echo "Pre-release: Will sign via unlisted channel only"
+        elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
           # Manual trigger - use provided inputs
           echo "submit=${{ github.event.inputs.submit_to_amo }}" >> $GITHUB_OUTPUT
           echo "channel=${{ github.event.inputs.channel }}" >> $GITHUB_OUTPUT
         elif [[ "${{ github.event_name }}" == "push" && "${{ vars.AMO_SUBMISSION_ENABLED }}" == "true" ]]; then
-          # Tag trigger with AMO auto-submission enabled - submit to listed channel
+          # Stable release with AMO enabled
           echo "submit=true" >> $GITHUB_OUTPUT
           echo "channel=listed" >> $GITHUB_OUTPUT
         else
-          # Default: build without AMO submission
           echo "submit=false" >> $GITHUB_OUTPUT
           echo "channel=unlisted" >> $GITHUB_OUTPUT
         fi
@@ -178,18 +206,6 @@ jobs:
     # - name: Chrome - Build extension
     #   if: matrix.browser == 'chrome'
     #   run: echo "Chrome build steps..."
-        
-    - name: Extract version
-      id: get_version
-      run: |
-        if [[ "${{ github.event_name }}" == "push" ]]; then
-          # Extract from tag
-          echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-        else
-          # Extract from manifest.json for manual builds
-          version=$(node -e "console.log(JSON.parse(require('fs').readFileSync('src/manifest.json', 'utf8')).version)")
-          echo "version=$version" >> $GITHUB_OUTPUT
-        fi
       
     - name: Firefox - Get build artifact
       if: matrix.browser == 'firefox'
@@ -302,7 +318,23 @@ jobs:
         
         EOF
         fi
-        
+
+        # Add pre-release notice if applicable
+        if [ "${{ steps.release_type.outputs.is_prerelease }}" == "true" ]; then
+          cat >> release_notes.md << 'EOF'
+
+        ---
+
+        **⚠️ Pre-release Version**
+
+        This is a pre-release version for testing new features.
+        - May contain bugs or incomplete features
+        - Will auto-update to stable version when released
+        - Please report issues at https://github.com/evanwon/fancy-links/issues
+
+        EOF
+        fi
+
         cat >> release_notes.md << 'EOF'
 
         ## What's New
@@ -314,17 +346,27 @@ jobs:
         **Permissions:** clipboardWrite, activeTab, storage, notifications
         EOF
         
+        # Determine release flags based on type
+        if [[ "${{ steps.release_type.outputs.is_prerelease }}" == "true" ]]; then
+          RELEASE_FLAGS="--prerelease"
+          RELEASE_TITLE="Fancy Links v${{ steps.get_version.outputs.version }} (Pre-release)"
+        else
+          RELEASE_FLAGS=""
+          RELEASE_TITLE="Fancy Links v${{ steps.get_version.outputs.version }}"
+        fi
+
         # Create release with asset using GitHub CLI
         if [[ "${{ github.event_name }}" == "push" ]]; then
           # Tag-triggered release
           gh release create "${{ github.ref_name }}" \
-            --title "Fancy Links v${{ steps.get_version.outputs.version }}" \
+            --title "$RELEASE_TITLE" \
             --notes-file release_notes.md \
+            $RELEASE_FLAGS \
             "$xpi_file"
         else
           # Manual trigger - create release with current commit
           gh release create "v${{ steps.get_version.outputs.version }}-manual-$(date +%Y%m%d%H%M%S)" \
-            --title "Fancy Links v${{ steps.get_version.outputs.version }} (Manual Build)" \
+            --title "$RELEASE_TITLE (Manual Build)" \
             --notes-file release_notes.md \
             --prerelease \
             "$xpi_file"
