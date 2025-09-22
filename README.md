@@ -86,11 +86,12 @@ To customize the keyboard shortcut:
 git clone https://github.com/evanwon/fancy-links.git
 cd fancy-links
 
-# Install dependencies
-npm install
+npm ci --ignore-scripts
+# We're using `npm ci` instead of `npm install` for security reasons, and prevent execution of install scripts for security
+# Note: If you don't have a package-lock.json, run: npm install --ignore-scripts
 
 # Install web-ext globally (if not already installed)
-npm install -g web-ext
+npm install -g web-ext --ignore-scripts
 ```
 
 #### Development Commands

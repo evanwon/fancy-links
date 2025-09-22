@@ -53,15 +53,23 @@ jobs:
         node-version: '22'
         
     - name: Install dependencies
-      run: npm ci
-        
+      run: npm ci --ignore-scripts
+
+    - name: Security audit
+      run: |
+        npm audit --audit-level=moderate || {
+          echo "::warning::Security vulnerabilities found! Run 'npm audit' locally for details."
+          npm audit --audit-level=moderate --json > audit-results.json
+          exit 1
+        }
+
     - name: Run tests with coverage
       run: npm run test:ci
         
     - name: Install build tools
       run: |
-        npm install -g web-ext  # Firefox extension tool
-        # Future: npm install -g chrome-webstore-upload-cli
+        npm install -g web-ext --ignore-scripts  # Firefox extension tool
+        # Future: npm install -g chrome-webstore-upload-cli --ignore-scripts
         
     - name: Validate manifest
       run: |
