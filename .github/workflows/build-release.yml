@@ -248,16 +248,94 @@ jobs:
     - name: Generate changelog
       id: changelog
       run: |
-        # Find the previous tag (second most recent)
-        previous_tag=$(git tag -l --sort=-version:refname | sed -n '2p')
-        
-        if [ -n "$previous_tag" ]; then
+        CURRENT_VERSION="${{ steps.get_version.outputs.version_name }}"
+        IS_PRERELEASE="${{ steps.release_type.outputs.is_prerelease }}"
+
+        # Function to check if a tag is a pre-release
+        is_prerelease_tag() {
+          local tag=$1
+          # Remove 'v' prefix if present
+          local version=${tag#v}
+          # Check for pre-release suffixes (rc, beta, alpha, pre)
+          if [[ "$version" =~ -(rc|beta|alpha|pre)[0-9]*$ ]]; then
+            return 0  # true
+          else
+            return 1  # false
+          fi
+        }
+
+        # Get all tags sorted by version
+        all_tags=$(git tag -l --sort=-version:refname)
+
+        # Find the last stable release (same logic for both stable and pre-release)
+        echo "Finding last stable release..."
+        previous_stable=""
+        for tag in $all_tags; do
+          # Skip the current tag if it's a stable release
+          if [ "$IS_PRERELEASE" == "false" ] && [ "$tag" == "${{ github.ref_name }}" ]; then
+            continue
+          fi
+
+          # Find the first stable (non-pre-release) tag
+          if ! is_prerelease_tag "$tag"; then
+            previous_stable=$tag
+            echo "Found last stable release: $previous_stable"
+            break
+          fi
+        done
+
+        # Generate the changelog
+        if [ -n "$previous_stable" ]; then
+          echo "Generating changelog from $previous_stable to HEAD..."
           echo "changelog<<EOF" >> $GITHUB_OUTPUT
-          echo "### Changes since $previous_tag" >> $GITHUB_OUTPUT
-          git log --pretty=format:"- %s (%h)" $previous_tag..HEAD >> $GITHUB_OUTPUT
+
+          if [ "$IS_PRERELEASE" == "true" ]; then
+            echo "### Changes in this pre-release (since stable $previous_stable)" >> $GITHUB_OUTPUT
+          else
+            echo "### Changes since $previous_stable" >> $GITHUB_OUTPUT
+          fi
+
+          # Get commit count for context
+          commit_count=$(git rev-list --count $previous_stable..HEAD)
           echo "" >> $GITHUB_OUTPUT
+          echo "_${commit_count} commits since last stable release_" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+
+          git log --pretty=format:"- %s (%h)" $previous_stable..HEAD >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+
+          # Add note about intermediate pre-releases if this is a stable release
+          if [ "$IS_PRERELEASE" == "false" ]; then
+            # Check if there were any pre-releases since the last stable
+            prereleases=""
+            for tag in $all_tags; do
+              # Stop when we reach the previous stable tag
+              if [ "$tag" == "$previous_stable" ]; then
+                break
+              fi
+              # Skip current tag
+              if [ "$tag" == "${{ github.ref_name }}" ]; then
+                continue
+              fi
+              # Collect pre-release tags
+              if is_prerelease_tag "$tag"; then
+                if [ -z "$prereleases" ]; then
+                  prereleases="$tag"
+                else
+                  prereleases="$prereleases, $tag"
+                fi
+              fi
+            done
+
+            if [ -n "$prereleases" ]; then
+              echo "" >> $GITHUB_OUTPUT
+              echo "**Note:** This release includes changes that were tested in pre-releases: $prereleases" >> $GITHUB_OUTPUT
+            fi
+          fi
+
           echo "EOF" >> $GITHUB_OUTPUT
         else
+          echo "No previous stable release found, generating initial release notes..."
           echo "changelog<<EOF" >> $GITHUB_OUTPUT
           echo "## Initial Release" >> $GITHUB_OUTPUT
           echo "First official release of Fancy Links browser extension." >> $GITHUB_OUTPUT
