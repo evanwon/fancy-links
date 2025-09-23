@@ -304,44 +304,6 @@ jobs:
           git log --pretty=format:"- %s (%h)" $previous_stable..HEAD >> $GITHUB_OUTPUT
           echo "" >> $GITHUB_OUTPUT
 
-          # Add note about intermediate pre-releases if this is a stable release
-          if [ "$IS_PRERELEASE" == "false" ]; then
-            # Extract base version from current release (e.g., 1.4.2 from v1.4.2)
-            current_base_version="${{ github.ref_name }}"
-            current_base_version="${current_base_version#v}"  # Remove 'v' prefix if present
-
-            # Check if there were any pre-releases for THIS version specifically
-            prereleases=""
-            for tag in $all_tags; do
-              # Stop when we reach the previous stable tag
-              if [ "$tag" == "$previous_stable" ]; then
-                break
-              fi
-              # Skip current tag
-              if [ "$tag" == "${{ github.ref_name }}" ]; then
-                continue
-              fi
-              # Only collect pre-release tags that match our base version
-              if is_prerelease_tag "$tag"; then
-                # Extract version from tag (remove 'v' prefix)
-                tag_version="${tag#v}"
-                # Check if this pre-release belongs to the current version
-                # (e.g., 1.4.2-rc1 starts with 1.4.2-)
-                if [[ "$tag_version" == "$current_base_version-"* ]]; then
-                  if [ -z "$prereleases" ]; then
-                    prereleases="$tag"
-                  else
-                    prereleases="$prereleases, $tag"
-                  fi
-                fi
-              fi
-            done
-
-            if [ -n "$prereleases" ]; then
-              echo "" >> $GITHUB_OUTPUT
-              echo "**Note:** This release includes changes that were tested in pre-releases: $prereleases" >> $GITHUB_OUTPUT
-            fi
-          fi
 
           echo "EOF" >> $GITHUB_OUTPUT
         else
