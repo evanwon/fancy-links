@@ -48,17 +48,17 @@
             }
         },
 
-        html: {
-            name: 'HTML',
-            description: 'HTML anchor tag',
-            example: '<a href="URL">Title</a>',
+        urlparams: {
+            name: 'URL with Title Parameter',
+            description: 'URL with title as parameter',
+            example: 'URL?_title=Title',
             worksWith: [],
             format: (title, url) => {
                 const displayText = title || url;
                 const truncated = truncateText(displayText);
-                const sanitized = sanitizers.html(truncated);
-                const urlEscaped = sanitizers.html(url);
-                return `<a href="${urlEscaped}">${sanitized}</a>`;
+                const sanitized = sanitizers.urlParam(truncated);
+                const separator = url.includes('?') ? '&' : '?';
+                return `${url}${separator}_title=${sanitized}`;
             }
         },
         
@@ -73,18 +73,18 @@
                 return `${truncated} - ${url}`;
             }
         },
-        
-        urlparams: {
-            name: 'URL with Title Parameter',
-            description: 'URL with title as parameter',
-            example: 'URL?_title=Title',
+
+        html: {
+            name: 'HTML',
+            description: 'HTML anchor tag',
+            example: '<a href="URL">Title</a>',
             worksWith: [],
             format: (title, url) => {
                 const displayText = title || url;
                 const truncated = truncateText(displayText);
-                const sanitized = sanitizers.urlParam(truncated);
-                const separator = url.includes('?') ? '&' : '?';
-                return `${url}${separator}_title=${sanitized}`;
+                const sanitized = sanitizers.html(truncated);
+                const urlEscaped = sanitizers.html(url);
+                return `<a href="${urlEscaped}">${sanitized}</a>`;
             }
         }
     };
