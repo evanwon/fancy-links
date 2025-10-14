@@ -15,12 +15,12 @@ describe('Format Registry', () => {
       expect(result).toBe('[Test Title](https://example.com)');
     });
 
-    test('should escape parentheses and backslashes but not square brackets', () => {
+    test('should escape backslashes but not parentheses or square brackets', () => {
       const result = formatRegistry.formatConfig.markdown.format(
         'Title (with) parens and \\ backslash',
         'https://example.com'
       );
-      expect(result).toBe('[Title \\(with\\) parens and \\\\ backslash](https://example.com)');
+      expect(result).toBe('[Title (with) parens and \\\\ backslash](https://example.com)');
     });
 
     test('should not escape square brackets in titles (e.g., JIRA tickets)', () => {

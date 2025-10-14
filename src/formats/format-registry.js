@@ -11,7 +11,7 @@
     
     // Sanitization utilities
     const sanitizers = {
-        markdown: (text) => text.replace(/[()\\]/g, '\\$&'),
+        markdown: (text) => text.replace(/\\/g, '\\\\'),
         html: (text) => text.replace(/[<>&"']/g, (match) => {
             const entities = {
                 '<': '&lt;',
