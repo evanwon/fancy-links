@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
   "name": "Fancy Links",
-  "version": "1.4.4.1",
-  "version_name": "1.4.5-rc1",
+  "version": "1.4.5",
+  "version_name": "1.4.5",
   "description": "Fancy Links transforms plain URLs into friendly links with included page titles. Perfect for sharing in chat apps, Reddit, GitHub, documentation, and anywhere formatted links look better than bare URLs.",
 
   "browser_specific_settings": {
