@@ -219,13 +219,76 @@ describe('Popup', () => {
     });
   });
 
+  describe('Error Message Mapping', () => {
+    test('getUserFriendlyError maps known error messages to user-friendly strings', async () => {
+      const event = new Event('DOMContentLoaded');
+      document.dispatchEvent(event);
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      // Simulate a copy failure with a known error message
+      browser.runtime.sendMessage.mockResolvedValue({ success: false, error: 'No active tab found' });
+
+      const markdownBtn = document.querySelector('[data-format="markdown"]');
+      markdownBtn.click();
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      const notification = document.getElementById('notification');
+      expect(notification.textContent).toBe('Copy failed: Could not access the current tab');
+    });
+
+    test('getUserFriendlyError maps clipboard errors to friendly message', async () => {
+      const event = new Event('DOMContentLoaded');
+      document.dispatchEvent(event);
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      browser.runtime.sendMessage.mockResolvedValue({ success: false, error: 'Failed to copy to clipboard' });
+
+      const markdownBtn = document.querySelector('[data-format="markdown"]');
+      markdownBtn.click();
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      const notification = document.getElementById('notification');
+      expect(notification.textContent).toBe('Copy failed: Could not access the clipboard');
+    });
+
+    test('getUserFriendlyError returns generic message for unknown errors', async () => {
+      const event = new Event('DOMContentLoaded');
+      document.dispatchEvent(event);
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      browser.runtime.sendMessage.mockResolvedValue({ success: false, error: 'Some unexpected internal error' });
+
+      const markdownBtn = document.querySelector('[data-format="markdown"]');
+      markdownBtn.click();
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      const notification = document.getElementById('notification');
+      expect(notification.textContent).toBe('Copy failed: An unexpected error occurred');
+    });
+
+    test('getUserFriendlyError handles null/undefined error gracefully', async () => {
+      const event = new Event('DOMContentLoaded');
+      document.dispatchEvent(event);
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      browser.runtime.sendMessage.mockResolvedValue({ success: false });
+
+      const markdownBtn = document.querySelector('[data-format="markdown"]');
+      markdownBtn.click();
+      await new Promise(resolve => setTimeout(resolve, 0));
+
+      const notification = document.getElementById('notification');
+      expect(notification.textContent).toBe('Copy failed: An unexpected error occurred');
+    });
+  });
+
   // TODO: Copy Operations tests removed - move to integration tests as they test:
   // - browser.runtime.sendMessage integration with background script
   // - clipboard operations through background script
   // - notification timing and UI feedback for copy operations
   // Tests to restore as integration tests:
   // - copyWithFormat provides user feedback for all scenarios
-  // - copyWithFormat handles edge cases gracefully  
+  // - copyWithFormat handles edge cases gracefully
   // - notification displays and auto-hides correctly
 
   // TODO: Event Handlers tests removed - move to integration tests as they test browser API integration:
