@@ -126,19 +126,12 @@ async function saveSettings() {
 
 async function resetSettings() {
     try {
-        // Clear stored settings
-        await browser.storage.sync.clear();
-        
-        // Update UI with defaults
+        const knownKeys = Object.keys(DEFAULT_SETTINGS);
+        await browser.storage.sync.remove(knownKeys);
+        await browser.storage.sync.set(DEFAULT_SETTINGS);
         updateUI(DEFAULT_SETTINGS);
-        
         showStatus('Settings reset to defaults', 'success');
-        
-        // Clear status after 3 seconds
-        setTimeout(() => {
-            showStatus('');
-        }, 3000);
-        
+        setTimeout(() => { showStatus(''); }, 3000);
     } catch (error) {
         console.error('Error resetting settings:', error);
         showStatus('Error resetting settings', 'error');
