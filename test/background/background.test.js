@@ -41,7 +41,8 @@ describe('Background Script', () => {
       },
       tabs: {
         query: jest.fn(),
-        executeScript: jest.fn()
+        executeScript: jest.fn(),
+        sendMessage: jest.fn()
       },
       browserAction: {
         setBadgeText: jest.fn(),
@@ -164,10 +165,13 @@ describe('Background Script', () => {
     beforeEach(() => {
       // Mock successful tab query
       browser.tabs.query.mockResolvedValue([mockTab()]);
-      
-      // Mock successful script execution
-      browser.tabs.executeScript.mockResolvedValue([{ success: true }]);
-      
+
+      // Mock successful script injection (file-based, no return value needed)
+      browser.tabs.executeScript.mockResolvedValue();
+
+      // Mock successful clipboard write via messaging
+      browser.tabs.sendMessage.mockResolvedValue({ success: true });
+
       // Mock format config
       global.window.FancyLinkFormatConfig.getFormatConfig.mockReturnValue({
         format: jest.fn((title, url) => `[${title}](${url})`)
@@ -280,24 +284,61 @@ describe('Background Script', () => {
         consoleSpy.mockRestore();
       });
 
-      test('should handle clipboard API failure with fallback', async () => {
+      test('should inject content script file and send message', async () => {
         browser.storage.sync.get.mockResolvedValue({
           defaultFormat: 'markdown',
           cleanUrls: false,
           showNotifications: false,
           showBadge: true
         });
-        
-        // Mock the content script that handles clipboard fallback
-        browser.tabs.executeScript.mockResolvedValue([{ success: true }]);
 
         const result = await global.copyFancyLink();
 
         expect(result.success).toBe(true);
-        expect(browser.tabs.executeScript).toHaveBeenCalled();
-        
+        expect(browser.tabs.executeScript).toHaveBeenCalledWith(1, {
+          file: '/content/clipboard-writer.js'
+        });
+        expect(browser.tabs.sendMessage).toHaveBeenCalledWith(1, {
+          action: 'writeToClipboard',
+          text: '[Example Page](https://example.com)'
+        });
+
         // Verify notification was attempted (badge set)
         expect(browser.browserAction.setBadgeText).toHaveBeenCalled();
+      });
+
+      test('should handle sendMessage failure', async () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+        browser.storage.sync.get.mockResolvedValue({
+          defaultFormat: 'markdown',
+          cleanUrls: false,
+          showNotifications: false,
+          showBadge: true
+        });
+        browser.tabs.sendMessage.mockResolvedValue({ success: false, error: 'Failed to copy' });
+
+        const result = await global.copyFancyLink();
+
+        expect(result.success).toBe(false);
+        expect(result.error).toBe('Failed to copy');
+        consoleSpy.mockRestore();
+      });
+
+      test('should handle null sendMessage result', async () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+        browser.storage.sync.get.mockResolvedValue({
+          defaultFormat: 'markdown',
+          cleanUrls: false,
+          showNotifications: false,
+          showBadge: true
+        });
+        browser.tabs.sendMessage.mockResolvedValue(null);
+
+        const result = await global.copyFancyLink();
+
+        expect(result.success).toBe(false);
+        expect(result.error).toBe('Clipboard copy failed in content script');
+        consoleSpy.mockRestore();
       });
 
       test('should handle script execution failure', async () => {
@@ -442,7 +483,8 @@ describe('Background Script', () => {
       // Mock the necessary dependencies for copyFancyLink
       browser.storage.sync.get.mockResolvedValue({ defaultFormat: 'markdown' });
       browser.tabs.query.mockResolvedValue([mockTab()]);
-      browser.tabs.executeScript.mockResolvedValue([{ success: true }]);
+      browser.tabs.executeScript.mockResolvedValue();
+      browser.tabs.sendMessage.mockResolvedValue({ success: true });
       global.window.FancyLinkFormatConfig.getFormatConfig.mockReturnValue({
         format: jest.fn((title, url) => `[${title}](${url})`)
       });
@@ -495,16 +537,17 @@ describe('Background Script', () => {
       // Mock the necessary dependencies for copyFancyLink
       browser.storage.sync.get.mockResolvedValue({ defaultFormat: 'markdown' });
       browser.tabs.query.mockResolvedValue([mockTab()]);
-      browser.tabs.executeScript.mockResolvedValue([{ success: true }]);
+      browser.tabs.executeScript.mockResolvedValue();
+      browser.tabs.sendMessage.mockResolvedValue({ success: true });
       global.window.FancyLinkFormatConfig.getFormatConfig.mockReturnValue({
         format: jest.fn((title, url) => `[${title}](${url})`)
       });
-      
+
       // Get command handler - it should have been registered when background.js loaded
       const commandHandler = browser.commands.onCommand.addListener.mock.calls[0][0];
-      
+
       await commandHandler('copy-fancy-link');
-      
+
       // Verify that copyFancyLink was called (by checking its side effects)
       expect(browser.tabs.query).toHaveBeenCalled();
       expect(browser.tabs.executeScript).toHaveBeenCalled();
@@ -514,16 +557,17 @@ describe('Background Script', () => {
       // Mock the necessary dependencies for copyFancyLink
       browser.storage.sync.get.mockResolvedValue({ defaultFormat: 'markdown' });
       browser.tabs.query.mockResolvedValue([mockTab()]);
-      browser.tabs.executeScript.mockResolvedValue([{ success: true }]);
+      browser.tabs.executeScript.mockResolvedValue();
+      browser.tabs.sendMessage.mockResolvedValue({ success: true });
       global.window.FancyLinkFormatConfig.getFormatConfig.mockReturnValue({
         format: jest.fn((title, url) => `[${title}](${url})`)
       });
-      
+
       // Get click handler - it should have been registered when background.js loaded
       const clickHandler = browser.browserAction.onClicked.addListener.mock.calls[0][0];
-      
+
       await clickHandler();
-      
+
       // Verify that copyFancyLink was called (by checking its side effects)
       expect(browser.tabs.query).toHaveBeenCalled();
       expect(browser.tabs.executeScript).toHaveBeenCalled();
