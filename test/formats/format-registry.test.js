@@ -32,6 +32,30 @@ describe('Format Registry', () => {
       expect(result).toBe('[[TEST-123] Page Name](https://example.com)');
     });
 
+    test('should escape ]( in titles to prevent markdown link injection', () => {
+      const result = formatRegistry.formatConfig.markdown.format(
+        '[Click here](https://evil.com)',
+        'https://real-url.com'
+      );
+      expect(result).toBe('[[Click here]\\(https://evil.com)](https://real-url.com)');
+    });
+
+    test('should not escape titles without ]( sequence (e.g., JIRA tickets)', () => {
+      const result = formatRegistry.formatConfig.markdown.format(
+        '[TEST-123] Page Name',
+        'https://example.com'
+      );
+      expect(result).toBe('[[TEST-123] Page Name](https://example.com)');
+    });
+
+    test('should escape ]( mid-string', () => {
+      const result = formatRegistry.formatConfig.markdown.format(
+        'text](more',
+        'https://example.com'
+      );
+      expect(result).toBe('[text]\\(more](https://example.com)');
+    });
+
     test('should truncate long titles', () => {
       const longTitle = 'a'.repeat(600);
       const result = formatRegistry.formatConfig.markdown.format(
