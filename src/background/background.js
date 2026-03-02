@@ -79,36 +79,22 @@ async function copyFancyLink(formatType = null) {
     // Format the link
     const formattedLink = formatConfig.format(title, url);
     
-    // Copy to clipboard using content script injection
-    // This is necessary because clipboard API isn't available in background scripts
-    const result = await browser.tabs.executeScript(tab.id, {
-      code: `
-        (async function() {
-          try {
-            const text = ${JSON.stringify(formattedLink)};
-            await navigator.clipboard.writeText(text);
-            
-            return { success: true };
-          } catch (error) {
-            // Fallback to older clipboard API
-            const textarea = document.createElement('textarea');
-            textarea.value = ${JSON.stringify(formattedLink)};
-            textarea.style.position = 'fixed';
-            textarea.style.opacity = '0';
-            document.body.appendChild(textarea);
-            textarea.select();
-            const success = document.execCommand('copy');
-            document.body.removeChild(textarea);
-            
-            if (!success) {
-              throw new Error('Failed to copy to clipboard');
-            }
-            
-            return { success: true };
-          }
-        })();
-      `
+    // Copy to clipboard using content script
+    // Inject the content script file (no dynamic code generation)
+    await browser.tabs.executeScript(tab.id, {
+      file: '/content/clipboard-writer.js'
     });
+
+    // Send data via messaging (no string interpolation)
+    const result = await browser.tabs.sendMessage(tab.id, {
+      action: 'writeToClipboard',
+      text: formattedLink
+    });
+
+    // Validate the content script result
+    if (!result || !result.success) {
+      throw new Error(result?.error || 'Clipboard copy failed in content script');
+    }
     
     // Show success notification
     await showNotification('success', `Copied ${format} link!`, title, settings);
