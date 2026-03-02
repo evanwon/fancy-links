@@ -5,9 +5,8 @@
 
 // Use shared format library loaded by manifest.json
 // Note: FancyLinkFormatConfig is available from format-registry.js
+// Note: FancyLinkSettings is available from settings-defaults.js
 
-// Default settings
-const DEFAULT_FORMAT = 'markdown';
 const NOTIFICATION_TIMEOUT = 2000;
 
 /**
@@ -15,11 +14,12 @@ const NOTIFICATION_TIMEOUT = 2000;
  */
 async function getCurrentFormat() {
   try {
+    const defaults = window.FancyLinkSettings.DEFAULT_SETTINGS;
     const result = await browser.storage.sync.get('defaultFormat');
-    return result.defaultFormat || DEFAULT_FORMAT;
+    return result.defaultFormat || defaults.defaultFormat;
   } catch (error) {
     console.error('Error getting format setting:', error);
-    return DEFAULT_FORMAT;
+    return window.FancyLinkSettings.DEFAULT_SETTINGS.defaultFormat;
   }
 }
 
@@ -28,16 +28,12 @@ async function getCurrentFormat() {
  */
 async function getSettings() {
   try {
-    const result = await browser.storage.sync.get({
-      defaultFormat: DEFAULT_FORMAT,
-      cleanUrls: false,
-      showNotifications: false,
-      showBadge: true
-    });
+    const defaults = window.FancyLinkSettings.DEFAULT_SETTINGS;
+    const result = await browser.storage.sync.get(defaults);
     return result;
   } catch (error) {
     console.error('Error getting settings:', error);
-    return { defaultFormat: DEFAULT_FORMAT, cleanUrls: false, showNotifications: false, showBadge: true };
+    return { ...window.FancyLinkSettings.DEFAULT_SETTINGS };
   }
 }
 
@@ -138,7 +134,7 @@ async function copyFancyLink(formatType = null) {
       notificationSettings = await getSettings();
     } catch (settingsError) {
       console.error('Error getting notification settings:', settingsError);
-      notificationSettings = { defaultFormat: DEFAULT_FORMAT, cleanUrls: false, showNotifications: false, showBadge: true };
+      notificationSettings = { ...window.FancyLinkSettings.DEFAULT_SETTINGS };
     }
     await showNotification('error', 'Failed to copy link', error.message, notificationSettings);
     return { success: false, error: error.message };

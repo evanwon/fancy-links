@@ -13,6 +13,17 @@ global.window.FancyLinkCleanUrl = {
   cleanUrl: jest.fn()
 };
 
+global.window.FancyLinkSettings = {
+  DEFAULT_SETTINGS: {
+    defaultFormat: 'markdown',
+    showNotifications: false,
+    showBadge: true,
+    cleanUrls: false,
+    debugMode: false,
+    includeCurrentPageInBugReports: false
+  }
+};
+
 describe('Background Script', () => {
   beforeEach(() => {
     // Reset all mocks
@@ -114,7 +125,9 @@ describe('Background Script', () => {
           defaultFormat: 'markdown',
           cleanUrls: false,
           showNotifications: false,
-          showBadge: true
+          showBadge: true,
+          debugMode: false,
+          includeCurrentPageInBugReports: false
         });
       });
 
@@ -138,7 +151,9 @@ describe('Background Script', () => {
           defaultFormat: 'markdown',
           cleanUrls: false,
           showNotifications: false,
-          showBadge: true
+          showBadge: true,
+          debugMode: false,
+          includeCurrentPageInBugReports: false
         });
         consoleSpy.mockRestore();
       });
