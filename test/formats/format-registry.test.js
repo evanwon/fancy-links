@@ -147,4 +147,35 @@ describe('Format Registry', () => {
       expect(result).toBe('https://example.com?_title=Title_%26_Description');
     });
   });
+
+  describe('Input Validation', () => {
+    test.each(['markdown', 'html', 'plaintext', 'urlparams'])(
+      '%s format should handle null title gracefully',
+      (format) => {
+        const result = formatRegistry.formatConfig[format].format(null, 'https://example.com');
+        expect(result).not.toContain('null');
+        expect(result).toContain('https://example.com');
+      }
+    );
+
+    test.each(['markdown', 'html', 'plaintext', 'urlparams'])(
+      '%s format should handle undefined url gracefully',
+      (format) => {
+        const result = formatRegistry.formatConfig[format].format('Test Title', undefined);
+        expect(result).not.toContain('undefined');
+      }
+    );
+
+    test.each(['markdown', 'html', 'plaintext', 'urlparams'])(
+      '%s format should handle both null without throwing',
+      (format) => {
+        expect(() => {
+          formatRegistry.formatConfig[format].format(null, null);
+        }).not.toThrow();
+        const result = formatRegistry.formatConfig[format].format(null, null);
+        expect(result).not.toContain('null');
+        expect(result).not.toContain('undefined');
+      }
+    );
+  });
 });

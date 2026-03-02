@@ -30,6 +30,11 @@
         return text.substring(0, maxLength - 3) + '...';
     };
 
+    const normalizeInputs = (title, url) => ({
+        title: String(title || ''),
+        url: String(url || '')
+    });
+
     /**
      * Format configuration registry
      * Each format is a self-contained plugin with all necessary metadata
@@ -41,6 +46,7 @@
             example: '[Title](URL)',
             worksWith: ['Discord', 'Reddit', 'GitHub', 'Notion'],
             format: (title, url) => {
+                ({ title, url } = normalizeInputs(title, url));
                 const displayText = title || url;
                 const truncated = truncateText(displayText);
                 const sanitized = sanitizers.markdown(truncated);
@@ -54,6 +60,7 @@
             example: 'URL?_title=Title',
             worksWith: [],
             format: (title, url) => {
+                ({ title, url } = normalizeInputs(title, url));
                 const displayText = title || url;
                 const truncated = truncateText(displayText);
                 const sanitized = sanitizers.urlParam(truncated);
@@ -68,6 +75,7 @@
             example: 'Title - URL',
             worksWith: [],
             format: (title, url) => {
+                ({ title, url } = normalizeInputs(title, url));
                 const displayText = title || url;
                 const truncated = truncateText(displayText);
                 return `${truncated} - ${url}`;
@@ -80,6 +88,7 @@
             example: '<a href="URL">Title</a>',
             worksWith: [],
             format: (title, url) => {
+                ({ title, url } = normalizeInputs(title, url));
                 const displayText = title || url;
                 const truncated = truncateText(displayText);
                 const sanitized = sanitizers.html(truncated);
