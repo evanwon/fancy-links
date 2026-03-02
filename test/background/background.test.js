@@ -423,7 +423,7 @@ describe('Background Script', () => {
         expect(browser.browserAction.setBadgeText).toHaveBeenCalledWith({ text: '✓' });
       });
 
-      test('should return error when executeScript returns success: false', async () => {
+      test('should return error when sendMessage returns success: false', async () => {
         const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
         browser.storage.sync.get.mockResolvedValue({
           defaultFormat: 'markdown',
@@ -431,7 +431,24 @@ describe('Background Script', () => {
           showNotifications: false,
           showBadge: true
         });
-        browser.tabs.executeScript.mockResolvedValue([{ success: false }]);
+        browser.tabs.sendMessage.mockResolvedValue({ success: false, error: 'Failed to copy' });
+
+        const result = await global.copyFancyLink();
+
+        expect(result.success).toBe(false);
+        expect(result.error).toBe('Failed to copy');
+        consoleSpy.mockRestore();
+      });
+
+      test('should return error when sendMessage returns undefined', async () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+        browser.storage.sync.get.mockResolvedValue({
+          defaultFormat: 'markdown',
+          cleanUrls: false,
+          showNotifications: false,
+          showBadge: true
+        });
+        browser.tabs.sendMessage.mockResolvedValue(undefined);
 
         const result = await global.copyFancyLink();
 
@@ -440,7 +457,7 @@ describe('Background Script', () => {
         consoleSpy.mockRestore();
       });
 
-      test('should return error when executeScript returns [undefined]', async () => {
+      test('should return error when sendMessage returns null', async () => {
         const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
         browser.storage.sync.get.mockResolvedValue({
           defaultFormat: 'markdown',
@@ -448,24 +465,7 @@ describe('Background Script', () => {
           showNotifications: false,
           showBadge: true
         });
-        browser.tabs.executeScript.mockResolvedValue([undefined]);
-
-        const result = await global.copyFancyLink();
-
-        expect(result.success).toBe(false);
-        expect(result.error).toBe('Clipboard copy failed in content script');
-        consoleSpy.mockRestore();
-      });
-
-      test('should return error when executeScript returns empty array', async () => {
-        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-        browser.storage.sync.get.mockResolvedValue({
-          defaultFormat: 'markdown',
-          cleanUrls: false,
-          showNotifications: false,
-          showBadge: true
-        });
-        browser.tabs.executeScript.mockResolvedValue([]);
+        browser.tabs.sendMessage.mockResolvedValue(null);
 
         const result = await global.copyFancyLink();
 
