@@ -302,6 +302,121 @@ describe('Background Script', () => {
         expect(result.error).toBe('Script execution failed');
         consoleSpy.mockRestore();
       });
+
+      // CR-2: URL scheme allowlist tests
+      test('should reject javascript: URLs', async () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+        browser.tabs.query.mockResolvedValue([mockTab({ url: 'javascript:alert(1)' })]);
+
+        const result = await global.copyFancyLink();
+
+        expect(result.success).toBe(false);
+        expect(result.error).toBe('Cannot copy this type of URL');
+        consoleSpy.mockRestore();
+      });
+
+      test('should reject data: URLs', async () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+        browser.tabs.query.mockResolvedValue([mockTab({ url: 'data:text/html,<h1>test</h1>' })]);
+
+        const result = await global.copyFancyLink();
+
+        expect(result.success).toBe(false);
+        expect(result.error).toBe('Cannot copy this type of URL');
+        consoleSpy.mockRestore();
+      });
+
+      test('should reject file: URLs', async () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+        browser.tabs.query.mockResolvedValue([mockTab({ url: 'file:///etc/passwd' })]);
+
+        const result = await global.copyFancyLink();
+
+        expect(result.success).toBe(false);
+        expect(result.error).toBe('Cannot copy this type of URL');
+        consoleSpy.mockRestore();
+      });
+
+      test('should accept ftp: URLs', async () => {
+        browser.storage.sync.get.mockResolvedValue({
+          defaultFormat: 'markdown',
+          cleanUrls: false,
+          showNotifications: false,
+          showBadge: true
+        });
+        browser.tabs.query.mockResolvedValue([mockTab({ url: 'ftp://files.example.com/file.txt' })]);
+
+        const result = await global.copyFancyLink();
+
+        expect(result.success).toBe(true);
+      });
+
+      // CR-4: executeScript result validation tests
+      test('should show success notification when executeScript returns success', async () => {
+        browser.storage.sync.get.mockResolvedValue({
+          defaultFormat: 'markdown',
+          cleanUrls: false,
+          showNotifications: false,
+          showBadge: true
+        });
+        browser.tabs.executeScript.mockResolvedValue([{ success: true }]);
+
+        const result = await global.copyFancyLink();
+
+        expect(result.success).toBe(true);
+        expect(browser.browserAction.setBadgeText).toHaveBeenCalledWith({ text: '✓' });
+      });
+
+      test('should return error when executeScript returns success: false', async () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+        browser.storage.sync.get.mockResolvedValue({
+          defaultFormat: 'markdown',
+          cleanUrls: false,
+          showNotifications: false,
+          showBadge: true
+        });
+        browser.tabs.executeScript.mockResolvedValue([{ success: false }]);
+
+        const result = await global.copyFancyLink();
+
+        expect(result.success).toBe(false);
+        expect(result.error).toBe('Clipboard copy failed in content script');
+        consoleSpy.mockRestore();
+      });
+
+      test('should return error when executeScript returns [undefined]', async () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+        browser.storage.sync.get.mockResolvedValue({
+          defaultFormat: 'markdown',
+          cleanUrls: false,
+          showNotifications: false,
+          showBadge: true
+        });
+        browser.tabs.executeScript.mockResolvedValue([undefined]);
+
+        const result = await global.copyFancyLink();
+
+        expect(result.success).toBe(false);
+        expect(result.error).toBe('Clipboard copy failed in content script');
+        consoleSpy.mockRestore();
+      });
+
+      test('should return error when executeScript returns empty array', async () => {
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+        browser.storage.sync.get.mockResolvedValue({
+          defaultFormat: 'markdown',
+          cleanUrls: false,
+          showNotifications: false,
+          showBadge: true
+        });
+        browser.tabs.executeScript.mockResolvedValue([]);
+
+        const result = await global.copyFancyLink();
+
+        expect(result.success).toBe(false);
+        expect(result.error).toBe('Clipboard copy failed in content script');
+        consoleSpy.mockRestore();
+      });
     });
   });
 

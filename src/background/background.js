@@ -56,8 +56,18 @@ async function copyFancyLink(formatType = null) {
     const title = tab.title || '';
     let url = tab.url || '';
     
-    // Check if we have a valid URL
-    if (!url || url.startsWith('about:') || url.startsWith('chrome:')) {
+    // Only allow safe URL schemes
+    if (!url) {
+      throw new Error('Cannot copy this type of URL');
+    }
+    const safeSchemes = ['http:', 'https:', 'ftp:'];
+    try {
+      const urlScheme = new URL(url).protocol;
+      if (!safeSchemes.includes(urlScheme)) {
+        throw new Error('Cannot copy this type of URL');
+      }
+    } catch (e) {
+      if (e.message === 'Cannot copy this type of URL') throw e;
       throw new Error('Cannot copy this type of URL');
     }
     
@@ -87,7 +97,7 @@ async function copyFancyLink(formatType = null) {
           try {
             const text = ${JSON.stringify(formattedLink)};
             await navigator.clipboard.writeText(text);
-            
+
             return { success: true };
           } catch (error) {
             // Fallback to older clipboard API
@@ -99,17 +109,22 @@ async function copyFancyLink(formatType = null) {
             textarea.select();
             const success = document.execCommand('copy');
             document.body.removeChild(textarea);
-            
+
             if (!success) {
               throw new Error('Failed to copy to clipboard');
             }
-            
+
             return { success: true };
           }
         })();
       `
     });
-    
+
+    // Validate the content script result
+    if (!result || !result[0] || !result[0].success) {
+      throw new Error('Clipboard copy failed in content script');
+    }
+
     // Show success notification
     await showNotification('success', `Copied ${format} link!`, title, settings);
     
