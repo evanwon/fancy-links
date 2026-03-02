@@ -4,6 +4,20 @@
  */
 
 /**
+ * Detects the available browser extension API
+ * Uses browser API if available, falls back to chrome, returns null if neither exists
+ * @returns {Object|null} The browser extension API object, or null if unavailable
+ */
+function getBrowserApi() {
+  if (typeof browser !== 'undefined') {
+    return browser;
+  } else if (typeof chrome !== 'undefined') {
+    return chrome;
+  }
+  return null;
+}
+
+/**
  * Collects diagnostic information for bug reports
  * @param {boolean} includeCurrentPage - Whether to include current tab info (default: false)
  * @returns {Promise<Object>} Diagnostic information object
@@ -12,14 +26,7 @@ async function collectDiagnostics(includeCurrentPage = false) {
   const diagnostics = {};
 
   // Extension information
-  // Use browser API if available, fall back to chrome, handle missing APIs
-  let api = null;
-  if (typeof browser !== 'undefined') {
-    api = browser;
-  } else if (typeof chrome !== 'undefined') {
-    api = chrome;
-  }
-  
+  const api = getBrowserApi();
   if (api) {
     const manifest = api.runtime.getManifest();
     diagnostics.extension = {
@@ -41,27 +48,20 @@ async function collectDiagnostics(includeCurrentPage = false) {
 
   // Extension settings
   try {
-    // Use browser API if available, fall back to chrome, handle missing APIs
-    let api = null;
-    if (typeof browser !== 'undefined') {
-      api = browser;
-    } else if (typeof chrome !== 'undefined') {
-      api = chrome;
-    }
-    
+    const api = getBrowserApi();
     if (!api) {
       throw new Error('No browser API available');
     }
-    
+
     const settings = await api.storage.sync.get([
       'defaultFormat',
-      'cleanUrls', 
+      'cleanUrls',
       'debugMode',
       'showNotifications',
       'showBadge',
       'includeCurrentPageInBugReports'
     ]);
-    
+
     diagnostics.settings = {
       defaultFormat: settings.defaultFormat || 'markdown',
       cleanUrls: settings.cleanUrls !== false,
@@ -77,18 +77,11 @@ async function collectDiagnostics(includeCurrentPage = false) {
   // Current page information (privacy-conscious)
   if (includeCurrentPage) {
     try {
-      // Use browser API if available, fall back to chrome, handle missing APIs
-      let api = null;
-      if (typeof browser !== 'undefined') {
-        api = browser;
-      } else if (typeof chrome !== 'undefined') {
-        api = chrome;
-      }
-      
+      const api = getBrowserApi();
       if (!api) {
         throw new Error('No browser API available');
       }
-      
+
       const [tab] = await api.tabs.query({ active: true, currentWindow: true });
       if (tab) {
         diagnostics.currentPage = {

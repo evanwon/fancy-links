@@ -14,6 +14,8 @@
 
   "permissions": ["clipboardWrite", "activeTab", "storage", "notifications"],
 
+  "content_security_policy": "script-src 'self'; object-src 'self'",
+
   "background": {
     "scripts": [
       "formats/format-registry.js",
