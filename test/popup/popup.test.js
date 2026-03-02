@@ -51,6 +51,17 @@ describe('Popup', () => {
       }
     };
 
+    global.FancyLinkSettings = {
+      DEFAULT_SETTINGS: {
+        defaultFormat: 'markdown',
+        showNotifications: false,
+        showBadge: true,
+        cleanUrls: false,
+        debugMode: false,
+        includeCurrentPageInBugReports: false
+      }
+    };
+
     global.KeyboardShortcuts = {
       formatShortcutForDisplay: jest.fn(shortcut => shortcut),
       getDefaultShortcut: jest.fn(() => 'Ctrl+Shift+L')

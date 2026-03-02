@@ -5,6 +5,10 @@
 (function() {
     'use strict';
 
+    // Prevent duplicate listener registration on repeated injection
+    if (window._fancyLinksClipboardWriterLoaded) return;
+    window._fancyLinksClipboardWriterLoaded = true;
+
     browser.runtime.onMessage.addListener(async (message) => {
         if (message.action !== 'writeToClipboard') return;
 

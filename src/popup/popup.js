@@ -295,7 +295,7 @@ async function updateDefaultIndicator() {
     try {
         // Get the default format setting
         const settings = await browser.storage.sync.get({
-            defaultFormat: 'markdown'
+            defaultFormat: FancyLinkSettings.DEFAULT_SETTINGS.defaultFormat
         });
         
         const defaultFormat = settings.defaultFormat;

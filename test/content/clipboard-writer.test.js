@@ -9,6 +9,9 @@ describe('Clipboard Writer Content Script', () => {
         jest.clearAllMocks();
         jest.resetModules();
 
+        // Clear idempotency guard
+        delete window._fancyLinksClipboardWriterLoaded;
+
         // Mock browser.runtime.onMessage
         global.browser = {
             runtime: {
@@ -74,6 +77,14 @@ describe('Clipboard Writer Content Script', () => {
         expect(mockTextarea.select).toHaveBeenCalled();
         expect(document.body.appendChild).toHaveBeenCalledWith(mockTextarea);
         expect(document.body.removeChild).toHaveBeenCalledWith(mockTextarea);
+    });
+
+    test('should not register duplicate listeners on repeated injection', () => {
+        // Script was already loaded in beforeEach; load it again
+        require('../../src/content/clipboard-writer.js');
+
+        // Should still only have one listener registered
+        expect(browser.runtime.onMessage.addListener).toHaveBeenCalledTimes(1);
     });
 
     test('should return failure when both clipboard methods fail', async () => {
