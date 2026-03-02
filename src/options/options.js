@@ -52,8 +52,6 @@ async function loadSettings() {
         const result = await browser.storage.sync.get(DEFAULT_SETTINGS);
         const settings = { ...DEFAULT_SETTINGS, ...result };
         
-        console.log('Settings loaded successfully:', settings);
-        
         // Update UI with loaded settings
         updateUI(settings);
         

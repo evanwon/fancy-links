@@ -132,16 +132,18 @@ async function updateKeyboardHint() {
                 // Command exists but no shortcut assigned
                 const hintElement = document.querySelector('.keyboard-hint');
                 if (hintElement) {
-                    hintElement.innerHTML = `No keyboard shortcut set. <a href="#" id="shortcutSettingsLink">Configure in settings →</a>`;
-                    
-                    // Add click handler for settings link
-                    const settingsLink = document.getElementById('shortcutSettingsLink');
-                    if (settingsLink) {
-                        settingsLink.addEventListener('click', (e) => {
-                            e.preventDefault();
-                            browserAPI.runtime.openOptionsPage();
-                        });
-                    }
+                    hintElement.textContent = '';
+                    const textNode = document.createTextNode('No keyboard shortcut set. ');
+                    const link = document.createElement('a');
+                    link.href = '#';
+                    link.id = 'shortcutSettingsLink';
+                    link.textContent = 'Configure in settings \u2192';
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        browserAPI.runtime.openOptionsPage();
+                    });
+                    hintElement.appendChild(textNode);
+                    hintElement.appendChild(link);
                 }
                 return;
             }
