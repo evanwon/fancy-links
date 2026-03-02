@@ -6,6 +6,18 @@ const formats = globalThis.FancyLinkFormatRegistry.formatConfig;
 // Current tab info
 let currentTab = null;
 
+// Map internal error messages to user-friendly strings
+const USER_FRIENDLY_ERRORS = {
+    'No active tab found': 'Could not access the current tab',
+    'Cannot copy this type of URL': 'This page type cannot be copied',
+    'Clipboard copy failed in content script': 'Could not access the clipboard',
+    'Failed to copy to clipboard': 'Could not access the clipboard'
+};
+
+function getUserFriendlyError(error) {
+    return USER_FRIENDLY_ERRORS[error] || 'An unexpected error occurred';
+}
+
 // Load version from manifest
 function loadVersion() {
     try {
@@ -249,7 +261,7 @@ async function copyWithFormat(formatKey) {
         if (result && result.success) {
             showNotification(`Copied as ${config.name}!`, 'success');
         } else {
-            showNotification(`Copy failed: ${result ? result.error : 'Unknown error'}`, 'error');
+            showNotification(`Copy failed: ${getUserFriendlyError(result?.error)}`, 'error');
         }
         
     } catch (error) {
