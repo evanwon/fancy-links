@@ -55,6 +55,9 @@ jobs:
     - name: Install dependencies
       run: npm ci --ignore-scripts
 
+    - name: Validate version consistency
+      run: node tools/validate-versions.js
+
     - name: Security audit
       run: |
         npm audit --audit-level=moderate || {
@@ -109,7 +112,7 @@ jobs:
 
         # Check if version_name contains pre-release suffix (rc, beta, alpha)
         # Examples: 1.5.0-rc1, 1.5.0-beta2, 1.5.0-alpha3
-        if [[ "$VERSION_NAME" =~ -(rc|beta|pre|alpha)[0-9]*$ ]]; then
+        if [[ "$VERSION_NAME" =~ -(rc|beta|alpha)[0-9]*$ ]]; then
           echo "is_prerelease=true" >> $GITHUB_OUTPUT
           echo "Pre-release detected: $VERSION_NAME"
         else
@@ -257,7 +260,7 @@ jobs:
           # Remove 'v' prefix if present
           local version=${tag#v}
           # Check for pre-release suffixes (rc, beta, alpha, pre)
-          if [[ "$version" =~ -(rc|beta|alpha|pre)[0-9]*$ ]]; then
+          if [[ "$version" =~ -(rc|beta|alpha)[0-9]*$ ]]; then
             return 0  # true
           else
             return 1  # false

@@ -64,29 +64,39 @@ web-ext lint --source-dir=src
 #### Pre-release Versions
 For testing new features before public release:
 
+**Preferred:** Use `npm run version:bump` to automate version bumps:
+```bash
+npm run version:bump rc minor    # Start RC for next minor (1.4.5 -> 1.5.0-rc1)
+npm run version:bump rc          # Increment RC (1.5.0-rc1 -> 1.5.0-rc2)
+npm run version:bump stable      # Promote to stable (1.5.0-rc1 -> 1.5.0)
+```
+
 1. **Version Naming Scheme**:
    - **manifest.json**: Use two fields:
-     - `version`: PREVIOUS stable + .9.N for RCs (e.g., `1.4.9.1` for 1.5.0-rc1)
+     - `version`: `{previousStable}.{suffixNum}` (e.g., `1.4.5.1` for 1.5.0-rc1)
      - `version_name`: Target version with suffix (e.g., `1.5.0-rc1`)
    - **Supported suffixes** (automatically detected from version_name):
      - `rc` - Release candidate (final testing before stable)
      - `beta` - Beta version (feature complete, testing needed)
      - `alpha` - Alpha version (early development, may be unstable)
-   - **Examples** (for 1.4.0 → 1.5.0):
+   - **Examples** (current stable 1.4.5 → target 1.5.0):
      ```json
-     "version": "1.4.9.1",      // Previous stable + .9.1
+     "version": "1.4.5.1",        // {previousStable}.{suffixNum}
      "version_name": "1.5.0-rc1"  // Target version with RC suffix
      ```
-   - **Critical**: Using previous version ensures 1.4.9.1 < 1.5.0 for proper auto-updates
+   - **Critical**: Using previous version ensures 1.4.5.1 < 1.5.0 for proper auto-updates
 
 2. **Create pre-release**:
    ```bash
-   # Update manifest.json with BOTH fields (see VERSIONING.md for details)
-   # Example for 1.5.0-rc1 (assuming previous stable is 1.4.0):
-   #   "version": "1.4.9.1"
-   #   "version_name": "1.5.0-rc1"
+   # Automated (preferred):
+   npm run version:bump rc minor
+   # Then follow the suggested git commands
 
-   # Commit changes
+   # Manual (if needed):
+   # Update manifest.json with BOTH fields
+   # Example for 1.5.0-rc1 (assuming previous stable is 1.4.5):
+   #   "version": "1.4.5.1"
+   #   "version_name": "1.5.0-rc1"
    git commit -am "Prepare v1.5.0-rc1 pre-release"
    git tag v1.5.0-rc1
    git push origin v1.5.0-rc1

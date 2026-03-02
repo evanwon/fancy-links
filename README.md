@@ -166,25 +166,28 @@ This project includes VSCode debugging configuration for the [Debugger for Firef
 #### Pre-release Versions (Beta Testing)
 
 ##### Supported Version Formats
-The build system automatically detects pre-releases based on version suffixes:
-- `rc[0-9]+` - Release candidates (e.g., `1.5.0-rc1`, `1.5.0-rc2`)
-- `beta[0-9]+` - Beta versions (e.g., `1.5.0-beta1`)
-- `alpha[0-9]+` - Alpha versions (e.g., `1.5.0-alpha1`)
+The build system automatically detects pre-releases based on version suffixes (numbering starts at 1):
+- `rc<N>` - Release candidates (e.g., `1.5.0-rc1`, `1.5.0-rc2`)
+- `beta<N>` - Beta versions (e.g., `1.5.0-beta1`)
+- `alpha<N>` - Alpha versions (e.g., `1.5.0-alpha1`)
 
 ##### Creating a Pre-release
 ```bash
-# 1. Update src/manifest.json with BOTH version fields:
-#    - "version": Use PREVIOUS stable + .9.N (e.g., "1.4.9.1" for 1.5.0-rc1)
+# Preferred: use the version bump tool
+npm run version:bump rc minor    # Start RC for next minor (1.4.5 -> 1.5.0-rc1)
+
+# Manual alternative: update src/manifest.json with BOTH version fields:
+#    - "version": {previousStable}.{suffixNum} (e.g., "1.4.5.1" for 1.5.0-rc1)
 #    - "version_name": Target version with suffix (e.g., "1.5.0-rc1")
-# 2. Commit changes
+# Then commit changes
 git add -A && git commit -m "Prepare v1.5.0-rc1 pre-release"
 
-# 3. Create and push tag (triggers GitHub Actions)
+# Create and push tag (triggers GitHub Actions)
 git tag v1.5.0-rc1
 git push origin v1.5.0-rc1
 ```
 
-**Important:** The `version` field must use the PREVIOUS stable version as base to ensure proper update paths. See [VERSIONING.md](VERSIONING.md) for detailed examples.
+**Important:** The `version` field must use the PREVIOUS stable version as base (e.g., `1.4.5.1` for `1.5.0-rc1` when current stable is `1.4.5`) to ensure proper update ordering. Use `npm run version:bump` to automate this.
 
 **Pre-release behavior:**
 - ✅ Automatically signed by Mozilla (via unlisted channel)

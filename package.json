@@ -12,7 +12,9 @@
     "build:firefox": "npm run lint:firefox && npm run build",
     "lint:firefox": "web-ext lint --source-dir=src",
     "test:build": "npm test && npm run lint:firefox && npm run build",
-    "dev": "web-ext run --source-dir=src"
+    "dev": "web-ext run --source-dir=src",
+    "version:bump": "node tools/version-bump.js",
+    "version:check": "node tools/validate-versions.js"
   },
   "devDependencies": {
     "@types/firefox-webext-browser": "^120.0.4",
