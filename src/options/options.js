@@ -1,17 +1,8 @@
-// Load format configuration from centralized registry 
+// Load format configuration from centralized registry
 // The registry is loaded as a script in the HTML, making FancyLinkFormatRegistry available globally
 const formats = globalThis.FancyLinkFormatRegistry.formatConfig;
 // Note: getWorksWithText is used directly from globalThis.FancyLinkFormatRegistry.getWorksWithText to avoid redeclaration
-
-// Default settings
-const DEFAULT_SETTINGS = {
-    defaultFormat: 'markdown',
-    showNotifications: false,
-    showBadge: true,
-    cleanUrls: false,
-    debugMode: false,
-    includeCurrentPageInBugReports: false
-};
+// Note: FancyLinkSettings is available from settings-defaults.js
 
 // Initialize options page
 document.addEventListener('DOMContentLoaded', async () => {
@@ -49,8 +40,9 @@ async function loadSettings() {
         }
         
         // Load settings from browser storage
-        const result = await browser.storage.sync.get(DEFAULT_SETTINGS);
-        const settings = { ...DEFAULT_SETTINGS, ...result };
+        const defaults = globalThis.FancyLinkSettings.DEFAULT_SETTINGS;
+        const result = await browser.storage.sync.get(defaults);
+        const settings = { ...defaults, ...result };
         
         console.log('Settings loaded successfully:', settings);
         
@@ -62,7 +54,7 @@ async function loadSettings() {
         showStatus(`Error loading settings: ${error.message}`, 'error');
         
         // Fall back to defaults
-        updateUI(DEFAULT_SETTINGS);
+        updateUI(globalThis.FancyLinkSettings.DEFAULT_SETTINGS);
     }
 }
 
@@ -97,7 +89,7 @@ function setupEventListeners() {
 async function saveSettings() {
     try {
         // Get current default format from storage to preserve it
-        const currentSettings = await browser.storage.sync.get({ defaultFormat: DEFAULT_SETTINGS.defaultFormat });
+        const currentSettings = await browser.storage.sync.get({ defaultFormat: globalThis.FancyLinkSettings.DEFAULT_SETTINGS.defaultFormat });
         
         const settings = {
             defaultFormat: currentSettings.defaultFormat, // Preserve existing default format
@@ -130,7 +122,7 @@ async function resetSettings() {
         await browser.storage.sync.clear();
         
         // Update UI with defaults
-        updateUI(DEFAULT_SETTINGS);
+        updateUI(globalThis.FancyLinkSettings.DEFAULT_SETTINGS);
         
         showStatus('Settings reset to defaults', 'success');
         
