@@ -46,6 +46,18 @@ describe('Options Page', () => {
     // Also set on globalThis for the top-level access in options.js
     globalThis.FancyLinkFormatRegistry = global.FancyLinkFormatRegistry;
 
+    // Mock FancyLinkSettings (loaded by settings-defaults.js via script tag)
+    globalThis.FancyLinkSettings = {
+      DEFAULT_SETTINGS: {
+        defaultFormat: 'markdown',
+        showNotifications: false,
+        showBadge: true,
+        cleanUrls: false,
+        debugMode: false,
+        includeCurrentPageInBugReports: false
+      }
+    };
+
     // Mock KeyboardShortcuts
     global.KeyboardShortcuts = {
       getCurrentShortcut: jest.fn().mockResolvedValue('Ctrl+Alt+C')
