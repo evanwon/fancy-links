@@ -1,6 +1,6 @@
 {
   "name": "fancy-links",
-  "version": "1.4.5.1",
+  "version": "1.4.5.2",
   "description": "A browser extension that allows you to copy formatted links with titles instead of plain URLs. Perfect for sharing links in chat apps, documentation, and anywhere formatted links look better than bare URLs.",
   "private": true,
   "scripts": {
