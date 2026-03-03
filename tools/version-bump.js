@@ -3,6 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 
 const MANIFEST_PATH = path.resolve(__dirname, '..', 'src', 'manifest.json');
 const PACKAGE_PATH = path.resolve(__dirname, '..', 'package.json');
@@ -78,7 +79,8 @@ function writeJSON(filePath, data) {
 function main() {
   const args = process.argv.slice(2);
   const dryRun = args.includes('--dry-run');
-  const positional = args.filter(a => a !== '--dry-run');
+  const noGit = args.includes('--no-git');
+  const positional = args.filter(a => a !== '--dry-run' && a !== '--no-git');
 
   if (positional.length === 0) {
     printUsage();
@@ -197,6 +199,18 @@ function main() {
     return;
   }
 
+  // Check for existing tag before making any changes
+  if (!noGit) {
+    const tag = `v${newVersionName}`;
+    try {
+      execFileSync('git', ['rev-parse', '--verify', `refs/tags/${tag}`], { stdio: 'pipe' });
+      console.error(`\nError: Tag "${tag}" already exists. Aborting.`);
+      process.exit(1);
+    } catch (_) {
+      // Tag does not exist — safe to proceed
+    }
+  }
+
   // Write changes
   manifest.version = newManifestVersion;
   manifest.version_name = newVersionName;
@@ -206,12 +220,31 @@ function main() {
   writeJSON(PACKAGE_PATH, pkg);
 
   console.log('');
-  console.log('Files updated. Suggested next steps:');
+  console.log('Files updated.');
+
+  if (noGit) {
+    console.log('');
+    console.log('Next steps:');
+    console.log(`  git add src/manifest.json package.json`);
+    console.log(`  git commit -m "Version bump: v${newVersionName}"`);
+    console.log(`  git tag v${newVersionName}`);
+    console.log(`  git push origin v${newVersionName}`);
+    return;
+  }
+
+  // Stage, commit, and tag
+  const commitMsg = `Version bump: v${newVersionName}`;
+  const tag = `v${newVersionName}`;
+
+  execFileSync('git', ['add', 'src/manifest.json', 'package.json'], { stdio: 'inherit' });
+  execFileSync('git', ['commit', '-m', commitMsg], { stdio: 'inherit' });
+  execFileSync('git', ['tag', tag], { stdio: 'inherit' });
+
   console.log('');
-  console.log(`  git add src/manifest.json package.json`);
-  console.log(`  git commit -m "Prepare v${newVersionName}"`);
-  console.log(`  git tag v${newVersionName}`);
-  console.log(`  git push origin v${newVersionName}`);
+  console.log(`Committed and tagged ${tag}.`);
+  console.log('');
+  console.log('To trigger the build:');
+  console.log(`  git push origin ${tag}`);
 }
 
 function printUsage() {
@@ -234,6 +267,7 @@ function printUsage() {
   console.log('');
   console.log('Options:');
   console.log('  --dry-run            Print changes without writing files');
+  console.log('  --no-git             Update files only, skip commit and tag');
 }
 
 // Support both CLI and testing

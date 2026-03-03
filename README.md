@@ -171,30 +171,35 @@ The build system automatically detects pre-releases based on version suffixes (n
 - `beta<N>` - Beta versions (e.g., `1.5.0-beta1`)
 - `alpha<N>` - Alpha versions (e.g., `1.5.0-alpha1`)
 
-##### Creating a Pre-release
+##### Pre-release Lifecycle
+A typical workflow from stable through testing to release:
+
 ```bash
-# Preferred: use the version bump tool
-npm run version:bump rc minor    # Start RC for next minor (1.4.5 -> 1.5.0-rc1)
+# 1. Start a pre-release (from stable)
+npm run version:bump rc patch    # 1.4.5 -> 1.4.6-rc1 (commits + tags automatically)
+git push origin v1.4.6-rc1       # Triggers build
 
-# Manual alternative: update src/manifest.json with BOTH version fields:
-#    - "version": {previousStable}.{suffixNum} (e.g., "1.4.5.1" for 1.5.0-rc1)
-#    - "version_name": Target version with suffix (e.g., "1.5.0-rc1")
-# Then commit changes
-git add -A && git commit -m "Prepare v1.5.0-rc1 pre-release"
+# 2. Iterate based on feedback (from pre-release)
+npm run version:bump rc           # 1.4.6-rc1 -> 1.4.6-rc2
+git push origin v1.4.6-rc2       # Triggers build
 
-# Create and push tag (triggers GitHub Actions)
-git tag v1.5.0-rc1
-git push origin v1.5.0-rc1
+# 3. Promote to stable when ready
+npm run version:bump stable       # 1.4.6-rc2 -> 1.4.6
+git push origin v1.4.6           # Triggers build + AMO submission
 ```
 
-**Important:** The `version` field must use the PREVIOUS stable version as base (e.g., `1.4.5.1` for `1.5.0-rc1` when current stable is `1.4.5`) to ensure proper update ordering. Use `npm run version:bump` to automate this.
+The version bump tool automatically stages, commits, and tags. Use `--no-git` to skip this and handle git manually. Use `--dry-run` to preview without changes.
+
+Use `patch`, `minor`, or `major` in step 1 to control the target version. You can also use `beta` or `alpha` instead of `rc`.
+
+**Important:** The `version` field in manifest.json must use the PREVIOUS stable version as base (e.g., `1.4.5.1` for `1.4.6-rc1` when current stable is `1.4.5`) to ensure proper update ordering. The version bump tool handles this automatically.
 
 **Pre-release behavior:**
-- ✅ Automatically signed by Mozilla (via unlisted channel)
-- ✅ Creates GitHub pre-release with download link
-- ❌ NOT submitted to AMO public listing
-- 📦 Distributed via GitHub releases page only
-- 🔄 Auto-updates to stable version when released
+- Automatically signed by Mozilla (via unlisted channel)
+- Creates GitHub pre-release with download link
+- NOT submitted to AMO public listing
+- Distributed via GitHub releases page only
+- Auto-updates to stable version when released
 
 #### Stable Release (Production)
 Releases are automatically built and optionally submitted to AMO when you push a version tag:

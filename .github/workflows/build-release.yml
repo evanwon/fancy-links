@@ -103,6 +103,18 @@ jobs:
         version_name=$(node -e "const m = JSON.parse(require('fs').readFileSync('src/manifest.json', 'utf8')); console.log(m.version_name || m.version)")
         echo "version_name=$version_name" >> $GITHUB_OUTPUT
 
+    - name: Verify tag matches manifest
+      if: github.event_name == 'push'
+      run: |
+        TAG_VERSION="${GITHUB_REF#refs/tags/v}"
+        MANIFEST_VERSION="${{ steps.get_version.outputs.version_name }}"
+        if [ "$TAG_VERSION" != "$MANIFEST_VERSION" ]; then
+          echo "::error::Tag v${TAG_VERSION} does not match manifest version_name (${MANIFEST_VERSION})"
+          echo "Run 'npm run version:bump' to ensure tag and manifest are in sync."
+          exit 1
+        fi
+        echo "Tag v${TAG_VERSION} matches manifest version_name"
+
     - name: Determine release type
       id: release_type
       run: |
@@ -190,18 +202,10 @@ jobs:
         web-ext sign --source-dir=src --artifacts-dir=dist-amo \
           --api-key="$AMO_API_KEY" --api-secret="$AMO_API_SECRET" \
           --channel=listed \
-          --upload-source-code=dist/source-code.zip || {
-            echo "⚠️ AMO submission failed - continuing with unsigned build"
-            echo "amo_submitted=false" >> $GITHUB_ENV
-            exit 0
-        }
+          --upload-source-code=dist/source-code.zip
 
-        if ls dist-amo/*.xpi 1> /dev/null 2>&1; then
-          echo "✅ Successfully submitted to AMO for review"
-          echo "amo_submitted=true" >> $GITHUB_ENV
-        else
-          echo "amo_submitted=false" >> $GITHUB_ENV
-        fi
+        echo "✅ Successfully submitted to AMO for review"
+        echo "amo_submitted=true" >> $GITHUB_ENV
 
     - name: Firefox - Sign extension (unlisted/self-distribution)
       if: matrix.browser == 'firefox' && (steps.amo_config.outputs.submit == 'false' || steps.amo_config.outputs.channel == 'unlisted')
@@ -219,7 +223,7 @@ jobs:
         echo "Firefox: Signing extension for self-distribution..."
         web-ext sign --source-dir=src --artifacts-dir=dist-signed \
           --api-key="$AMO_API_KEY" --api-secret="$AMO_API_SECRET" \
-          --channel=unlisted || echo "⚠️ Signing failed"
+          --channel=unlisted
         
     # Future Chrome/Edge build steps would go here:
     # - name: Chrome - Build extension
