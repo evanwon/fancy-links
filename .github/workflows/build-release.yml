@@ -60,10 +60,18 @@ jobs:
 
     - name: Security audit
       run: |
-        npm audit --audit-level=moderate || {
-          echo "::warning::Security vulnerabilities found! Run 'npm audit' locally for details."
-          npm audit --audit-level=moderate --json > audit-results.json
+        # Hard-fail on production dependency vulnerabilities
+        echo "Checking production dependencies..."
+        npm audit --omit=dev --audit-level=moderate || {
+          echo "::error::Production dependency vulnerabilities found! Run 'npm audit --omit=dev' locally."
           exit 1
+        }
+
+        # Warn (but don't fail) on dev-only dependency vulnerabilities
+        echo "Checking dev dependencies..."
+        npm audit --audit-level=moderate || {
+          echo "::warning::Dev dependency vulnerabilities found. Run 'npm audit' locally for details."
+          echo "These are in dev/test tooling only and do not affect the shipped extension."
         }
 
     - name: Run tests with coverage
