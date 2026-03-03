@@ -10,7 +10,7 @@
     "test:ci": "jest --ci --coverage --maxWorkers=2",
     "build": "web-ext build --source-dir=src --artifacts-dir=dist --overwrite-dest",
     "build:firefox": "npm run lint:firefox && npm run build",
-    "lint:firefox": "web-ext lint --source-dir=src",
+    "lint:firefox": "web-ext lint --source-dir=src --warnings-as-errors",
     "test:build": "npm test && npm run lint:firefox && npm run build",
     "dev": "web-ext run --source-dir=src",
     "version:bump": "node tools/version-bump.js",

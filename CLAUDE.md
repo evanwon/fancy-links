@@ -21,8 +21,8 @@ npm run test:ci          # CI optimized
 # Build for distribution
 web-ext build --source-dir=src --artifacts-dir=dist
 
-# Check for lint/format issues
-web-ext lint --source-dir=src
+# Check for lint/format issues (matches CI --warnings-as-errors)
+web-ext lint --source-dir=src --warnings-as-errors
 ```
 
 ### Critical Files
@@ -52,8 +52,8 @@ web-ext lint --source-dir=src
 # Test functionality (REQUIRED for all functional changes)
 npm test
 
-# Check extension compliance
-web-ext lint --source-dir=src
+# Check extension compliance (must match CI: --warnings-as-errors)
+web-ext lint --source-dir=src --warnings-as-errors
 ```
 
 ### 2. Commit Changes (if validation passes)
@@ -152,7 +152,7 @@ Consolidated registry with 4 formats:
 - `urlparams` - `URL?_title=Page_Title`
 
 ### Browser Requirements
-- Firefox 109+ with Manifest V2
+- Firefox 142+ with Manifest V2
 - Permissions: `clipboardWrite`, `activeTab`, `storage`, `notifications`
 - Support for other browsers like Chrome is expected in the future; ensure that feature development is designed with future cross-browser compatibility
 

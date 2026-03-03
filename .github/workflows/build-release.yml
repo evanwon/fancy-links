@@ -79,7 +79,7 @@ jobs:
         
     - name: Install build tools
       run: |
-        npm install -g web-ext --ignore-scripts  # Firefox extension tool
+        npm install -g web-ext@latest --ignore-scripts  # Firefox extension tool
         # Future: npm install -g chrome-webstore-upload-cli --ignore-scripts
         
     - name: Validate manifest
