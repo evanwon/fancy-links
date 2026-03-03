@@ -202,7 +202,8 @@ jobs:
         web-ext sign --source-dir=src --artifacts-dir=dist-amo \
           --api-key="$AMO_API_KEY" --api-secret="$AMO_API_SECRET" \
           --channel=listed \
-          --upload-source-code=dist/source-code.zip
+          --upload-source-code=dist/source-code.zip \
+          --timeout=300000
 
         echo "✅ Successfully submitted to AMO for review"
         echo "amo_submitted=true" >> $GITHUB_ENV
@@ -223,7 +224,8 @@ jobs:
         echo "Firefox: Signing extension for self-distribution..."
         web-ext sign --source-dir=src --artifacts-dir=dist-signed \
           --api-key="$AMO_API_KEY" --api-secret="$AMO_API_SECRET" \
-          --channel=unlisted
+          --channel=unlisted \
+          --timeout=300000
         
     # Future Chrome/Edge build steps would go here:
     # - name: Chrome - Build extension

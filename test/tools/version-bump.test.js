@@ -231,8 +231,34 @@ describe('parseVersion rejects rc0', () => {
 
 describe('CLI error exits', () => {
   const { execFileSync } = require('child_process');
+  const fs = require('fs');
   const path = require('path');
   const SCRIPT = path.resolve(__dirname, '../../tools/version-bump.js');
+  const MANIFEST_PATH = path.resolve(__dirname, '../../src/manifest.json');
+  const PACKAGE_PATH = path.resolve(__dirname, '../../package.json');
+
+  // Save and restore real files so tests run from a known stable state
+  // regardless of the repo's current version.
+  let savedManifest, savedPackage;
+
+  beforeAll(() => {
+    savedManifest = fs.readFileSync(MANIFEST_PATH, 'utf8');
+    savedPackage = fs.readFileSync(PACKAGE_PATH, 'utf8');
+
+    const manifest = JSON.parse(savedManifest);
+    manifest.version = '1.4.5';
+    delete manifest.version_name;
+    fs.writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2) + '\n');
+
+    const pkg = JSON.parse(savedPackage);
+    pkg.version = '1.4.5';
+    fs.writeFileSync(PACKAGE_PATH, JSON.stringify(pkg, null, 2) + '\n');
+  });
+
+  afterAll(() => {
+    fs.writeFileSync(MANIFEST_PATH, savedManifest);
+    fs.writeFileSync(PACKAGE_PATH, savedPackage);
+  });
 
   function runBump(...args) {
     return execFileSync(process.execPath, [SCRIPT, ...args, '--dry-run'], {
@@ -245,16 +271,11 @@ describe('CLI error exits', () => {
     expect(() => runBump('stable')).toThrow(/only valid from a pre-release state/);
   });
 
-  test('"rc" with suffix mismatch exits with error', () => {
-    // This test relies on the current repo being in stable state.
-    // The error would mention suffix mismatch if we were in a beta pre-release,
-    // but from stable state with just "rc" and no bump type, it's an invalid args error.
+  test('"rc" without bump type from stable state exits with error', () => {
     expect(() => runBump('rc')).toThrow();
   });
 
-  test('"patch" from pre-release state message is correct', () => {
-    // We can't easily simulate pre-release state without file writes,
-    // but we can verify the tool rejects unknown commands
+  test('unknown command exits with error', () => {
     expect(() => runBump('unknown-command')).toThrow(/Unknown command/);
   });
 });

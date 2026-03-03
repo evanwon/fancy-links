@@ -41,6 +41,8 @@ web-ext lint --source-dir=src
 
 **Exception:** Documentation-only changes to `.md` files (skip workflow)
 
+**Pre-existing test failures:** If tests reveal failures unrelated to your current changes, fix them anyway. Broken tests erode trust in the suite and only get harder to fix later.
+
 ## Post-Change Workflow
 
 **CRITICAL**: After triggering changes above, Claude Code must execute this sequence:
