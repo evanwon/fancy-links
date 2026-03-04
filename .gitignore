@@ -1,6 +1,7 @@
 # Firefox Extension Development
 
 # Build output and artifacts
+build/
 dist/
 web-ext-artifacts/
 *.xpi
