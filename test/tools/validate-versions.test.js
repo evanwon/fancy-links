@@ -1,4 +1,4 @@
-const { validate } = require('../../tools/validate-versions');
+const { validate } = require('extension-workflows/tools/validate-versions');
 
 describe('validate', () => {
   test('matching stable versions pass', () => {

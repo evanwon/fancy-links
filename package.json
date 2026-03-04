@@ -13,11 +13,12 @@
     "lint:firefox": "web-ext lint --source-dir=src --warnings-as-errors",
     "test:build": "npm test && npm run lint:firefox && npm run build",
     "dev": "web-ext run --source-dir=src",
-    "version:bump": "node tools/version-bump.js",
-    "version:check": "node tools/validate-versions.js"
+    "version:bump": "extension-version-bump",
+    "version:check": "extension-validate-versions"
   },
   "devDependencies": {
     "@types/firefox-webext-browser": "^120.0.4",
+    "extension-workflows": "github:evanwon/extension-workflows",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "jest-webextension-mock": "^3.9.0",
