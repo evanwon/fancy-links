@@ -139,7 +139,7 @@ Set to `true` in repository settings to enable automatic submission to addons.mo
 
 **Development** (root):
 - `test/` - Automated test suites
-- `tools/` - Development utilities (build scripts, icon generation)
+- `tools/` - Development utilities (icon generation)
 - `design/` - Design assets and mockups
 
 **CI/CD** (shared via [`evanwon/extension-workflows`](https://github.com/evanwon/extension-workflows)):

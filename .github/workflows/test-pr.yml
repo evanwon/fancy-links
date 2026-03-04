@@ -8,7 +8,6 @@ on:
       - 'test/**'
       - 'package*.json'
       - 'jest.config.js'
-      - 'tools/**'
 
 jobs:
   test:
