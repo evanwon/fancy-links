@@ -6,6 +6,7 @@ const path = require('path');
 
 const MANIFEST_PATH = path.resolve(__dirname, '..', 'src', 'manifest.json');
 const PACKAGE_PATH = path.resolve(__dirname, '..', 'package.json');
+const CHROME_TEMPLATE_PATH = path.resolve(__dirname, '..', 'manifests', 'chrome', 'manifest.json');
 
 /**
  * Validate version consistency between manifest.json and package.json.
@@ -71,11 +72,46 @@ function validate(manifest, pkg) {
   return errors;
 }
 
+/**
+ * Validate Chrome manifest template or built Chrome manifest.
+ * In template mode (__VERSION__ placeholder), it's always valid.
+ * In built mode, version must match the Firefox manifest.
+ * Returns an array of error strings (empty = valid).
+ */
+function validateChromeTemplate(chromeManifest, firefoxManifest) {
+  const errors = [];
+
+  // Template mode: placeholders present — valid as a template
+  if (chromeManifest.version === '__VERSION__') {
+    return errors;
+  }
+
+  // Built mode: versions must match Firefox manifest
+  if (chromeManifest.version !== firefoxManifest.version) {
+    errors.push(
+      `Chrome manifest version "${chromeManifest.version}" does not match Firefox manifest version "${firefoxManifest.version}"`
+    );
+  }
+  if (chromeManifest.version_name !== (firefoxManifest.version_name || firefoxManifest.version)) {
+    errors.push(
+      `Chrome manifest version_name "${chromeManifest.version_name}" does not match Firefox manifest version_name "${firefoxManifest.version_name || firefoxManifest.version}"`
+    );
+  }
+
+  return errors;
+}
+
 function main() {
   const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'));
   const pkg = JSON.parse(fs.readFileSync(PACKAGE_PATH, 'utf8'));
 
   const errors = validate(manifest, pkg);
+
+  // Validate Chrome template if it exists
+  if (fs.existsSync(CHROME_TEMPLATE_PATH)) {
+    const chromeManifest = JSON.parse(fs.readFileSync(CHROME_TEMPLATE_PATH, 'utf8'));
+    errors.push(...validateChromeTemplate(chromeManifest, manifest));
+  }
 
   if (errors.length === 0) {
     console.log(`Version check passed: ${manifest.version_name || manifest.version}`);
@@ -93,4 +129,4 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { validate };
+module.exports = { validate, validateChromeTemplate };

@@ -1,4 +1,4 @@
-const { validate } = require('../../tools/validate-versions');
+const { validate, validateChromeTemplate } = require('../../tools/validate-versions');
 
 describe('validate', () => {
   test('matching stable versions pass', () => {
@@ -104,5 +104,36 @@ describe('validate', () => {
     const pkg = { version: 'foo.bar.baz.1' };
     const errors = validate(manifest, pkg);
     expect(errors.some(e => /non-numeric segments/.test(e))).toBe(true);
+  });
+});
+
+describe('validateChromeTemplate', () => {
+  test('template with __VERSION__ placeholder passes', () => {
+    const chrome = { version: '__VERSION__', version_name: '__VERSION_NAME__' };
+    const firefox = { version: '1.4.5', version_name: '1.4.5' };
+    expect(validateChromeTemplate(chrome, firefox)).toEqual([]);
+  });
+
+  test('built manifest with matching version passes', () => {
+    const chrome = { version: '1.4.5.3', version_name: '1.4.6-rc3' };
+    const firefox = { version: '1.4.5.3', version_name: '1.4.6-rc3' };
+    expect(validateChromeTemplate(chrome, firefox)).toEqual([]);
+  });
+
+  test('built manifest with mismatched version fails', () => {
+    const chrome = { version: '1.4.5.2', version_name: '1.4.6-rc2' };
+    const firefox = { version: '1.4.5.3', version_name: '1.4.6-rc3' };
+    const errors = validateChromeTemplate(chrome, firefox);
+    expect(errors.length).toBe(2);
+    expect(errors[0]).toMatch(/does not match Firefox/);
+    expect(errors[1]).toMatch(/does not match Firefox/);
+  });
+
+  test('built manifest with mismatched version_name only fails', () => {
+    const chrome = { version: '1.4.5', version_name: '1.4.5' };
+    const firefox = { version: '1.4.5', version_name: '1.4.6' };
+    const errors = validateChromeTemplate(chrome, firefox);
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toMatch(/version_name.*does not match/);
   });
 });
