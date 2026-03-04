@@ -69,6 +69,18 @@ describe('Options Page', () => {
       generateGitHubIssueUrl: jest.fn().mockReturnValue('https://github.com/test')
     };
 
+    // Mock BrowserApi abstraction layer
+    global.BrowserApi = {
+      getApi: jest.fn(() => browser),
+      getAction: jest.fn(() => browser.browserAction),
+      getManifestVersion: jest.fn(() => 2),
+      setBadgeText: jest.fn(),
+      setBadgeBackgroundColor: jest.fn(),
+      onActionClicked: jest.fn(),
+      executeContentScript: jest.fn(),
+      getBrowserName: jest.fn(() => 'firefox')
+    };
+
     // Load options.js - it registers a DOMContentLoaded listener
     require('../../src/options/options.js');
   });

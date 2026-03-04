@@ -28,6 +28,7 @@
       "formats/format-registry.js",
       "utils/settings-defaults.js",
       "utils/clean-url.js",
+      "utils/browser-api.js",
       "background/background.js"
     ],
     "persistent": false

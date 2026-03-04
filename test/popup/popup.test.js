@@ -88,6 +88,18 @@ describe('Popup', () => {
       { name: 'copy-fancy-link', shortcut: 'Ctrl+Shift+L' }
     ]));
 
+    // Mock BrowserApi abstraction layer
+    global.BrowserApi = {
+      getApi: jest.fn(() => browser),
+      getAction: jest.fn(() => browser.browserAction),
+      getManifestVersion: jest.fn(() => 2),
+      setBadgeText: jest.fn(),
+      setBadgeBackgroundColor: jest.fn(),
+      onActionClicked: jest.fn(),
+      executeContentScript: jest.fn(),
+      getBrowserName: jest.fn(() => 'firefox')
+    };
+
     // Load popup module - we need to reload it for each test
     // to ensure event listeners are properly set up
     delete require.cache[require.resolve('../../src/popup/popup.js')];

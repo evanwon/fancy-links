@@ -12,7 +12,7 @@ describe('Clipboard Writer Content Script', () => {
         // Clear idempotency guard
         delete window._fancyLinksClipboardWriterLoaded;
 
-        // Mock browser.runtime.onMessage
+        // Mock browser.runtime.onMessage (inline fallback prefers browser over chrome)
         global.browser = {
             runtime: {
                 onMessage: {

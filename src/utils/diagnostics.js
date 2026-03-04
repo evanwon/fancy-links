@@ -226,14 +226,22 @@ function getOperatingSystem() {
 
 // Export for different module systems
 if (typeof module !== 'undefined' && module.exports) {
-  // CommonJS
   module.exports = {
     collectDiagnostics,
-    formatDiagnosticsForGitHub, 
+    formatDiagnosticsForGitHub,
     generateGitHubIssueUrl
   };
-} else if (typeof window !== 'undefined') {
-  // Browser global
+}
+
+if (typeof globalThis !== 'undefined') {
+  globalThis.Diagnostics = {
+    collectDiagnostics,
+    formatDiagnosticsForGitHub,
+    generateGitHubIssueUrl
+  };
+}
+
+if (typeof window !== 'undefined') {
   window.Diagnostics = {
     collectDiagnostics,
     formatDiagnosticsForGitHub,

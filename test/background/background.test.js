@@ -2,18 +2,17 @@
  * Tests for background script functionality
  */
 
-// Mock format registry
-global.window = global.window || {};
-global.window.FancyLinkFormatConfig = {
+// Mock format registry (on globalThis for background script)
+global.FancyLinkFormatConfig = {
   getFormatConfig: jest.fn(),
   getFormats: jest.fn()
 };
 
-global.window.FancyLinkCleanUrl = {
+global.FancyLinkCleanUrl = {
   cleanUrl: jest.fn()
 };
 
-global.window.FancyLinkSettings = {
+global.FancyLinkSettings = {
   DEFAULT_SETTINGS: {
     defaultFormat: 'markdown',
     showNotifications: false,
@@ -24,14 +23,20 @@ global.window.FancyLinkSettings = {
   }
 };
 
+// Also keep window.* references for backward compatibility in tests
+global.window = global.window || {};
+global.window.FancyLinkFormatConfig = global.FancyLinkFormatConfig;
+global.window.FancyLinkCleanUrl = global.FancyLinkCleanUrl;
+global.window.FancyLinkSettings = global.FancyLinkSettings;
+
 describe('Background Script', () => {
   beforeEach(() => {
     // Reset all mocks
     jest.clearAllMocks();
-    
+
     // Clear the module cache to ensure fresh load
     jest.resetModules();
-    
+
     // Mock browser APIs
     global.browser = {
       storage: {
@@ -55,6 +60,7 @@ describe('Background Script', () => {
         create: jest.fn()
       },
       runtime: {
+        getManifest: jest.fn(() => ({ manifest_version: 2 })),
         getURL: jest.fn(),
         onMessage: {
           addListener: jest.fn()
@@ -66,15 +72,28 @@ describe('Background Script', () => {
         }
       }
     };
-    
+
+    // Mock BrowserApi abstraction layer
+    global.BrowserApi = {
+      getApi: jest.fn(() => global.browser),
+      getAction: jest.fn(() => global.browser.browserAction),
+      getManifestVersion: jest.fn(() => 2),
+      setBadgeText: jest.fn((details) => global.browser.browserAction.setBadgeText(details)),
+      setBadgeBackgroundColor: jest.fn((details) => global.browser.browserAction.setBadgeBackgroundColor(details)),
+      onActionClicked: jest.fn((callback) => global.browser.browserAction.onClicked.addListener(callback)),
+      executeContentScript: jest.fn((tabId, file) => global.browser.tabs.executeScript(tabId, { file })),
+      getBrowserName: jest.fn(() => 'firefox')
+    };
+
     // Mock setTimeout
     global.setTimeout = jest.fn((fn, timeout) => fn());
-    
-    // Reset window object before loading
-    global.window.FancyLinkCleanUrl = {
+
+    // Reset globalThis references before loading
+    global.FancyLinkCleanUrl = {
       cleanUrl: jest.fn()
     };
-    
+    global.window.FancyLinkCleanUrl = global.FancyLinkCleanUrl;
+
     // Load the background script - this will export functions to global
     require('../../src/background/background.js');
   });
@@ -173,7 +192,7 @@ describe('Background Script', () => {
       browser.tabs.sendMessage.mockResolvedValue({ success: true });
 
       // Mock format config
-      global.window.FancyLinkFormatConfig.getFormatConfig.mockReturnValue({
+      global.FancyLinkFormatConfig.getFormatConfig.mockReturnValue({
         format: jest.fn((title, url) => `[${title}](${url})`)
       });
     });
@@ -191,7 +210,7 @@ describe('Background Script', () => {
 
         expect(result.success).toBe(true);
         expect(browser.tabs.query).toHaveBeenCalledWith({ active: true, currentWindow: true });
-        expect(global.window.FancyLinkFormatConfig.getFormatConfig).toHaveBeenCalledWith('markdown');
+        expect(global.FancyLinkFormatConfig.getFormatConfig).toHaveBeenCalledWith('markdown');
       });
 
       test('should copy with specified format type', async () => {
@@ -204,7 +223,7 @@ describe('Background Script', () => {
 
         await global.copyFancyLink('markdown');
 
-        expect(global.window.FancyLinkFormatConfig.getFormatConfig).toHaveBeenCalledWith('markdown');
+        expect(global.FancyLinkFormatConfig.getFormatConfig).toHaveBeenCalledWith('markdown');
       });
 
       test('should clean URLs when cleanUrls enabled', async () => {
@@ -214,11 +233,11 @@ describe('Background Script', () => {
           showNotifications: false,
           showBadge: true
         });
-        global.window.FancyLinkCleanUrl.cleanUrl.mockReturnValue('https://example.com/clean');
+        global.FancyLinkCleanUrl.cleanUrl.mockReturnValue('https://example.com/clean');
 
         await global.copyFancyLink();
 
-        expect(global.window.FancyLinkCleanUrl.cleanUrl).toHaveBeenCalledWith('https://example.com');
+        expect(global.FancyLinkCleanUrl.cleanUrl).toHaveBeenCalledWith('https://example.com');
       });
 
       test('should not clean URLs when cleanUrls disabled', async () => {
@@ -231,7 +250,7 @@ describe('Background Script', () => {
 
         await global.copyFancyLink();
 
-        expect(global.window.FancyLinkCleanUrl.cleanUrl).not.toHaveBeenCalled();
+        expect(global.FancyLinkCleanUrl.cleanUrl).not.toHaveBeenCalled();
       });
 
       test('should handle invalid URLs (about:, chrome:)', async () => {
@@ -275,7 +294,7 @@ describe('Background Script', () => {
           showNotifications: false,
           showBadge: true
         });
-        global.window.FancyLinkFormatConfig.getFormatConfig.mockReturnValue(null);
+        global.FancyLinkFormatConfig.getFormatConfig.mockReturnValue(null);
 
         const result = await global.copyFancyLink('unknown');
 
@@ -485,7 +504,7 @@ describe('Background Script', () => {
       browser.tabs.query.mockResolvedValue([mockTab()]);
       browser.tabs.executeScript.mockResolvedValue();
       browser.tabs.sendMessage.mockResolvedValue({ success: true });
-      global.window.FancyLinkFormatConfig.getFormatConfig.mockReturnValue({
+      global.FancyLinkFormatConfig.getFormatConfig.mockReturnValue({
         format: jest.fn((title, url) => `[${title}](${url})`)
       });
 
@@ -494,23 +513,23 @@ describe('Background Script', () => {
       const result = await messageHandler(mockRequest);
 
       expect(result.success).toBe(true);
-      expect(global.window.FancyLinkFormatConfig.getFormatConfig).toHaveBeenCalledWith('markdown');
+      expect(global.FancyLinkFormatConfig.getFormatConfig).toHaveBeenCalledWith('markdown');
     });
 
     test('should handle cleanUrl action with FancyLinkCleanUrl available', async () => {
       const mockRequest = { action: 'cleanUrl', url: 'https://example.com?utm=test' };
-      global.window.FancyLinkCleanUrl.cleanUrl.mockReturnValue('https://example.com');
+      global.FancyLinkCleanUrl.cleanUrl.mockReturnValue('https://example.com');
 
       const messageHandler = browser.runtime.onMessage.addListener.mock.calls[0][0];
       const result = await messageHandler(mockRequest);
 
-      expect(global.window.FancyLinkCleanUrl.cleanUrl).toHaveBeenCalledWith('https://example.com?utm=test');
+      expect(global.FancyLinkCleanUrl.cleanUrl).toHaveBeenCalledWith('https://example.com?utm=test');
       expect(result).toEqual({ cleanedUrl: 'https://example.com' });
     });
 
     test('should handle cleanUrl action with FancyLinkCleanUrl missing', async () => {
       const mockRequest = { action: 'cleanUrl', url: 'https://example.com?utm=test' };
-      global.window.FancyLinkCleanUrl = null;
+      global.FancyLinkCleanUrl = null;
 
       const messageHandler = browser.runtime.onMessage.addListener.mock.calls[0][0];
       const result = await messageHandler(mockRequest);
@@ -520,7 +539,7 @@ describe('Background Script', () => {
     test('should handle cleanUrl action error gracefully', async () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
       const mockRequest = { action: 'cleanUrl', url: 'https://example.com' };
-      global.window.FancyLinkCleanUrl = {
+      global.FancyLinkCleanUrl = {
         cleanUrl: jest.fn().mockImplementation(() => {
           throw new Error('Clean URL error');
         })
@@ -529,7 +548,7 @@ describe('Background Script', () => {
       const messageHandler = browser.runtime.onMessage.addListener.mock.calls[0][0];
       const result = await messageHandler(mockRequest);
       expect(result).toEqual({ cleanedUrl: 'https://example.com' });
-      expect(global.window.FancyLinkCleanUrl.cleanUrl).toHaveBeenCalledWith('https://example.com');
+      expect(global.FancyLinkCleanUrl.cleanUrl).toHaveBeenCalledWith('https://example.com');
       consoleSpy.mockRestore();
     });
 
@@ -539,7 +558,7 @@ describe('Background Script', () => {
       browser.tabs.query.mockResolvedValue([mockTab()]);
       browser.tabs.executeScript.mockResolvedValue();
       browser.tabs.sendMessage.mockResolvedValue({ success: true });
-      global.window.FancyLinkFormatConfig.getFormatConfig.mockReturnValue({
+      global.FancyLinkFormatConfig.getFormatConfig.mockReturnValue({
         format: jest.fn((title, url) => `[${title}](${url})`)
       });
 
@@ -559,7 +578,7 @@ describe('Background Script', () => {
       browser.tabs.query.mockResolvedValue([mockTab()]);
       browser.tabs.executeScript.mockResolvedValue();
       browser.tabs.sendMessage.mockResolvedValue({ success: true });
-      global.window.FancyLinkFormatConfig.getFormatConfig.mockReturnValue({
+      global.FancyLinkFormatConfig.getFormatConfig.mockReturnValue({
         format: jest.fn((title, url) => `[${title}](${url})`)
       });
 
@@ -646,7 +665,7 @@ describe('Background Script', () => {
       test('should handle notification errors gracefully', async () => {
         const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
         const settings = { showBadge: true, showNotifications: true };
-        browser.browserAction.setBadgeText.mockRejectedValue(new Error('Badge error'));
+        global.BrowserApi.setBadgeText.mockRejectedValue(new Error('Badge error'));
         browser.notifications.create.mockRejectedValue(new Error('Notification error'));
         browser.runtime.getURL.mockReturnValue('moz-extension://test/icons/icon-48.png');
 

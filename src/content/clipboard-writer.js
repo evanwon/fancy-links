@@ -9,7 +9,10 @@
     if (window._fancyLinksClipboardWriterLoaded) return;
     window._fancyLinksClipboardWriterLoaded = true;
 
-    browser.runtime.onMessage.addListener(async (message) => {
+    // Content scripts don't use full BrowserApi — simple inline fallback
+    const api = (typeof browser !== 'undefined') ? browser : chrome;
+
+    api.runtime.onMessage.addListener(async (message) => {
         if (message.action !== 'writeToClipboard') return;
 
         try {
