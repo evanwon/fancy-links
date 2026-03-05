@@ -131,10 +131,12 @@
             } catch (e) {
                 // Document already exists — expected on subsequent calls
             }
-            return api.runtime.sendMessage({
+            // Fire-and-forget pattern (matches Chrome's official offscreen sample)
+            await api.runtime.sendMessage({
                 action: 'offscreen-clipboard-write',
                 text: text
             });
+            return { success: true };
         }
         // MV2: use content script
         await executeContentScript(tabId, '/content/clipboard-writer.js');

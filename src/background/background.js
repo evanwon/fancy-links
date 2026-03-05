@@ -160,23 +160,25 @@ BrowserApi.getApi().commands.onCommand.addListener(async (command) => {
 /**
  * Handle messages from popup or content scripts
  */
-BrowserApi.getApi().runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+BrowserApi.getApi().runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'copyLink') {
-    const result = await copyFancyLink(request.format);
-    return result;
+    copyFancyLink(request.format).then(result => sendResponse(result));
+    return true; // Keep channel open for async sendResponse
   }
 
   if (request.action === 'cleanUrl') {
     try {
       if (globalThis.FancyLinkCleanUrl && request.url) {
         const cleanedUrl = globalThis.FancyLinkCleanUrl.cleanUrl(request.url);
-        return { cleanedUrl };
+        sendResponse({ cleanedUrl });
+      } else {
+        sendResponse({ cleanedUrl: request.url });
       }
-      return { cleanedUrl: request.url };
     } catch (error) {
       console.error('Error cleaning URL:', error);
-      return { cleanedUrl: request.url };
+      sendResponse({ cleanedUrl: request.url });
     }
+    return false;
   }
 });
 

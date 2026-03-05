@@ -1,22 +1,17 @@
 /**
  * Offscreen document for clipboard operations (Chrome MV3)
  * Chrome MV3 service workers cannot access the clipboard directly.
- * This offscreen document provides a DOM context for document.execCommand('copy').
+ * This offscreen document provides a DOM context for clipboard writes.
+ *
+ * Pattern matches Chrome's official offscreen clipboard sample:
+ * - Uses pre-existing textarea + execCommand (not navigator.clipboard)
+ * - Fire-and-forget (no sendResponse)
  */
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message) => {
     if (message.action !== 'offscreen-clipboard-write') return;
 
-    const textarea = document.createElement('textarea');
+    const textarea = document.getElementById('text');
     textarea.value = message.text;
-    textarea.style.position = 'fixed';
-    textarea.style.opacity = '0';
-    document.body.appendChild(textarea);
     textarea.select();
-    const success = document.execCommand('copy');
-    document.body.removeChild(textarea);
-
-    sendResponse({
-        success: success,
-        error: success ? undefined : 'Failed to copy to clipboard'
-    });
+    document.execCommand('copy');
 });

@@ -501,35 +501,42 @@ describe('Background Script', () => {
         format: jest.fn((title, url) => `[${title}](${url})`)
       });
 
-      // Get message handler - it should have been registered when background.js loaded
       const messageHandler = browser.runtime.onMessage.addListener.mock.calls[0][0];
-      const result = await messageHandler(mockRequest);
+      const sendResponse = jest.fn();
+      const keepOpen = messageHandler(mockRequest, {}, sendResponse);
 
-      expect(result.success).toBe(true);
+      expect(keepOpen).toBe(true);
+      // Flush all microtasks (copyFancyLink has multiple awaits)
+      await new Promise(resolve => process.nextTick(resolve));
+
+      expect(sendResponse).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
       expect(global.FancyLinkFormatConfig.getFormatConfig).toHaveBeenCalledWith('markdown');
     });
 
-    test('should handle cleanUrl action with FancyLinkCleanUrl available', async () => {
+    test('should handle cleanUrl action with FancyLinkCleanUrl available', () => {
       const mockRequest = { action: 'cleanUrl', url: 'https://example.com?utm=test' };
       global.FancyLinkCleanUrl.cleanUrl.mockReturnValue('https://example.com');
 
       const messageHandler = browser.runtime.onMessage.addListener.mock.calls[0][0];
-      const result = await messageHandler(mockRequest);
+      const sendResponse = jest.fn();
+      messageHandler(mockRequest, {}, sendResponse);
 
       expect(global.FancyLinkCleanUrl.cleanUrl).toHaveBeenCalledWith('https://example.com?utm=test');
-      expect(result).toEqual({ cleanedUrl: 'https://example.com' });
+      expect(sendResponse).toHaveBeenCalledWith({ cleanedUrl: 'https://example.com' });
     });
 
-    test('should handle cleanUrl action with FancyLinkCleanUrl missing', async () => {
+    test('should handle cleanUrl action with FancyLinkCleanUrl missing', () => {
       const mockRequest = { action: 'cleanUrl', url: 'https://example.com?utm=test' };
       global.FancyLinkCleanUrl = null;
 
       const messageHandler = browser.runtime.onMessage.addListener.mock.calls[0][0];
-      const result = await messageHandler(mockRequest);
-      expect(result).toEqual({ cleanedUrl: 'https://example.com?utm=test' });
+      const sendResponse = jest.fn();
+      messageHandler(mockRequest, {}, sendResponse);
+
+      expect(sendResponse).toHaveBeenCalledWith({ cleanedUrl: 'https://example.com?utm=test' });
     });
 
-    test('should handle cleanUrl action error gracefully', async () => {
+    test('should handle cleanUrl action error gracefully', () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
       const mockRequest = { action: 'cleanUrl', url: 'https://example.com' };
       global.FancyLinkCleanUrl = {
@@ -539,8 +546,10 @@ describe('Background Script', () => {
       };
 
       const messageHandler = browser.runtime.onMessage.addListener.mock.calls[0][0];
-      const result = await messageHandler(mockRequest);
-      expect(result).toEqual({ cleanedUrl: 'https://example.com' });
+      const sendResponse = jest.fn();
+      messageHandler(mockRequest, {}, sendResponse);
+
+      expect(sendResponse).toHaveBeenCalledWith({ cleanedUrl: 'https://example.com' });
       expect(global.FancyLinkCleanUrl.cleanUrl).toHaveBeenCalledWith('https://example.com');
       consoleSpy.mockRestore();
     });
