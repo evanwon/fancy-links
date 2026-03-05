@@ -139,8 +139,12 @@ Set to `true` in repository settings to enable automatic submission to addons.mo
 
 **Development** (root):
 - `test/` - Automated test suites
-- `tools/` - Development utilities  
+- `tools/` - Development utilities (icon generation)
 - `design/` - Design assets and mockups
+
+**CI/CD** (shared via [`evanwon/extension-workflows`](https://github.com/evanwon/extension-workflows)):
+- `.github/workflows/` - Thin callers to shared reusable workflows
+- Version tooling (`version:bump`, `version:check`) provided by `extension-workflows` package
 
 ## Technical Details
 
@@ -163,7 +167,8 @@ Consolidated registry with 4 formats:
 - **Manual Testing**: Load `test/manual.html` in Firefox with extension active
 
 ### Distribution
-- GitHub Actions auto-signs releases when AMO secrets are configured triggered by git tags
+- CI/CD workflows are shared via [`evanwon/extension-workflows`](https://github.com/evanwon/extension-workflows) (reusable GitHub Actions)
+- GitHub Actions auto-signs releases when AMO secrets are configured, triggered by git tags
 - Unsigned builds require Firefox Developer Edition or temporary loading
 
 ## GitHub Issues & Task Management

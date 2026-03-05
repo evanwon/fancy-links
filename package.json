@@ -1,6 +1,6 @@
 {
   "name": "fancy-links",
-  "version": "1.4.5.3",
+  "version": "1.4.5.4",
   "description": "A browser extension that allows you to copy formatted links with titles instead of plain URLs. Perfect for sharing links in chat apps, documentation, and anywhere formatted links look better than bare URLs.",
   "private": true,
   "scripts": {
@@ -10,16 +10,17 @@
     "test:ci": "jest --ci --coverage --maxWorkers=2",
     "build": "web-ext build --source-dir=src --artifacts-dir=dist --overwrite-dest",
     "build:chrome": "node tools/build.js --browser=chrome",
-    "build:firefox": "node tools/build.js --browser=firefox",
+    "build:firefox": "npm run lint:firefox && npm run build",
     "build:all": "node tools/build.js --browser=all",
     "lint:firefox": "web-ext lint --source-dir=src --warnings-as-errors",
     "test:build": "npm test && npm run lint:firefox && npm run build",
     "dev": "web-ext run --source-dir=src",
-    "version:bump": "node tools/version-bump.js",
-    "version:check": "node tools/validate-versions.js"
+    "version:bump": "extension-version-bump",
+    "version:check": "extension-validate-versions"
   },
   "devDependencies": {
     "@types/firefox-webext-browser": "^120.0.4",
+    "extension-workflows": "github:evanwon/extension-workflows",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "jest-webextension-mock": "^3.9.0",

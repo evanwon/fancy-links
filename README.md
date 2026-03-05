@@ -205,13 +205,13 @@ Use `patch`, `minor`, or `major` in step 1 to control the target version. You ca
 Releases are automatically built and optionally submitted to AMO when you push a version tag:
 
 ```bash
-# 1. Update version in src/manifest.json (no suffix, e.g., 1.5.0)
-# 2. Commit changes
-git add -A && git commit -m "Version 1.5.0"
+# From stable state:
+npm run version:bump patch       # 1.4.5 -> 1.4.6 (commits + tags automatically)
+git push origin v1.4.6           # Triggers build + AMO submission
 
-# 3. Create and push tag (triggers GitHub Actions)
-git tag v1.5.0
-git push origin v1.5.0
+# Or from pre-release state:
+npm run version:bump stable      # 1.4.6-rc2 -> 1.4.6 (commits + tags automatically)
+git push origin v1.4.6           # Triggers build + AMO submission
 ```
 
 The workflow will:
@@ -255,9 +255,9 @@ fancy-links/
 │   ├── utils/             # Shared utilities (clean-url, clipboard, etc.)
 │   └── icons/             # Extension icons (PNG)
 ├── test/                  # Automated and manual tests
-├── tools/                 # Development utilities (icon generation)
+├── tools/                 # Development utilities (build scripts, icon generation)
 ├── design/                # Design files and assets
-├── .github/              # GitHub Actions workflows
+├── .github/              # CI/CD (thin callers to shared evanwon/extension-workflows)
 └── dist/                 # Build output (generated)
 ```
 
