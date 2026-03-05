@@ -135,7 +135,7 @@ async function showNotification(type, title, message, settings = {}) {
     // Show system notification only if enabled (default false)
     if (settings.showNotifications === true) {
       const api = BrowserApi.getApi();
-      await api.notifications.create({
+      await api.notifications.create('fancy-links-' + Date.now(), {
         type: 'basic',
         iconUrl: api.runtime.getURL('icons/icon-48.png'),
         title: title,

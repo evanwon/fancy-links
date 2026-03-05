@@ -92,6 +92,9 @@ global.setupChromeMocks = () => {
     commands: {
       onCommand: { addListener: jest.fn() },
       getAll: jest.fn(() => Promise.resolve([]))
+    },
+    offscreen: {
+      createDocument: jest.fn(() => Promise.resolve())
     }
   };
   return global.chrome;

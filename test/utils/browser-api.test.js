@@ -251,6 +251,106 @@ describe('BrowserApi', () => {
     });
   });
 
+  describe('copyToClipboard()', () => {
+    test('MV2: should inject content script and send message', async () => {
+      const mockExecuteScript = jest.fn(() => Promise.resolve());
+      const mockSendMessage = jest.fn(() => Promise.resolve({ success: true }));
+      global.browser = {
+        runtime: { getManifest: jest.fn(() => ({ manifest_version: 2 })) },
+        tabs: {
+          executeScript: mockExecuteScript,
+          sendMessage: mockSendMessage
+        }
+      };
+      loadBrowserApi();
+
+      const result = await BrowserApi.copyToClipboard(42, 'hello world');
+
+      expect(mockExecuteScript).toHaveBeenCalledWith(42, { file: '/content/clipboard-writer.js' });
+      expect(mockSendMessage).toHaveBeenCalledWith(42, {
+        action: 'writeToClipboard',
+        text: 'hello world'
+      });
+      expect(result).toEqual({ success: true });
+    });
+
+    test('MV2: should propagate sendMessage result', async () => {
+      global.browser = {
+        runtime: { getManifest: jest.fn(() => ({ manifest_version: 2 })) },
+        tabs: {
+          executeScript: jest.fn(() => Promise.resolve()),
+          sendMessage: jest.fn(() => Promise.resolve({ success: false, error: 'Failed to copy' }))
+        }
+      };
+      loadBrowserApi();
+
+      const result = await BrowserApi.copyToClipboard(1, 'text');
+
+      expect(result).toEqual({ success: false, error: 'Failed to copy' });
+    });
+
+    test('MV3: should create offscreen document and send message', async () => {
+      delete global.browser;
+      const mockCreateDocument = jest.fn(() => Promise.resolve());
+      const mockSendMessage = jest.fn(() => Promise.resolve());
+      global.chrome = {
+        runtime: {
+          getManifest: jest.fn(() => ({ manifest_version: 3 })),
+          sendMessage: mockSendMessage
+        },
+        offscreen: { createDocument: mockCreateDocument }
+      };
+      loadBrowserApi();
+
+      const result = await BrowserApi.copyToClipboard(1, 'copied text');
+
+      expect(mockCreateDocument).toHaveBeenCalledWith({
+        url: 'offscreen/clipboard.html',
+        reasons: ['CLIPBOARD'],
+        justification: 'Write formatted link to clipboard'
+      });
+      expect(mockSendMessage).toHaveBeenCalledWith({
+        action: 'offscreen-clipboard-write',
+        text: 'copied text'
+      });
+      expect(result).toEqual({ success: true });
+    });
+
+    test('MV3: should handle offscreen document already existing', async () => {
+      delete global.browser;
+      const mockCreateDocument = jest.fn(() => Promise.reject(new Error('Document already exists')));
+      const mockSendMessage = jest.fn(() => Promise.resolve());
+      global.chrome = {
+        runtime: {
+          getManifest: jest.fn(() => ({ manifest_version: 3 })),
+          sendMessage: mockSendMessage
+        },
+        offscreen: { createDocument: mockCreateDocument }
+      };
+      loadBrowserApi();
+
+      const result = await BrowserApi.copyToClipboard(1, 'text');
+
+      expect(mockCreateDocument).toHaveBeenCalled();
+      expect(mockSendMessage).toHaveBeenCalled();
+      expect(result).toEqual({ success: true });
+    });
+
+    test('MV3: should propagate sendMessage errors', async () => {
+      delete global.browser;
+      global.chrome = {
+        runtime: {
+          getManifest: jest.fn(() => ({ manifest_version: 3 })),
+          sendMessage: jest.fn(() => Promise.reject(new Error('Send failed')))
+        },
+        offscreen: { createDocument: jest.fn(() => Promise.resolve()) }
+      };
+      loadBrowserApi();
+
+      await expect(BrowserApi.copyToClipboard(1, 'text')).rejects.toThrow('Send failed');
+    });
+  });
+
   describe('exports', () => {
     test('should export via module.exports', () => {
       global.browser = { runtime: {} };

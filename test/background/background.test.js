@@ -318,7 +318,7 @@ describe('Background Script', () => {
         );
 
         // Verify notification was attempted (badge set)
-        expect(browser.browserAction.setBadgeText).toHaveBeenCalled();
+        expect(BrowserApi.setBadgeText).toHaveBeenCalled();
       });
 
       test('should handle clipboard copy failure', async () => {
@@ -433,7 +433,7 @@ describe('Background Script', () => {
         const result = await global.copyFancyLink();
 
         expect(result.success).toBe(true);
-        expect(browser.browserAction.setBadgeText).toHaveBeenCalledWith({ text: '✓' });
+        expect(BrowserApi.setBadgeText).toHaveBeenCalledWith({ text: '✓' });
       });
 
       test('should return error when copyToClipboard returns success: false', async () => {
@@ -607,14 +607,14 @@ describe('Background Script', () => {
 
         await global.showNotification('success', 'Test Title', 'Test Message', settings);
 
-        expect(browser.browserAction.setBadgeText).toHaveBeenCalledWith({ text: '✓' });
-        expect(browser.browserAction.setBadgeBackgroundColor).toHaveBeenCalledWith({ color: '#4CAF50' });
+        expect(BrowserApi.setBadgeText).toHaveBeenCalledWith({ text: '✓' });
+        expect(BrowserApi.setBadgeBackgroundColor).toHaveBeenCalledWith({ color: '#4CAF50' });
         expect(global.setTimeout).toHaveBeenCalledWith(expect.any(Function), 2000);
       });
 
       test('should show error badge when showBadge enabled', async () => {
         const settings = { showBadge: true, showNotifications: false };
-        
+
         // Mock setTimeout
         global.setTimeout = jest.fn((callback, delay) => {
           return 123;
@@ -622,8 +622,8 @@ describe('Background Script', () => {
 
         await global.showNotification('error', 'Test Title', 'Test Message', settings);
 
-        expect(browser.browserAction.setBadgeText).toHaveBeenCalledWith({ text: '!' });
-        expect(browser.browserAction.setBadgeBackgroundColor).toHaveBeenCalledWith({ color: '#F44336' });
+        expect(BrowserApi.setBadgeText).toHaveBeenCalledWith({ text: '!' });
+        expect(BrowserApi.setBadgeBackgroundColor).toHaveBeenCalledWith({ color: '#F44336' });
       });
 
       test('should not show badge when showBadge disabled', async () => {
@@ -631,8 +631,8 @@ describe('Background Script', () => {
 
         await global.showNotification('success', 'Test Title', 'Test Message', settings);
 
-        expect(browser.browserAction.setBadgeText).not.toHaveBeenCalled();
-        expect(browser.browserAction.setBadgeBackgroundColor).not.toHaveBeenCalled();
+        expect(BrowserApi.setBadgeText).not.toHaveBeenCalled();
+        expect(BrowserApi.setBadgeBackgroundColor).not.toHaveBeenCalled();
       });
 
       test('should show system notification when showNotifications enabled', async () => {
@@ -646,12 +646,15 @@ describe('Background Script', () => {
 
         await global.showNotification('success', 'Test Title', 'Test Message', settings);
 
-        expect(browser.notifications.create).toHaveBeenCalledWith({
-          type: 'basic',
-          iconUrl: 'moz-extension://test/icons/icon-48.png',
-          title: 'Test Title',
-          message: 'Test Message'
-        });
+        expect(browser.notifications.create).toHaveBeenCalledWith(
+          expect.stringMatching(/^fancy-links-\d+$/),
+          {
+            type: 'basic',
+            iconUrl: 'moz-extension://test/icons/icon-48.png',
+            title: 'Test Title',
+            message: 'Test Message'
+          }
+        );
       });
 
       test('should not show system notification when showNotifications disabled', async () => {
@@ -689,19 +692,19 @@ describe('Background Script', () => {
         });
         
         // Reset mock to clear any previous calls
-        browser.browserAction.setBadgeText.mockClear();
+        BrowserApi.setBadgeText.mockClear();
 
         await global.showNotification('success', 'Test Title', 'Test Message', settings);
 
         // Verify badge was set
-        expect(browser.browserAction.setBadgeText).toHaveBeenCalledWith({ text: '✓' });
-        
+        expect(BrowserApi.setBadgeText).toHaveBeenCalledWith({ text: '✓' });
+
         // Execute the timeout callback
         expect(timeoutCallback).toBeDefined();
         timeoutCallback();
-        
+
         // Verify badge was cleared
-        expect(browser.browserAction.setBadgeText).toHaveBeenCalledWith({ text: '' });
+        expect(BrowserApi.setBadgeText).toHaveBeenCalledWith({ text: '' });
       });
     });
   });

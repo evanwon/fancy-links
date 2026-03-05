@@ -100,6 +100,31 @@ describe('Clipboard Writer Content Script', () => {
         expect(browser.runtime.onMessage.addListener).toHaveBeenCalledTimes(1);
     });
 
+    test('should use chrome API when browser is not available', () => {
+        jest.resetModules();
+        delete window._fancyLinksClipboardWriterLoaded;
+        delete global.browser;
+
+        global.chrome = {
+            runtime: {
+                onMessage: {
+                    addListener: jest.fn()
+                }
+            }
+        };
+
+        require('../../src/content/clipboard-writer.js');
+
+        expect(chrome.runtime.onMessage.addListener).toHaveBeenCalledTimes(1);
+
+        // Restore browser for other tests
+        global.browser = {
+            runtime: {
+                onMessage: { addListener: jest.fn() }
+            }
+        };
+    });
+
     test('should return failure when both clipboard methods fail', async () => {
         navigator.clipboard.writeText.mockRejectedValue(new Error('Not allowed'));
 

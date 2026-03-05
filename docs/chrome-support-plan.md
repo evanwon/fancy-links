@@ -39,7 +39,7 @@
 | Build system | Shared `extension-build` CLI (from `extension-workflows`) | No transpilation needed; just manifest swapping, file copying, and background script concatenation for Chrome service worker; keeps things simple with no new dependencies; shared so all extensions can reuse the same build logic |
 | Source structure | Shared `src/` with separate `manifests/` directory | Single source of truth; build script copies the correct manifest per browser |
 | Chrome MV3 background | Service worker with concatenated scripts | Concatenate background scripts into a single `service-worker.js`; Chrome MV3 requires a single service worker entry point |
-| Clipboard approach | Keep current content-script architecture | Chrome MV3 service workers cannot access `navigator.clipboard` directly; current design where a content script handles clipboard writes already solves this |
+| Clipboard approach | MV2: content script; MV3: offscreen document | Chrome MV3 content scripts lack user gesture context for clipboard writes when invoked from the service worker. MV2 continues using the content-script approach. MV3 uses an offscreen document (`src/offscreen/clipboard.html` + `clipboard.js`) with `document.execCommand('copy')`, matching Chrome's official offscreen clipboard sample. Requires `offscreen` permission in Chrome manifest. |
 | Minimum Chrome version | Chrome 102+ | Covers `chrome.scripting` (88+), Promise-based `onMessage` (99+), and stable MV3 APIs |
 | Testing strategy | Dual-environment test runs | Existing test suites run under both Firefox and Chrome mocks; export pattern tests verify all 3 contexts (Node, window, service worker) |
 
