@@ -8,7 +8,8 @@
     "activeTab",
     "storage",
     "notifications",
-    "scripting"
+    "scripting",
+    "offscreen"
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"

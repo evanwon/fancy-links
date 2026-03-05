@@ -110,6 +110,40 @@
         return 'unknown';
     }
 
+    /**
+     * Copy text to clipboard using the appropriate method for the browser/manifest version
+     * MV2: Injects content script into the tab
+     * MV3: Uses an offscreen document (content scripts lack user gesture context)
+     * @param {number} tabId - Tab ID (used only for MV2)
+     * @param {string} text - Text to copy
+     * @returns {Promise<{success: boolean, error?: string}>}
+     */
+    async function copyToClipboard(tabId, text) {
+        if (getManifestVersion() >= 3) {
+            const api = getApi();
+            // Ensure offscreen document exists
+            try {
+                await api.offscreen.createDocument({
+                    url: 'offscreen/clipboard.html',
+                    reasons: ['CLIPBOARD'],
+                    justification: 'Write formatted link to clipboard'
+                });
+            } catch (e) {
+                // Document already exists — expected on subsequent calls
+            }
+            return api.runtime.sendMessage({
+                action: 'offscreen-clipboard-write',
+                text: text
+            });
+        }
+        // MV2: use content script
+        await executeContentScript(tabId, '/content/clipboard-writer.js');
+        return getApi().tabs.sendMessage(tabId, {
+            action: 'writeToClipboard',
+            text: text
+        });
+    }
+
     const BrowserApi = {
         getApi,
         getManifestVersion,
@@ -118,6 +152,7 @@
         setBadgeBackgroundColor,
         onActionClicked,
         executeContentScript,
+        copyToClipboard,
         getBrowserName
     };
 

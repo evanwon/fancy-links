@@ -86,18 +86,11 @@ async function copyFancyLink(formatType = null) {
     // Format the link
     const formattedLink = formatConfig.format(title, url);
 
-    // Copy to clipboard using content script
-    await BrowserApi.executeContentScript(tab.id, '/content/clipboard-writer.js');
+    // Copy to clipboard (MV2: content script, MV3: offscreen document)
+    const result = await BrowserApi.copyToClipboard(tab.id, formattedLink);
 
-    // Send data via messaging (no string interpolation)
-    const result = await BrowserApi.getApi().tabs.sendMessage(tab.id, {
-      action: 'writeToClipboard',
-      text: formattedLink
-    });
-
-    // Validate the content script result
     if (!result || !result.success) {
-      throw new Error(result?.error || 'Clipboard copy failed in content script');
+      throw new Error(result?.error || 'Clipboard copy failed');
     }
 
     // Show success notification
