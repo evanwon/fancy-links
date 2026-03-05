@@ -36,7 +36,7 @@
 |----------|--------|-----------|
 | Firefox manifest version | Keep MV2 | Firefox supports MV2 well; avoids risk to existing users; MV3 migration can happen separately later |
 | API compatibility approach | Custom `src/utils/browser-api.js` wrapper | Extension uses a small API surface (~12 distinct APIs); avoids adding `webextension-polyfill` dependency; keeps zero-dependency philosophy; the polyfill doesn't fully bridge MV2/MV3 gaps (service workers, `scripting` API, `action` API) |
-| Build system | Custom Node.js script (`tools/build.js`) | No transpilation needed; just manifest swapping, file copying, and background script concatenation for Chrome service worker; keeps things simple with no new dependencies |
+| Build system | Shared `extension-build` CLI (from `extension-workflows`) | No transpilation needed; just manifest swapping, file copying, and background script concatenation for Chrome service worker; keeps things simple with no new dependencies; shared so all extensions can reuse the same build logic |
 | Source structure | Shared `src/` with separate `manifests/` directory | Single source of truth; build script copies the correct manifest per browser |
 | Chrome MV3 background | Service worker with concatenated scripts | Concatenate background scripts into a single `service-worker.js`; Chrome MV3 requires a single service worker entry point |
 | Clipboard approach | Keep current content-script architecture | Chrome MV3 service workers cannot access `navigator.clipboard` directly; current design where a content script handles clipboard writes already solves this |
@@ -463,22 +463,18 @@ web-ext run --source-dir=src                       # Manual smoke test
 
 `src/manifest.json` remains the **authoritative Firefox manifest**. The `web-ext run --source-dir=src` development workflow continues to work unchanged. There is no separate `manifests/firefox/manifest.json` — the build script copies directly from `src/` for Firefox, avoiding an extra file to keep in sync.
 
-The Chrome manifest version is injected at build time from `src/manifest.json` (or `package.json`). `version-bump.js` only updates `src/manifest.json` + `package.json` (2 files, not 3).
+The Chrome manifest version is injected at build time from `src/manifest.json`. The `extension-version-bump` tool (from the `extension-workflows` package) only updates `src/manifest.json` + `package.json` (2 files, not 3).
 
 The `manifests/` directory contains only `manifests/chrome/manifest.json` as a template with a version placeholder.
 
 ### Files to Create
 
-#### `tools/build.js`
+#### `extension-build` CLI (provided by `extension-workflows` package)
 
-Multi-browser build script (Node.js, no external dependencies):
+The multi-browser build tool lives in the shared `extension-workflows` package as `extension-build`. It follows standardized conventions so any extension can use it:
 
-```javascript
-#!/usr/bin/env node
-/**
- * Multi-browser build script for Fancy Links extension.
- * Usage: node tools/build.js --browser=firefox|chrome|all
- */
+```bash
+extension-build --browser=firefox|chrome|all
 ```
 
 **Behavior**:
@@ -489,10 +485,17 @@ Multi-browser build script (Node.js, no external dependencies):
 5. **For Chrome MV3**:
    - Copy `manifests/chrome/manifest.json`, injecting the current version from `src/manifest.json`
    - Concatenate background scripts into a single `service-worker.js` in dependency order (read from Firefox manifest's `background.scripts` array). Wrap with `'use strict';` preamble
-   - Remove individual background script files from output. Content script (`clipboard-writer.js`) remains separate
+   - Remove background-only script files (those under `background/`) from output. Shared scripts in `utils/`, `formats/`, etc. remain. Content scripts remain separate.
 6. Print build summary
 
-**Script concatenation order for Chrome service worker**:
+**Conventions** (all extensions must follow):
+- `src/` contains the Firefox source (source of truth)
+- `src/manifest.json` is the authoritative Firefox MV2 manifest
+- `manifests/chrome/manifest.json` is the Chrome MV3 template with `__VERSION__` and `__VERSION_NAME__` placeholders
+- `build/` is the output directory
+- Background-only scripts live under `src/background/`; shared scripts live elsewhere
+
+**Script concatenation order** is read dynamically from Firefox manifest's `background.scripts` array:
 1. `formats/format-registry.js`
 2. `utils/settings-defaults.js`
 3. `utils/clean-url.js`
@@ -505,7 +508,8 @@ Chrome MV3 manifest template with a version placeholder. Fully populated in Phas
 
 #### `test/tools/build.test.js`
 
-Test that:
+Generic build tests live in the `extension-workflows` package (template placeholder replacement, valid JS output, MV3 manifest). Extension-specific output validation stays local:
+
 - Firefox build output has all expected files
 - Chrome build has `service-worker.js`
 - Chrome build does NOT have individual background script files
@@ -522,37 +526,34 @@ Add scripts:
 
 ```json
 {
-    "build:chrome": "node tools/build.js --browser=chrome",
-    "build:firefox": "node tools/build.js --browser=firefox",
-    "build:all": "node tools/build.js --browser=all"
+    "build:chrome": "extension-build --browser=chrome",
+    "build:firefox": "npm run lint:firefox && npm run build",
+    "build:all": "extension-build --browser=all"
 }
 ```
 
-> Note: The existing `build:firefox` script uses `web-ext` directly. Consider whether to keep it or replace it with the new build script. The new script handles manifest swapping; `web-ext build` can then package the `build/firefox/` output.
+> Note: `build:firefox` combines linting and `web-ext build` for the Firefox workflow. `build:chrome` and `build:all` use the shared `extension-build` CLI from `extension-workflows`.
 
-#### `tools/validate-versions.js`
+#### Version tooling (provided by `extension-workflows`)
 
-Update to validate version consistency across `src/manifest.json`, `manifests/chrome/manifest.json`, and `package.json`.
+**`extension-validate-versions`** already supports Chrome manifest template validation. When `manifests/chrome/manifest.json` exists with `__VERSION__` placeholder, it is treated as valid. When a built Chrome manifest exists, its version must match the Firefox manifest. No changes needed.
 
-#### `tools/version-bump.js`
-
-Update to write version changes to `src/manifest.json` and `package.json` (2 files). The Chrome manifest template in `manifests/chrome/` uses a placeholder that is injected at build time, so it does not need direct version-bump updates.
+**`extension-version-bump`** writes version changes to `src/manifest.json` and `package.json` (2 files). The Chrome manifest template uses `__VERSION__`/`__VERSION_NAME__` placeholders injected at build time, so it does not need direct version-bump updates. No changes needed.
 
 #### `.gitignore`
 
-Add `build/` directory. (Currently missing from `.gitignore` — must be added to prevent build output from being committed.)
+Add `build/` directory to `.gitignore`. (Done — added as part of Phase 2 completion.)
 
-#### Test Files to Update
+#### Test Files
 
-- `test/tools/validate-versions.test.js` — Add cross-manifest validation tests
-- `test/tools/version-bump.test.js` — Add multi-manifest update tests
+Core tool tests for `validate-versions` and `version-bump` live in the `extension-workflows` repository. Local test files (`test/tools/validate-versions.test.js`, `test/tools/version-bump.test.js`) test the shared package's exported functions from the consumer side.
 
 ### Verification
 
 ```bash
 npm test
-node tools/build.js --browser=firefox
-node tools/build.js --browser=chrome
+extension-build --browser=firefox
+extension-build --browser=chrome
 web-ext lint --source-dir=build/firefox --warnings-as-errors
 ```
 
@@ -574,8 +575,8 @@ web-ext lint --source-dir=build/firefox --warnings-as-errors
 {
     "manifest_version": 3,
     "name": "Fancy Links",
-    "version": "1.4.5.3",
-    "version_name": "1.4.6-rc3",
+    "version": "__VERSION__",
+    "version_name": "__VERSION_NAME__",
     "description": "Fancy Links transforms plain URLs into friendly links with included page titles. Perfect for sharing in chat apps, Reddit, GitHub, documentation, and anywhere formatted links look better than bare URLs.",
     "permissions": [
         "activeTab",
@@ -656,7 +657,7 @@ window.FancyLinkCleanUrl      →  globalThis.FancyLinkCleanUrl
 
 ```bash
 npm test
-node tools/build.js --browser=chrome
+extension-build --browser=chrome
 ```
 
 **Manual verification in Chrome**:
@@ -768,7 +769,7 @@ Browser-aware shortcut configuration help text (see fix above). The static HTML 
 
 ```bash
 npm test                                           # All tests pass (Firefox + Chrome mocks)
-node tools/build.js --browser=chrome
+extension-build --browser=chrome
 ```
 
 Load `build/chrome/` in Chrome and repeat the manual checklist from Phase 3.
@@ -783,93 +784,63 @@ Load `build/chrome/` in Chrome and repeat the manual checklist from Phase 3.
 
 **Dependencies**: Phase 2, Phase 3
 
-### Files to Modify
+> **Architecture note**: CI/CD workflows are shared via the [`extension-workflows`](https://github.com/evanwon/extension-workflows) package. Fancy-links' workflow files (`.github/workflows/`) are thin callers that pass configuration inputs to reusable workflows. All Chrome CI/CD logic is implemented in `extension-workflows` so other extensions can opt in with a single `chrome-enabled: true` input.
 
-#### `.github/workflows/test-pr.yml`
+### Changes in `extension-workflows` (reusable workflows)
 
-Add Chrome-specific validation steps:
+These changes are implemented in the `extension-workflows` repository, not in fancy-links.
 
-```yaml
-    - name: Build Chrome extension
-      run: node tools/build.js --browser=chrome
+#### `build-release.yml` — Add opt-in Chrome support
 
-    - name: Validate Chrome manifest
-      run: |
-        node -e "
-          const manifest = JSON.parse(require('fs').readFileSync('build/chrome/manifest.json', 'utf8'));
-          if (manifest.manifest_version !== 3) throw new Error('Chrome manifest must be MV3');
-          if (!manifest.background.service_worker) throw new Error('Chrome must use service worker');
-          console.log('Chrome manifest validation passed');
-        "
+**New inputs** (all opt-in, defaults preserve existing Firefox-only behavior):
 
-    - name: Validate Chrome service worker
-      run: |
-        if [ ! -f "build/chrome/service-worker.js" ]; then
-          echo "::error::service-worker.js not found in Chrome build"
-          exit 1
-        fi
-        echo "Chrome service worker exists"
-```
+| Input | Type | Default | Description |
+|-------|------|---------|-------------|
+| `chrome-enabled` | boolean | `false` | Enable Chrome build, validation, and packaging |
+| `chrome-build-dir` | string | `"build/chrome"` | Where Chrome build output lives |
+| `cws-submission-enabled` | boolean | `false` | Enable Chrome Web Store submission (mirrors `amo-submission-enabled` pattern) |
+| `cws-extension-id` | string | `""` | Chrome Web Store extension ID (reusable workflows can't access caller's `vars.*`) |
+| `chrome-min-version` | string | `"102+"` | Minimum Chrome version, used in release notes |
 
-#### `.github/workflows/build-release.yml`
+**New secrets** (all optional):
 
-**1. Activate browser matrix** (in the `strategy` section):
+| Secret | Description |
+|--------|-------------|
+| `CWS_CLIENT_ID` | Chrome Web Store API client ID |
+| `CWS_CLIENT_SECRET` | Chrome Web Store API client secret |
+| `CWS_REFRESH_TOKEN` | Chrome Web Store API refresh token |
 
-```yaml
-    strategy:
-      matrix:
-        browser: [firefox, chrome]  # Was: [firefox]
-```
-
-**2. Add Chrome build steps** (after the Firefox build steps):
+**New steps** (sequential, in the existing single job, all gated by `if: inputs.chrome-enabled`):
 
 ```yaml
     - name: Chrome - Build extension
-      if: matrix.browser == 'chrome'
-      run: |
-        echo "Chrome: Building extension..."
-        node tools/build.js --browser=chrome
+      if: inputs.chrome-enabled
+      run: npx extension-build --browser=chrome
 
     - name: Chrome - Validate build
-      if: matrix.browser == 'chrome'
+      if: inputs.chrome-enabled
       run: |
-        echo "Validating Chrome build..."
-        test -f build/chrome/service-worker.js
-        test -f build/chrome/manifest.json
+        test -f ${{ inputs.chrome-build-dir }}/service-worker.js
+        test -f ${{ inputs.chrome-build-dir }}/manifest.json
         node -e "
-          const m = JSON.parse(require('fs').readFileSync('build/chrome/manifest.json', 'utf8'));
-          if (m.manifest_version !== 3) throw new Error('Not MV3');
+          const m = JSON.parse(require('fs').readFileSync('${{ inputs.chrome-build-dir }}/manifest.json', 'utf8'));
+          if (m.manifest_version !== 3) throw new Error('Chrome manifest must be MV3');
+          if (!m.background.service_worker) throw new Error('Chrome must use service worker');
           console.log('Chrome build validated');
         "
 
     - name: Chrome - Create ZIP
-      if: matrix.browser == 'chrome'
+      if: inputs.chrome-enabled
       run: |
-        cd build/chrome
-        zip -r "../../dist/fancy-links-chrome-v${{ steps.get_version.outputs.version }}.zip" .
+        cd ${{ inputs.chrome-build-dir }}
+        zip -r "../../dist/${{ inputs.extension-name }}-chrome-v${{ steps.get_version.outputs.version }}.zip" .
         cd ../..
-        echo "Chrome ZIP created: dist/fancy-links-chrome-v${{ steps.get_version.outputs.version }}.zip"
-```
 
-**3. Uncomment Chrome Web Store upload CLI** (in the "Install build tools" step):
-
-```yaml
-    - name: Install build tools
-      run: |
-        npm install -g web-ext@latest --ignore-scripts
-        npm install -g chrome-webstore-upload-cli --ignore-scripts
-```
-
-**4. Update release creation** to attach Chrome ZIP alongside Firefox XPI. Add Chrome installation instructions to release notes.
-
-**5. Add Chrome Web Store submission step** (controlled by `CWS_SUBMISSION_ENABLED`):
-
-```yaml
     - name: Chrome - Submit to Chrome Web Store
       if: >
-        matrix.browser == 'chrome' &&
-        steps.release_type.outputs.is_prerelease == 'false' &&
-        vars.CWS_SUBMISSION_ENABLED == 'true'
+        inputs.chrome-enabled &&
+        inputs.cws-submission-enabled &&
+        steps.release_type.outputs.is_prerelease == 'false'
       env:
         CWS_CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
         CWS_CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
@@ -879,45 +850,99 @@ Add Chrome-specific validation steps:
           echo "Chrome Web Store credentials not configured. Skipping submission."
           exit 0
         fi
-
-        echo "Chrome: Submitting to Chrome Web Store..."
         npx chrome-webstore-upload-cli upload \
-          --source "dist/fancy-links-chrome-v${{ steps.get_version.outputs.version }}.zip" \
-          --extension-id "${{ vars.CWS_EXTENSION_ID }}" \
+          --source "dist/${{ inputs.extension-name }}-chrome-v${{ steps.get_version.outputs.version }}.zip" \
+          --extension-id "${{ inputs.cws-extension-id }}" \
           --client-id "$CWS_CLIENT_ID" \
           --client-secret "$CWS_CLIENT_SECRET" \
           --refresh-token "$CWS_REFRESH_TOKEN"
 ```
 
-**6. Add a separate `release` job** to coordinate GitHub release creation:
+**Updated release creation**: When `chrome-enabled` is true, the release step attaches both the Firefox XPI and Chrome ZIP. Chrome installation instructions are added to release notes. No separate `release` job is needed — sequential steps in the same job avoid matrix and artifact-passing complexity.
 
-A browser matrix means separate jobs. Both produce artifacts, but only one should create the GitHub release. Add a separate `release` job that `needs: [build-firefox, build-chrome]`, downloads artifacts from both browser build jobs, and creates a single GitHub release with both attachments (Firefox XPI + Chrome ZIP).
+**Install step update**: When `chrome-enabled` is true, also install `chrome-webstore-upload-cli` alongside `web-ext`.
+
+> **Note**: `web-ext lint` is Firefox-specific and only runs for Firefox builds. Chrome build validation uses the manifest validation script above.
+
+#### `test-pr.yml` — Add opt-in Chrome build validation
+
+**New inputs**:
+
+| Input | Type | Default | Description |
+|-------|------|---------|-------------|
+| `chrome-enabled` | boolean | `false` | Enable Chrome build validation in PR checks |
+
+**New steps** (gated by `if: inputs.chrome-enabled`):
 
 ```yaml
-  release:
-    needs: [build-firefox, build-chrome]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: dist/
+    - name: Chrome - Build extension
+      if: inputs.chrome-enabled
+      run: npx extension-build --browser=chrome
 
-      - name: Create GitHub Release
-        # Creates a single release with both Firefox and Chrome artifacts attached
-        ...
+    - name: Chrome - Validate build
+      if: inputs.chrome-enabled
+      run: |
+        test -f build/chrome/service-worker.js
+        test -f build/chrome/manifest.json
+        node -e "
+          const m = JSON.parse(require('fs').readFileSync('build/chrome/manifest.json', 'utf8'));
+          if (m.manifest_version !== 3) throw new Error('Not MV3');
+          console.log('Chrome build validated');
+        "
 ```
 
-> **Note**: `web-ext lint` is Firefox-specific and should only run on Firefox builds. Chrome build validation uses the manifest validation script (step 2 above), not `web-ext lint`.
+### Changes in `fancy-links` (thin callers)
+
+#### `.github/workflows/build-release.yml`
+
+Pass new Chrome inputs to the reusable workflow:
+
+```yaml
+jobs:
+  build:
+    uses: evanwon/extension-workflows/.github/workflows/build-release.yml@v1
+    with:
+      # ... existing Firefox inputs ...
+      chrome-enabled: true
+      cws-submission-enabled: ${{ vars.CWS_SUBMISSION_ENABLED == 'true' }}
+      cws-extension-id: ${{ vars.CWS_EXTENSION_ID }}
+      chrome-min-version: "102+"
+    secrets: inherit
+```
+
+#### `.github/workflows/test-pr.yml`
+
+Pass Chrome input and add `manifests/**` to paths filter:
+
+```yaml
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'test/**'
+      - 'manifests/**'
+      - 'package*.json'
+      - 'jest.config.js'
+
+jobs:
+  test:
+    uses: evanwon/extension-workflows/.github/workflows/test-pr.yml@v1
+    with:
+      # ... existing inputs ...
+      chrome-enabled: true
+```
 
 ### Verification
 
 ```bash
 # Locally: simulate CI steps
 npm test
-node tools/build.js --browser=all
+extension-build --browser=all
 web-ext lint --source-dir=build/firefox --warnings-as-errors  # Firefox only
 ```
+
+To verify the CI pipeline end-to-end, push a branch to trigger the reusable workflows and confirm both Firefox and Chrome builds succeed. Verify that `goodreads-shelf-position-editor` (which does not pass `chrome-enabled: true`) is unaffected.
 
 ---
 
@@ -961,15 +986,15 @@ Add `"chrome"` to keywords:
 
 ### Repository Configuration Required
 
-The following GitHub secrets and variables must be configured before CWS submission:
+CWS submission uses a two-layer pass-through: secrets are passed via `secrets: inherit` to the reusable workflow; variables are passed as explicit inputs (reusable workflows cannot access the caller's `vars.*` context).
 
-| Name | Type | Description |
-|------|------|-------------|
-| `CWS_CLIENT_ID` | Secret | Chrome Web Store API client ID |
-| `CWS_CLIENT_SECRET` | Secret | Chrome Web Store API client secret |
-| `CWS_REFRESH_TOKEN` | Secret | Chrome Web Store API refresh token |
-| `CWS_EXTENSION_ID` | Variable | Chrome Web Store extension ID (assigned after first manual upload) |
-| `CWS_SUBMISSION_ENABLED` | Variable | Set to `true` to enable automated CWS uploads (mirrors `AMO_SUBMISSION_ENABLED` pattern) |
+| Name | Type | Configured In | Passed As | Description |
+|------|------|---------------|-----------|-------------|
+| `CWS_CLIENT_ID` | Secret | fancy-links repo settings | `secrets: inherit` | Chrome Web Store API client ID |
+| `CWS_CLIENT_SECRET` | Secret | fancy-links repo settings | `secrets: inherit` | Chrome Web Store API client secret |
+| `CWS_REFRESH_TOKEN` | Secret | fancy-links repo settings | `secrets: inherit` | Chrome Web Store API refresh token |
+| `CWS_EXTENSION_ID` | Variable | fancy-links repo settings | `cws-extension-id` input | Chrome Web Store extension ID (assigned after first manual upload) |
+| `CWS_SUBMISSION_ENABLED` | Variable | fancy-links repo settings | `cws-submission-enabled` input | Set to `true` to enable automated CWS uploads (mirrors `AMO_SUBMISSION_ENABLED` pattern) |
 
 ### Verification
 
@@ -987,8 +1012,8 @@ The following GitHub secrets and variables must be configured before CWS submiss
 | Firefox regression | Low | High | Phase 1 includes export pattern fixes and API abstraction; all existing tests must pass before proceeding. Firefox-specific `web-ext lint` runs in every phase. |
 | Service worker lifecycle issues | Medium | Low | Content script handles clipboard (not service worker). Badge timeout is non-critical (cosmetic only). Test with Chrome DevTools service worker termination. |
 | Chrome API differences missed | Low | Medium | Comprehensive API inventory completed (30+ calls across 4 files). Chrome-specific integration tests in Phase 4 catch runtime issues. |
-| Build system complexity | Low | Medium | Deliberately simple Node.js script with no dependencies. No bundling, no transpilation. Just file copying and script concatenation. |
-| Version sync across manifests | Medium | Medium | `validate-versions.js` updated in Phase 2 to validate all manifest files. `version-bump.js` writes to all manifests. CI enforces validation. |
+| Build system complexity | Low | Medium | Deliberately simple Node.js script with no dependencies, shared via `extension-workflows` as `extension-build`. No bundling, no transpilation. Just file copying and script concatenation. |
+| Version sync across manifests | Medium | Medium | `extension-validate-versions` (from `extension-workflows`) validates Firefox manifest, package.json, and Chrome template if present. `extension-version-bump` writes to `src/manifest.json` and `package.json`; Chrome manifest uses build-time placeholder injection. CI enforces validation. |
 | `storage.sync` quota exceeded | Very Low | Low | Current settings total < 1KB. Chrome quota is 100KB total, 8KB per item. Not a concern unless settings grow dramatically. |
 | `setTimeout` in service worker | Medium | Very Low | Badge clearing is purely cosmetic. 2-second timeout is short enough to complete before worker termination in most cases. Can optionally use `chrome.alarms` API later. |
 | `globalThis`/`window` export patterns break in service worker | Medium | High | Fixed in Phase 1 with independent export checks for `module.exports`, `globalThis`, and `window`; verified by `test/utils/export-patterns.test.js` across all 3 contexts (Node, browser, service worker) |
