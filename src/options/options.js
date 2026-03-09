@@ -8,8 +8,28 @@ const formats = globalThis.FancyLinkFormatRegistry.formatConfig;
 document.addEventListener('DOMContentLoaded', async () => {
     await loadSettings();
     await updateKeyboardShortcutDisplay();
+    updateShortcutHelpForBrowser();
     setupEventListeners();
 });
+
+// Update shortcut help text for Chrome users with a clickable link
+function updateShortcutHelpForBrowser() {
+    if (BrowserApi.getBrowserName() === 'chrome') {
+        const shortcutHelp = document.querySelector('.shortcut-help p');
+        if (shortcutHelp) {
+            shortcutHelp.textContent = 'Go to ';
+            const link = document.createElement('a');
+            link.href = '#';
+            link.textContent = 'chrome://extensions/shortcuts';
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                BrowserApi.getApi().tabs.create({ url: 'chrome://extensions/shortcuts' });
+            });
+            shortcutHelp.appendChild(link);
+            shortcutHelp.appendChild(document.createTextNode(' to customize your shortcut.'));
+        }
+    }
+}
 
 // Update keyboard shortcut display
 async function updateKeyboardShortcutDisplay() {

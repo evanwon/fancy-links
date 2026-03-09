@@ -11,7 +11,7 @@
 | Phase 1: Browser API Abstraction Layer | **Complete** | Foundation — no dependencies |
 | Phase 2: Build System | **Complete** | Depends on Phase 1 |
 | Phase 3: Chrome MV3 Manifest and Adaptation | **Complete** | All deliverables implemented in Phases 1-2 |
-| Phase 4: Chrome-Specific Testing and Polish | Not Started | Depends on Phase 3 |
+| Phase 4: Chrome-Specific Testing and Polish | **Complete** | Chrome integration tests, browser-aware options UI |
 | Phase 5: CI/CD Pipeline for Chrome | Not Started | Depends on Phase 2, 3 |
 | Phase 6: Chrome Web Store Preparation | Not Started | Depends on Phase 5 |
 
@@ -1002,6 +1002,7 @@ CWS submission uses a two-layer pass-through: secrets are passed via `secrets: i
 - [ ] Screenshots show Chrome browser chrome (not Firefox)
 - [ ] GitHub secrets/variables are configured
 - [ ] A manual test upload to CWS succeeds
+- [ ] Confirm `suggested_key` (`Alt+Shift+C`) is auto-assigned on production install (not guaranteed for unpacked dev extensions — must verify with a CWS or `.crx` install)
 
 ---
 
