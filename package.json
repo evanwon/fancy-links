@@ -22,7 +22,7 @@
     "@types/firefox-webext-browser": "^120.0.4",
     "extension-workflows": "github:evanwon/extension-workflows",
     "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0",
+    "jest-environment-jsdom": "^30.1.2",
     "jest-webextension-mock": "^3.9.0",
     "jsdom": "^26.1.0"
   },
