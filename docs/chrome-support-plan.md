@@ -784,7 +784,7 @@ Load `build/chrome/` in Chrome and repeat the manual checklist from Phase 3.
 
 **Dependencies**: Phase 2, Phase 3
 
-> **Architecture note**: CI/CD workflows are shared via the [`extension-workflows`](https://github.com/evanwon/extension-workflows) package. Fancy-links' workflow files (`.github/workflows/`) are thin callers that pass configuration inputs to reusable workflows. All Chrome CI/CD logic is implemented in `extension-workflows` so other extensions can opt in with a single `chrome-enabled: true` input.
+> **Architecture note**: CI/CD workflows are shared via the [`extension-workflows`](https://github.com/evanwon/browser-extension-workflows) package. Fancy-links' workflow files (`.github/workflows/`) are thin callers that pass configuration inputs to reusable workflows. All Chrome CI/CD logic is implemented in `extension-workflows` so other extensions can opt in with a single `chrome-enabled: true` input.
 
 ### Changes in `extension-workflows` (reusable workflows)
 
@@ -900,7 +900,7 @@ Pass new Chrome inputs to the reusable workflow:
 ```yaml
 jobs:
   build:
-    uses: evanwon/extension-workflows/.github/workflows/build-release.yml@v1
+    uses: evanwon/browser-extension-workflows/.github/workflows/build-release.yml@v1
     with:
       # ... existing Firefox inputs ...
       chrome-enabled: true
@@ -927,7 +927,7 @@ on:
 
 jobs:
   test:
-    uses: evanwon/extension-workflows/.github/workflows/test-pr.yml@v1
+    uses: evanwon/browser-extension-workflows/.github/workflows/test-pr.yml@v1
     with:
       # ... existing inputs ...
       chrome-enabled: true

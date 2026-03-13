@@ -258,7 +258,7 @@ fancy-links/
 ├── test/                  # Automated and manual tests
 ├── tools/                 # Development utilities (build scripts, icon generation)
 ├── design/                # Design files and assets
-├── .github/              # CI/CD (thin callers to shared evanwon/extension-workflows)
+├── .github/              # CI/CD (thin callers to shared evanwon/browser-extension-workflows)
 └── build/                 # Build output (generated)
 ```
 

@@ -32,7 +32,7 @@ permissions:
 
 jobs:
   build:
-    uses: evanwon/extension-workflows/.github/workflows/build-release.yml@v1
+    uses: evanwon/browser-extension-workflows/.github/workflows/build-release.yml@v1
     with:
       extension-name: fancy-links
       extension-display-name: "Fancy Links"
