@@ -3,7 +3,7 @@ const {
   getCurrentStableVersion,
   computePreReleaseVersion,
   bumpVersion,
-} = require('extension-workflows/tools/version-bump');
+} = require('browser-extension-workflows/tools/version-bump');
 
 describe('parseVersion', () => {
   test('parses stable version', () => {
@@ -233,7 +233,7 @@ describe('CLI error exits', () => {
   const { execFileSync } = require('child_process');
   const fs = require('fs');
   const path = require('path');
-  const SCRIPT = require.resolve('extension-workflows/tools/version-bump');
+  const SCRIPT = require.resolve('browser-extension-workflows/tools/version-bump');
   const MANIFEST_PATH = path.resolve(__dirname, '../../src/manifest.json');
   const PACKAGE_PATH = path.resolve(__dirname, '../../package.json');
 

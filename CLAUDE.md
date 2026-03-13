@@ -144,7 +144,7 @@ Set to `true` in repository settings to enable automatic submission to addons.mo
 
 **CI/CD** (shared via [`evanwon/browser-extension-workflows`](https://github.com/evanwon/browser-extension-workflows)):
 - `.github/workflows/` - Thin callers to shared reusable workflows
-- Version tooling (`version:bump`, `version:check`) provided by `extension-workflows` package
+- Version tooling (`version:bump`, `version:check`) provided by `browser-extension-workflows` package
 
 ## Technical Details
 

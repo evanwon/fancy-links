@@ -36,7 +36,7 @@
 |----------|--------|-----------|
 | Firefox manifest version | Keep MV2 | Firefox supports MV2 well; avoids risk to existing users; MV3 migration can happen separately later |
 | API compatibility approach | Custom `src/utils/browser-api.js` wrapper | Extension uses a small API surface (~12 distinct APIs); avoids adding `webextension-polyfill` dependency; keeps zero-dependency philosophy; the polyfill doesn't fully bridge MV2/MV3 gaps (service workers, `scripting` API, `action` API) |
-| Build system | Shared `extension-build` CLI (from `extension-workflows`) | No transpilation needed; just manifest swapping, file copying, and background script concatenation for Chrome service worker; keeps things simple with no new dependencies; shared so all extensions can reuse the same build logic |
+| Build system | Shared `extension-build` CLI (from `browser-extension-workflows`) | No transpilation needed; just manifest swapping, file copying, and background script concatenation for Chrome service worker; keeps things simple with no new dependencies; shared so all extensions can reuse the same build logic |
 | Source structure | Shared `src/` with separate `manifests/` directory | Single source of truth; build script copies the correct manifest per browser |
 | Chrome MV3 background | Service worker with concatenated scripts | Concatenate background scripts into a single `service-worker.js`; Chrome MV3 requires a single service worker entry point |
 | Clipboard approach | MV2: content script; MV3: offscreen document | Chrome MV3 content scripts lack user gesture context for clipboard writes when invoked from the service worker. MV2 continues using the content-script approach. MV3 uses an offscreen document (`src/offscreen/clipboard.html` + `clipboard.js`) with `document.execCommand('copy')`, matching Chrome's official offscreen clipboard sample. Requires `offscreen` permission in Chrome manifest. |
@@ -463,15 +463,15 @@ web-ext run --source-dir=src                       # Manual smoke test
 
 `src/manifest.json` remains the **authoritative Firefox manifest**. The `web-ext run --source-dir=src` development workflow continues to work unchanged. There is no separate `manifests/firefox/manifest.json` — the build script copies directly from `src/` for Firefox, avoiding an extra file to keep in sync.
 
-The Chrome manifest version is injected at build time from `src/manifest.json`. The `extension-version-bump` tool (from the `extension-workflows` package) only updates `src/manifest.json` + `package.json` (2 files, not 3).
+The Chrome manifest version is injected at build time from `src/manifest.json`. The `extension-version-bump` tool (from the `browser-extension-workflows` package) only updates `src/manifest.json` + `package.json` (2 files, not 3).
 
 The `manifests/` directory contains only `manifests/chrome/manifest.json` as a template with a version placeholder.
 
 ### Files to Create
 
-#### `extension-build` CLI (provided by `extension-workflows` package)
+#### `extension-build` CLI (provided by `browser-extension-workflows` package)
 
-The multi-browser build tool lives in the shared `extension-workflows` package as `extension-build`. It follows standardized conventions so any extension can use it:
+The multi-browser build tool lives in the shared `browser-extension-workflows` package as `extension-build`. It follows standardized conventions so any extension can use it:
 
 ```bash
 extension-build --browser=firefox|chrome|all
@@ -508,7 +508,7 @@ Chrome MV3 manifest template with a version placeholder. Fully populated in Phas
 
 #### `test/tools/build.test.js`
 
-Generic build tests live in the `extension-workflows` package (template placeholder replacement, valid JS output, MV3 manifest). Extension-specific output validation stays local:
+Generic build tests live in the `browser-extension-workflows` package (template placeholder replacement, valid JS output, MV3 manifest). Extension-specific output validation stays local:
 
 - Firefox build output has all expected files
 - Chrome build has `service-worker.js`
@@ -532,9 +532,9 @@ Add scripts:
 }
 ```
 
-> Note: `build:firefox` combines linting and `web-ext build` for the Firefox workflow. `build:chrome` and `build:all` use the shared `extension-build` CLI from `extension-workflows`.
+> Note: `build:firefox` combines linting and `web-ext build` for the Firefox workflow. `build:chrome` and `build:all` use the shared `extension-build` CLI from `browser-extension-workflows`.
 
-#### Version tooling (provided by `extension-workflows`)
+#### Version tooling (provided by `browser-extension-workflows`)
 
 **`extension-validate-versions`** already supports Chrome manifest template validation. When `manifests/chrome/manifest.json` exists with `__VERSION__` placeholder, it is treated as valid. When a built Chrome manifest exists, its version must match the Firefox manifest. No changes needed.
 
@@ -546,7 +546,7 @@ Add `build/` directory to `.gitignore`. (Done — added as part of Phase 2 compl
 
 #### Test Files
 
-Core tool tests for `validate-versions` and `version-bump` live in the `extension-workflows` repository. Local test files (`test/tools/validate-versions.test.js`, `test/tools/version-bump.test.js`) test the shared package's exported functions from the consumer side.
+Core tool tests for `validate-versions` and `version-bump` live in the `browser-extension-workflows` repository. Local test files (`test/tools/validate-versions.test.js`, `test/tools/version-bump.test.js`) test the shared package's exported functions from the consumer side.
 
 ### Verification
 
@@ -784,11 +784,11 @@ Load `build/chrome/` in Chrome and repeat the manual checklist from Phase 3.
 
 **Dependencies**: Phase 2, Phase 3
 
-> **Architecture note**: CI/CD workflows are shared via the [`extension-workflows`](https://github.com/evanwon/browser-extension-workflows) package. Fancy-links' workflow files (`.github/workflows/`) are thin callers that pass configuration inputs to reusable workflows. All Chrome CI/CD logic is implemented in `extension-workflows` so other extensions can opt in with a single `chrome-enabled: true` input.
+> **Architecture note**: CI/CD workflows are shared via the [`browser-extension-workflows`](https://github.com/evanwon/browser-extension-workflows) package. Fancy-links' workflow files (`.github/workflows/`) are thin callers that pass configuration inputs to reusable workflows. All Chrome CI/CD logic is implemented in `browser-extension-workflows` so other extensions can opt in with a single `chrome-enabled: true` input.
 
-### Changes in `extension-workflows` (reusable workflows)
+### Changes in `browser-extension-workflows` (reusable workflows)
 
-These changes are implemented in the `extension-workflows` repository, not in fancy-links.
+These changes are implemented in the `browser-extension-workflows` repository, not in fancy-links.
 
 #### `build-release.yml` — Add opt-in Chrome support
 
@@ -939,7 +939,7 @@ jobs:
 
 **Changes made across two repos**:
 
-1. **`extension-workflows`** (branch `chrome-ci-support` off `master`):
+1. **`browser-extension-workflows`** (branch `chrome-ci-support` off `master`):
    - `build-release.yml`: 5 new opt-in inputs, 3 new secrets, 4 Chrome build/validate/ZIP/CWS steps, updated release notes and asset attachment
    - `test-pr.yml`: 1 new input, 2 Chrome build/validate steps
    - All new steps gated by `if: inputs.chrome-enabled` — zero impact on repos that don't opt in
@@ -1033,8 +1033,8 @@ CWS submission uses a two-layer pass-through: secrets are passed via `secrets: i
 | Firefox regression | Low | High | Phase 1 includes export pattern fixes and API abstraction; all existing tests must pass before proceeding. Firefox-specific `web-ext lint` runs in every phase. |
 | Service worker lifecycle issues | Medium | Low | Content script handles clipboard (not service worker). Badge timeout is non-critical (cosmetic only). Test with Chrome DevTools service worker termination. |
 | Chrome API differences missed | Low | Medium | Comprehensive API inventory completed (30+ calls across 4 files). Chrome-specific integration tests in Phase 4 catch runtime issues. |
-| Build system complexity | Low | Medium | Deliberately simple Node.js script with no dependencies, shared via `extension-workflows` as `extension-build`. No bundling, no transpilation. Just file copying and script concatenation. |
-| Version sync across manifests | Medium | Medium | `extension-validate-versions` (from `extension-workflows`) validates Firefox manifest, package.json, and Chrome template if present. `extension-version-bump` writes to `src/manifest.json` and `package.json`; Chrome manifest uses build-time placeholder injection. CI enforces validation. |
+| Build system complexity | Low | Medium | Deliberately simple Node.js script with no dependencies, shared via `browser-extension-workflows` as `extension-build`. No bundling, no transpilation. Just file copying and script concatenation. |
+| Version sync across manifests | Medium | Medium | `extension-validate-versions` (from `browser-extension-workflows`) validates Firefox manifest, package.json, and Chrome template if present. `extension-version-bump` writes to `src/manifest.json` and `package.json`; Chrome manifest uses build-time placeholder injection. CI enforces validation. |
 | `storage.sync` quota exceeded | Very Low | Low | Current settings total < 1KB. Chrome quota is 100KB total, 8KB per item. Not a concern unless settings grow dramatically. |
 | `setTimeout` in service worker | Medium | Very Low | Badge clearing is purely cosmetic. 2-second timeout is short enough to complete before worker termination in most cases. Can optionally use `chrome.alarms` API later. |
 | `globalThis`/`window` export patterns break in service worker | Medium | High | Fixed in Phase 1 with independent export checks for `module.exports`, `globalThis`, and `window`; verified by `test/utils/export-patterns.test.js` across all 3 contexts (Node, browser, service worker) |

@@ -1,4 +1,4 @@
-const { validate, validateChromeTemplate } = require('extension-workflows/tools/validate-versions');
+const { validate, validateChromeTemplate } = require('browser-extension-workflows/tools/validate-versions');
 
 describe('validate', () => {
   test('matching stable versions pass', () => {
