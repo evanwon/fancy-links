@@ -12,7 +12,7 @@
 | Phase 2: Build System | **Complete** | Depends on Phase 1 |
 | Phase 3: Chrome MV3 Manifest and Adaptation | **Complete** | All deliverables implemented in Phases 1-2 |
 | Phase 4: Chrome-Specific Testing and Polish | **Complete** | Chrome integration tests, browser-aware options UI |
-| Phase 5: CI/CD Pipeline for Chrome | **Implementation Complete** | Awaiting validation; changes in both `extension-workflows` (branch `chrome-ci-support`) and `fancy-links` (branch `chrome-support-phase1`) |
+| Phase 5: CI/CD Pipeline for Chrome | **Complete** | CI validated: PR #76 passes Chrome build + validate; extension-workflows v1.1.0 released |
 | Phase 6: Chrome Web Store Preparation | Not Started | Depends on Phase 5 |
 
 ## Table of Contents
@@ -960,8 +960,8 @@ npm run build:chrome        # Chrome build succeeds
 **Remaining validation**:
 - [x] Review the extension-workflows diff on `chrome-ci-support` branch
 - [x] Merge `chrome-ci-support` into `master` in extension-workflows and tag v1.1.0 (moved floating `v1` tag)
-- [ ] Push fancy-links `chrome-support-phase1` branch and open PR to trigger `test-pr.yml` — confirm Chrome build + validate steps pass
-- [ ] Verify `goodreads-shelf-position-editor` CI is unaffected (no `chrome-enabled` input = all Chrome steps skipped)
+- [x] Push fancy-links `chrome-support-phase1` branch and open PR (#76) — CI passes, Chrome build validated as MV3 with service worker
+- [x] Verify `goodreads-shelf-position-editor` CI is unaffected — `chrome-enabled: false` confirmed, no Chrome steps executed (run #23034510553; unrelated AMO version conflict)
 - [ ] Optionally: trigger a manual `workflow_dispatch` build to confirm the full build-release flow
 
 ---
