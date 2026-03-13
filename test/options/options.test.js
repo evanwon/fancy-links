@@ -27,7 +27,15 @@ describe('Options Page', () => {
       currentShortcut: { textContent: '' }
     };
 
+    // Create a real DOM element for shortcut help so appendChild/createTextNode work
+    mockElements.shortcutHelpP = document.createElement('p');
+    mockElements.shortcutHelpP.textContent = 'Visit about:addons to customize your shortcut.';
+    const realGetElementById = document.getElementById.bind(document);
     document.getElementById = jest.fn((id) => mockElements[id] || null);
+    document.querySelector = jest.fn((selector) => {
+      if (selector === '.shortcut-help p') return mockElements.shortcutHelpP;
+      return null;
+    });
     document.querySelectorAll = jest.fn(() => []);
     document.addEventListener = jest.fn();
 
@@ -67,6 +75,18 @@ describe('Options Page', () => {
     global.Diagnostics = {
       collectDiagnostics: jest.fn().mockResolvedValue({}),
       generateGitHubIssueUrl: jest.fn().mockReturnValue('https://github.com/test')
+    };
+
+    // Mock BrowserApi abstraction layer
+    global.BrowserApi = {
+      getApi: jest.fn(() => browser),
+      getAction: jest.fn(() => browser.browserAction),
+      getManifestVersion: jest.fn(() => 2),
+      setBadgeText: jest.fn(),
+      setBadgeBackgroundColor: jest.fn(),
+      onActionClicked: jest.fn(),
+      executeContentScript: jest.fn(),
+      getBrowserName: jest.fn(() => 'firefox')
     };
 
     // Load options.js - it registers a DOMContentLoaded listener
@@ -291,6 +311,43 @@ describe('Options Page', () => {
 
       expect(mockElements.statusMessage.textContent).toBe('Error saving settings');
       consoleSpy.mockRestore();
+    });
+  });
+
+  describe('updateShortcutHelpForBrowser()', () => {
+    test('should create clickable shortcut link for Chrome', async () => {
+      global.BrowserApi.getBrowserName.mockReturnValue('chrome');
+
+      await triggerDOMContentLoaded();
+
+      const link = mockElements.shortcutHelpP.querySelector('a');
+      expect(link).toBeTruthy();
+      expect(link.textContent).toBe('chrome://extensions/shortcuts');
+      expect(mockElements.shortcutHelpP.textContent).toBe(
+        'Go to chrome://extensions/shortcuts to customize your shortcut.'
+      );
+    });
+
+    test('should open chrome://extensions/shortcuts on link click', async () => {
+      global.BrowserApi.getBrowserName.mockReturnValue('chrome');
+
+      await triggerDOMContentLoaded();
+
+      const link = mockElements.shortcutHelpP.querySelector('a');
+      link.click();
+
+      expect(browser.tabs.create).toHaveBeenCalledWith({
+        url: 'chrome://extensions/shortcuts'
+      });
+    });
+
+    test('should not change shortcut help text for Firefox', async () => {
+      global.BrowserApi.getBrowserName.mockReturnValue('firefox');
+      const originalText = mockElements.shortcutHelpP.textContent;
+
+      await triggerDOMContentLoaded();
+
+      expect(mockElements.shortcutHelpP.textContent).toBe(originalText);
     });
   });
 });

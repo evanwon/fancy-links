@@ -52,3 +52,50 @@ global.mockSettings = (overrides = {}) => ({
   showBadge: true,
   ...overrides
 });
+
+/**
+ * Setup Chrome MV3 mocks for testing cross-browser compatibility
+ * Sets up global.chrome with MV3 API structure (action instead of browserAction,
+ * scripting.executeScript instead of tabs.executeScript)
+ */
+global.setupChromeMocks = () => {
+  global.chrome = {
+    runtime: {
+      getManifest: jest.fn(() => ({ manifest_version: 3 })),
+      getURL: jest.fn((path) => `chrome-extension://test-id/${path}`),
+      onMessage: { addListener: jest.fn() },
+      sendMessage: jest.fn()
+    },
+    storage: {
+      sync: {
+        get: jest.fn(() => Promise.resolve({})),
+        set: jest.fn(() => Promise.resolve()),
+        remove: jest.fn(() => Promise.resolve())
+      }
+    },
+    tabs: {
+      query: jest.fn(() => Promise.resolve([])),
+      sendMessage: jest.fn(() => Promise.resolve({ success: true })),
+      create: jest.fn(() => Promise.resolve())
+    },
+    action: {
+      setBadgeText: jest.fn(() => Promise.resolve()),
+      setBadgeBackgroundColor: jest.fn(() => Promise.resolve()),
+      onClicked: { addListener: jest.fn() }
+    },
+    scripting: {
+      executeScript: jest.fn(() => Promise.resolve())
+    },
+    notifications: {
+      create: jest.fn(() => Promise.resolve())
+    },
+    commands: {
+      onCommand: { addListener: jest.fn() },
+      getAll: jest.fn(() => Promise.resolve([]))
+    },
+    offscreen: {
+      createDocument: jest.fn(() => Promise.resolve())
+    }
+  };
+  return global.chrome;
+};

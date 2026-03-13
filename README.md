@@ -254,15 +254,17 @@ fancy-links/
 │   ├── formats/           # Format registry and logic
 │   ├── utils/             # Shared utilities (clean-url, clipboard, etc.)
 │   └── icons/             # Extension icons (PNG)
+├── manifests/             # Browser-specific manifest templates (Chrome MV3)
 ├── test/                  # Automated and manual tests
 ├── tools/                 # Development utilities (build scripts, icon generation)
 ├── design/                # Design files and assets
-├── .github/              # CI/CD (thin callers to shared evanwon/extension-workflows)
-└── dist/                 # Build output (generated)
+├── .github/              # CI/CD (thin callers to shared evanwon/browser-extension-workflows)
+└── build/                 # Build output (generated)
 ```
 
 ### Development Notes
-- Uses **Manifest V2** (Firefox still prefers MV2 over MV3)
+- **Cross-browser**: Firefox (MV2) and Chrome (MV3) from a single codebase via `BrowserApi` abstraction layer
+- **Dual build system**: `node tools/build.js` produces separate Firefox and Chrome builds
 - **No external dependencies** - pure HTML/CSS/JS
 - **Modular architecture** for easy format addition
 - **Browser-compatible format system** (avoids Node.js require() issues)

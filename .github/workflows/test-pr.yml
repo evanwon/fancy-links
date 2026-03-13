@@ -6,14 +6,16 @@ on:
     paths:
       - 'src/**'
       - 'test/**'
+      - 'manifests/**'
       - 'package*.json'
       - 'jest.config.js'
 
 jobs:
   test:
-    uses: evanwon/extension-workflows/.github/workflows/test-pr.yml@v1
+    uses: evanwon/browser-extension-workflows/.github/workflows/test-pr.yml@v1
     with:
       lint-warnings-as-errors: true
       validate-versions: true
       security-audit-strict: true
       upload-coverage: true
+      chrome-enabled: true

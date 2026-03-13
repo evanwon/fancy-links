@@ -8,8 +8,28 @@ const formats = globalThis.FancyLinkFormatRegistry.formatConfig;
 document.addEventListener('DOMContentLoaded', async () => {
     await loadSettings();
     await updateKeyboardShortcutDisplay();
+    updateShortcutHelpForBrowser();
     setupEventListeners();
 });
+
+// Update shortcut help text for Chrome users with a clickable link
+function updateShortcutHelpForBrowser() {
+    if (BrowserApi.getBrowserName() === 'chrome') {
+        const shortcutHelp = document.querySelector('.shortcut-help p');
+        if (shortcutHelp) {
+            shortcutHelp.textContent = 'Go to ';
+            const link = document.createElement('a');
+            link.href = '#';
+            link.textContent = 'chrome://extensions/shortcuts';
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                BrowserApi.getApi().tabs.create({ url: 'chrome://extensions/shortcuts' });
+            });
+            shortcutHelp.appendChild(link);
+            shortcutHelp.appendChild(document.createTextNode(' to customize your shortcut.'));
+        }
+    }
+}
 
 // Update keyboard shortcut display
 async function updateKeyboardShortcutDisplay() {
@@ -30,18 +50,19 @@ async function updateKeyboardShortcutDisplay() {
 
 async function loadSettings() {
     try {
-        // Check if browser and storage APIs are available
-        if (typeof browser === 'undefined') {
+        // Check if browser extension APIs are available
+        const api = BrowserApi.getApi();
+        if (!api) {
             throw new Error('Browser API not available');
         }
-        
-        if (!browser.storage || !browser.storage.sync) {
+
+        if (!api.storage || !api.storage.sync) {
             throw new Error('Storage API not available');
         }
-        
+
         // Load settings from browser storage
         const defaults = globalThis.FancyLinkSettings.DEFAULT_SETTINGS;
-        const result = await browser.storage.sync.get(defaults);
+        const result = await api.storage.sync.get(defaults);
         const settings = { ...defaults, ...result };
         
         // Update UI with loaded settings
@@ -87,8 +108,9 @@ function setupEventListeners() {
 async function saveSettings() {
     try {
         // Get current default format from storage to preserve it
-        const currentSettings = await browser.storage.sync.get({ defaultFormat: globalThis.FancyLinkSettings.DEFAULT_SETTINGS.defaultFormat });
-        
+        const api = BrowserApi.getApi();
+        const currentSettings = await api.storage.sync.get({ defaultFormat: globalThis.FancyLinkSettings.DEFAULT_SETTINGS.defaultFormat });
+
         const settings = {
             defaultFormat: currentSettings.defaultFormat, // Preserve existing default format
             showNotifications: document.getElementById('showNotifications').checked,
@@ -97,9 +119,9 @@ async function saveSettings() {
             debugMode: document.getElementById('debugMode').checked,
             includeCurrentPageInBugReports: document.getElementById('includeCurrentPageInBugReports').checked
         };
-        
+
         // Save to browser storage
-        await browser.storage.sync.set(settings);
+        await api.storage.sync.set(settings);
         
         showStatus('Settings saved successfully!', 'success');
         
@@ -118,8 +140,9 @@ async function resetSettings() {
     try {
         const defaults = globalThis.FancyLinkSettings.DEFAULT_SETTINGS;
         const knownKeys = Object.keys(defaults);
-        await browser.storage.sync.remove(knownKeys);
-        await browser.storage.sync.set(defaults);
+        const api = BrowserApi.getApi();
+        await api.storage.sync.remove(knownKeys);
+        await api.storage.sync.set(defaults);
         updateUI(defaults);
         showStatus('Settings reset to defaults', 'success');
         setTimeout(() => { showStatus(''); }, 3000);
@@ -140,15 +163,16 @@ async function handleReportIssue(event) {
     
     try {
         // Get current settings to determine if we should include page info
-        const settings = await browser.storage.sync.get(['includeCurrentPageInBugReports']);
+        const api = BrowserApi.getApi();
+        const settings = await api.storage.sync.get(['includeCurrentPageInBugReports']);
         const includeCurrentPage = settings.includeCurrentPageInBugReports === true;
-        
-        // Load diagnostics utility - use chrome API for compatibility
+
+        // Collect diagnostics information
         const diagnostics = await Diagnostics.collectDiagnostics(includeCurrentPage);
         const issueUrl = Diagnostics.generateGitHubIssueUrl(diagnostics);
-        
+
         // Open GitHub Issues in new tab
-        browser.tabs.create({ url: issueUrl });
+        api.tabs.create({ url: issueUrl });
         
     } catch (error) {
         console.error('Error generating issue report:', error);

@@ -77,9 +77,13 @@ function hasTrackingParams(url) {
 
 // Export for different environments
 if (typeof module !== 'undefined' && module.exports) {
-    // Node.js environment
     module.exports = { cleanUrl, hasTrackingParams, TRACKING_PARAMS };
-} else {
-    // Browser environment - make available globally
+}
+
+if (typeof globalThis !== 'undefined') {
+    globalThis.FancyLinkCleanUrl = { cleanUrl, hasTrackingParams, TRACKING_PARAMS };
+}
+
+if (typeof window !== 'undefined') {
     window.FancyLinkCleanUrl = { cleanUrl, hasTrackingParams, TRACKING_PARAMS };
 }

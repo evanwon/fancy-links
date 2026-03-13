@@ -12,7 +12,7 @@ describe('Clipboard Writer Content Script', () => {
         // Clear idempotency guard
         delete window._fancyLinksClipboardWriterLoaded;
 
-        // Mock browser.runtime.onMessage
+        // Mock browser.runtime.onMessage (inline fallback prefers browser over chrome)
         global.browser = {
             runtime: {
                 onMessage: {
@@ -33,20 +33,28 @@ describe('Clipboard Writer Content Script', () => {
         expect(typeof messageHandler).toBe('function');
     });
 
-    test('should ignore non-writeToClipboard messages', async () => {
-        const result = await messageHandler({ action: 'other' });
-        expect(result).toBeUndefined();
+    test('should ignore non-writeToClipboard messages', () => {
+        const sendResponse = jest.fn();
+        const result = messageHandler({ action: 'other' }, {}, sendResponse);
+        expect(result).toBe(false);
+        expect(sendResponse).not.toHaveBeenCalled();
     });
 
     test('should write to clipboard using navigator.clipboard API', async () => {
         navigator.clipboard.writeText.mockResolvedValue();
+        const sendResponse = jest.fn();
 
-        const result = await messageHandler({
+        const keepOpen = messageHandler({
             action: 'writeToClipboard',
             text: 'test text'
-        });
+        }, {}, sendResponse);
 
-        expect(result).toEqual({ success: true });
+        expect(keepOpen).toBe(true);
+
+        // Wait for async sendResponse
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(sendResponse).toHaveBeenCalledWith({ success: true });
         expect(navigator.clipboard.writeText).toHaveBeenCalledWith('test text');
     });
 
@@ -64,12 +72,17 @@ describe('Clipboard Writer Content Script', () => {
         document.body.removeChild = jest.fn();
         document.execCommand = jest.fn(() => true);
 
-        const result = await messageHandler({
+        const sendResponse = jest.fn();
+
+        messageHandler({
             action: 'writeToClipboard',
             text: 'fallback text'
-        });
+        }, {}, sendResponse);
 
-        expect(result).toEqual({ success: true });
+        // Wait for async sendResponse
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(sendResponse).toHaveBeenCalledWith({ success: true });
         expect(document.execCommand).toHaveBeenCalledWith('copy');
         expect(mockTextarea.value).toBe('fallback text');
         expect(mockTextarea.style.position).toBe('fixed');
@@ -87,6 +100,31 @@ describe('Clipboard Writer Content Script', () => {
         expect(browser.runtime.onMessage.addListener).toHaveBeenCalledTimes(1);
     });
 
+    test('should use chrome API when browser is not available', () => {
+        jest.resetModules();
+        delete window._fancyLinksClipboardWriterLoaded;
+        delete global.browser;
+
+        global.chrome = {
+            runtime: {
+                onMessage: {
+                    addListener: jest.fn()
+                }
+            }
+        };
+
+        require('../../src/content/clipboard-writer.js');
+
+        expect(chrome.runtime.onMessage.addListener).toHaveBeenCalledTimes(1);
+
+        // Restore browser for other tests
+        global.browser = {
+            runtime: {
+                onMessage: { addListener: jest.fn() }
+            }
+        };
+    });
+
     test('should return failure when both clipboard methods fail', async () => {
         navigator.clipboard.writeText.mockRejectedValue(new Error('Not allowed'));
 
@@ -100,11 +138,16 @@ describe('Clipboard Writer Content Script', () => {
         document.body.removeChild = jest.fn();
         document.execCommand = jest.fn(() => false);
 
-        const result = await messageHandler({
+        const sendResponse = jest.fn();
+
+        messageHandler({
             action: 'writeToClipboard',
             text: 'fail text'
-        });
+        }, {}, sendResponse);
 
-        expect(result).toEqual({ success: false, error: 'Failed to copy to clipboard' });
+        // Wait for async sendResponse
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(sendResponse).toHaveBeenCalledWith({ success: false, error: 'Failed to copy to clipboard' });
     });
 });

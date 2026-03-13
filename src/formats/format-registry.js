@@ -138,19 +138,21 @@
         formats: formatConfig
     };
 
-    // Global export for background script (non-module context)
-    if (typeof window !== 'undefined') {
-        window.FancyLinkFormatConfig = registry;
-        
-        // Also make it available on globalThis for module access
-        if (typeof globalThis !== 'undefined') {
-            globalThis.FancyLinkFormatRegistry = registry;
-        }
-    }
-
     // Node.js export for testing (CommonJS compatibility)
     if (typeof module !== 'undefined' && module.exports) {
         module.exports = registry;
+    }
+
+    // Global export for service worker context (no window)
+    if (typeof globalThis !== 'undefined') {
+        globalThis.FancyLinkFormatConfig = registry;
+        globalThis.FancyLinkFormatRegistry = registry;
+    }
+
+    // Global export for browser window context
+    if (typeof window !== 'undefined') {
+        window.FancyLinkFormatConfig = registry;
+        window.FancyLinkFormatRegistry = registry;
     }
 
 })();

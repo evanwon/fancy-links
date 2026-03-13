@@ -21,7 +21,7 @@ function getUserFriendlyError(error) {
 // Load version from manifest
 function loadVersion() {
     try {
-        const manifest = browser.runtime.getManifest();
+        const manifest = BrowserApi.getApi().runtime.getManifest();
         const versionElement = document.getElementById('version');
 
         if (versionElement) {
@@ -128,14 +128,12 @@ async function updateKeyboardHint() {
     if (!shortcutSpan) return;
     
     try {
-        // Try to get browser API (cross-browser compatible)
-        const browserAPI = typeof browser !== 'undefined' ? browser : 
-                          (typeof chrome !== 'undefined' ? chrome : null);
-        
-        if (browserAPI && browserAPI.commands && browserAPI.commands.getAll) {
-            const commands = await browserAPI.commands.getAll();
+        const api = BrowserApi.getApi();
+
+        if (api && api.commands && api.commands.getAll) {
+            const commands = await api.commands.getAll();
             const copyCommand = commands.find(cmd => cmd.name === 'copy-fancy-link');
-            
+
             if (copyCommand && copyCommand.shortcut) {
                 // Use the centralized formatter
                 shortcutSpan.textContent = KeyboardShortcuts.formatShortcutForDisplay(copyCommand.shortcut);
@@ -152,7 +150,7 @@ async function updateKeyboardHint() {
                     link.textContent = 'Configure in settings \u2192';
                     link.addEventListener('click', (e) => {
                         e.preventDefault();
-                        browserAPI.runtime.openOptionsPage();
+                        api.runtime.openOptionsPage();
                     });
                     hintElement.appendChild(textNode);
                     hintElement.appendChild(link);
@@ -174,7 +172,7 @@ async function updateKeyboardHint() {
 async function loadCurrentTab() {
     try {
         // Get current active tab
-        const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+        const tabs = await BrowserApi.getApi().tabs.query({ active: true, currentWindow: true });
         currentTab = tabs[0];
         
         // Update UI with tab info
@@ -226,7 +224,7 @@ function setupEventListeners() {
     const headerOptionsBtn = document.getElementById('headerOptionsBtn');
     if (headerOptionsBtn) {
         headerOptionsBtn.addEventListener('click', () => {
-            browser.runtime.openOptionsPage();
+            BrowserApi.getApi().runtime.openOptionsPage();
             window.close();
         });
     }
@@ -253,7 +251,7 @@ async function copyWithFormat(formatKey) {
     
     try {
         // Use the background script's copyLink function which handles settings like cleanUrls
-        const result = await browser.runtime.sendMessage({
+        const result = await BrowserApi.getApi().runtime.sendMessage({
             action: 'copyLink',
             format: formatKey
         });
@@ -273,7 +271,7 @@ async function copyWithFormat(formatKey) {
 async function setDefaultFormat(formatKey) {
     try {
         // Save the new default format to storage
-        await browser.storage.sync.set({
+        await BrowserApi.getApi().storage.sync.set({
             defaultFormat: formatKey
         });
         
@@ -294,7 +292,7 @@ async function setDefaultFormat(formatKey) {
 async function updateDefaultIndicator() {
     try {
         // Get the default format setting
-        const settings = await browser.storage.sync.get({
+        const settings = await BrowserApi.getApi().storage.sync.get({
             defaultFormat: FancyLinkSettings.DEFAULT_SETTINGS.defaultFormat
         });
         
@@ -364,15 +362,15 @@ function showNotification(message, type = 'success') {
 async function handleHelpButtonClick() {
     try {
         // Get current settings to determine if we should include page info
-        const settings = await browser.storage.sync.get(['includeCurrentPageInBugReports']);
+        const settings = await BrowserApi.getApi().storage.sync.get(['includeCurrentPageInBugReports']);
         const includeCurrentPage = settings.includeCurrentPageInBugReports === true;
-        
+
         // Collect diagnostics information
         const diagnostics = await Diagnostics.collectDiagnostics(includeCurrentPage);
         const issueUrl = Diagnostics.generateGitHubIssueUrl(diagnostics);
-        
+
         // Open GitHub Issues in new tab
-        browser.tabs.create({ url: issueUrl });
+        BrowserApi.getApi().tabs.create({ url: issueUrl });
         window.close(); // Close popup after opening issue reporting
         
     } catch (error) {
@@ -383,12 +381,12 @@ async function handleHelpButtonClick() {
 
 async function handleVersionClick() {
     try {
-        const manifest = browser.runtime.getManifest();
+        const manifest = BrowserApi.getApi().runtime.getManifest();
         // Use version_name for the tag since that's what we tag releases with (e.g., "v1.5.0-rc1")
         // Only proceed if version_name exists to ensure we link to a valid release tag
         if (manifest && manifest.version_name) {
             const changelogUrl = `https://github.com/evanwon/fancy-links/releases/tag/v${manifest.version_name}`;
-            browser.tabs.create({ url: changelogUrl });
+            BrowserApi.getApi().tabs.create({ url: changelogUrl });
             window.close();
         }
     } catch (error) {
