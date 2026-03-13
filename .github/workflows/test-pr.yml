@@ -6,6 +6,7 @@ on:
     paths:
       - 'src/**'
       - 'test/**'
+      - 'manifests/**'
       - 'package*.json'
       - 'jest.config.js'
 
@@ -17,3 +18,4 @@ jobs:
       validate-versions: true
       security-audit-strict: true
       upload-coverage: true
+      chrome-enabled: true

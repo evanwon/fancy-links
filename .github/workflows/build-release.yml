@@ -49,4 +49,8 @@ jobs:
       submit-to-amo: ${{ github.event.inputs.submit_to_amo == 'true' }}
       channel: ${{ github.event.inputs.channel || 'listed' }}
       version-notes: ${{ github.event.inputs.version_notes || '' }}
+      chrome-enabled: true
+      cws-submission-enabled: ${{ vars.CWS_SUBMISSION_ENABLED == 'true' }}
+      cws-extension-id: ${{ vars.CWS_EXTENSION_ID }}
+      chrome-min-version: "102+"
     secrets: inherit

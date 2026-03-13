@@ -12,7 +12,7 @@
 | Phase 2: Build System | **Complete** | Depends on Phase 1 |
 | Phase 3: Chrome MV3 Manifest and Adaptation | **Complete** | All deliverables implemented in Phases 1-2 |
 | Phase 4: Chrome-Specific Testing and Polish | **Complete** | Chrome integration tests, browser-aware options UI |
-| Phase 5: CI/CD Pipeline for Chrome | Not Started | Depends on Phase 2, 3 |
+| Phase 5: CI/CD Pipeline for Chrome | **Implementation Complete** | Awaiting validation; changes in both `extension-workflows` (branch `chrome-ci-support`) and `fancy-links` (branch `chrome-support-phase1`) |
 | Phase 6: Chrome Web Store Preparation | Not Started | Depends on Phase 5 |
 
 ## Table of Contents
@@ -933,16 +933,36 @@ jobs:
       chrome-enabled: true
 ```
 
+### Implementation Notes
+
+**Deviation from plan**: The plan specified `npx extension-build --browser=chrome` but the `extension-build` CLI was never added to extension-workflows as a bin command. Phase 2 implemented the build as a local `tools/build.js` script instead. CI steps use `npm run build:chrome` (which maps to `node tools/build.js --browser=chrome`).
+
+**Changes made across two repos**:
+
+1. **`extension-workflows`** (branch `chrome-ci-support` off `master`):
+   - `build-release.yml`: 5 new opt-in inputs, 3 new secrets, 4 Chrome build/validate/ZIP/CWS steps, updated release notes and asset attachment
+   - `test-pr.yml`: 1 new input, 2 Chrome build/validate steps
+   - All new steps gated by `if: inputs.chrome-enabled` — zero impact on repos that don't opt in
+
+2. **`fancy-links`** (branch `chrome-support-phase1`):
+   - `build-release.yml`: Passes `chrome-enabled: true` and CWS variables
+   - `test-pr.yml`: Passes `chrome-enabled: true`, added `manifests/**` to paths filter
+
 ### Verification
 
+**Local verification (completed)**:
 ```bash
-# Locally: simulate CI steps
-npm test
-extension-build --browser=all
-web-ext lint --source-dir=build/firefox --warnings-as-errors  # Firefox only
+npm test                    # 278 tests pass
+npm run build:chrome        # Chrome build succeeds
+# All 4 YAML files validated with js-yaml
 ```
 
-To verify the CI pipeline end-to-end, push a branch to trigger the reusable workflows and confirm both Firefox and Chrome builds succeed. Verify that `goodreads-shelf-position-editor` (which does not pass `chrome-enabled: true`) is unaffected.
+**Remaining validation**:
+- [x] Review the extension-workflows diff on `chrome-ci-support` branch
+- [x] Merge `chrome-ci-support` into `master` in extension-workflows and tag v1.1.0 (moved floating `v1` tag)
+- [ ] Push fancy-links `chrome-support-phase1` branch and open PR to trigger `test-pr.yml` — confirm Chrome build + validate steps pass
+- [ ] Verify `goodreads-shelf-position-editor` CI is unaffected (no `chrome-enabled` input = all Chrome steps skipped)
+- [ ] Optionally: trigger a manual `workflow_dispatch` build to confirm the full build-release flow
 
 ---
 
