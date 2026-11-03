@@ -16,6 +16,19 @@ jobs:
     with:
       lint-warnings-as-errors: true
       validate-versions: true
-      security-audit-strict: true
+      # The audit reports every open advisory, so failing on it failed each fix PR while other alerts were open.
+      # It still runs and warns; dependency-review is the gate.
+      security-audit-strict: false
       upload-coverage: true
       chrome-enabled: true
+
+  # Fails a PR that adds a dependency with a moderate or worse advisory, whatever else is already open.
+  dependency-review:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: moderate
