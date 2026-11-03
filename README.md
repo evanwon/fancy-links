@@ -156,9 +156,13 @@ This project includes VSCode debugging configuration for the [Debugger for Firef
 ### Release Process
 
 #### Setup for AMO Submission (one-time)
-1. **Configure GitHub Secrets** (Settings → Secrets and variables → Actions → Secrets):
+1. **Put the AMO keys in the `release` environment** (Settings → Environments → `release`), which only `v*` tags
+   can deploy to, so no branch's workflow can read them:
    - `AMO_API_KEY`: Your AMO API issuer ID
    - `AMO_API_SECRET`: Your AMO API secret
+
+   To check them without releasing anything, run a dry run on a `v*-dryrun` tag (see
+   [browser-extension-workflows](https://github.com/evanwon/browser-extension-workflows#5-create-the-release-environment-and-its-secrets-optional)).
 
 2. **Configure GitHub Variables** (Settings → Secrets and variables → Actions → Variables):
    - `AMO_SUBMISSION_ENABLED`: Set to `true` to enable automatic AMO submission on tags
