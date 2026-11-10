@@ -12,6 +12,9 @@ on:
 
 jobs:
   test:
+    # The called workflow's one job only reads the code; this caps what it can be granted.
+    permissions:
+      contents: read
     uses: evanwon/browser-extension-workflows/.github/workflows/test-pr.yml@8f9220707e894952a30abf7fb1a1e4a057d2fd48 # v1.2.0
     with:
       lint-warnings-as-errors: true
