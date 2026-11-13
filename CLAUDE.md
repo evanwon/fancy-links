@@ -124,8 +124,7 @@ git tag v<version>    # Triggers automated GitHub Actions build
 git push origin v<version>
 ```
 
-**Note:** AMO submission is controlled by the `AMO_SUBMISSION_ENABLED` GitHub Variable.
-Set to `true` in repository settings to enable automatic submission to addons.mozilla.org.
+**Note:** AMO submission is controlled by the `AMO_SUBMISSION_ENABLED` GitHub Variable. Set to `true` in repository settings to enable automatic submission to addons.mozilla.org.
 
 ## Project Structure
 
